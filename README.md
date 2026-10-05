@@ -255,8 +255,3 @@ Local development → Git → GitHub → Cloudflare Pages → https://ops-handbo
 
 The site is live at [**ops-handbook-dvp.pages.dev**](https://ops-handbook-dvp.pages.dev/).
 The build is a plain static site, so no adapter or server runtime is required.
-
-## Repository
-
-Public repository: [`mustafammasoud/devops-atlas`](https://github.com/mustafammasoud/devops-atlas).
-No secrets or environment credentials are used or committed.
