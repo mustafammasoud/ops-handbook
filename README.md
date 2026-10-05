@@ -1,13 +1,23 @@
-# Ops Handbook
+<p align="center">
+  <a href="https://ops-handbook-dvp.pages.dev/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="public/logo/logo-dark.svg" />
+      <img src="public/logo/logo-light.svg" alt="Ops Handbook" width="280" />
+    </picture>
+  </a>
+</p>
 
-**Ops Handbook** is an open-source DevOps knowledge base and learning platform.
+<h1 align="center">Ops Handbook</h1>
+
+**Ops Handbook** is an open-source DevOps knowledge base and learning platform, live at
+[**ops-handbook-dvp.pages.dev**](https://ops-handbook-dvp.pages.dev/).
 It is not a blog: it is structured documentation, practical labs, diagrams, screenshots,
 code examples, troubleshooting notes and cheatsheets. The UI is English-only;
 individual articles may declare `language: ar` to render their content region
 as RTL for Arabic or mixed Arabic/English writing.
 
 All educational content lives as **Markdown/MDX files in this repository** (source of truth).
-The site is fully static and ready for Cloudflare Pages.
+The site is fully static and deployed on Cloudflare Pages.
 
 ## Stack
 
@@ -19,7 +29,7 @@ The site is fully static and ready for Cloudflare Pages.
 | Content    | Astro Content Collections (`glob` loader) + MDX     |
 | Diagrams   | Mermaid (lazy-loaded, client-side)                 |
 | Highlight  | Shiki (dual light/dark themes)                     |
-| Hosting    | Static build → Cloudflare Pages (later milestone)  |
+| Hosting    | Static build → [Cloudflare Pages](https://ops-handbook-dvp.pages.dev/)  |
 
 No backend, database, auth, CMS or React. Nothing that is not needed yet.
 
@@ -179,7 +189,7 @@ limitations) lives in [`docs-roadmap.md`](docs-roadmap.md).
    tags, URLs, tool names) is isolated LTR via CSS, and layout uses CSS logical properties
    (`ms-*`, `ps-*`, `border-inline-start`) so the same markup works in both directions.
 3. **Static output, no adapter** — `output: 'static'` so the `dist/` folder can be pushed
-   straight to Cloudflare Pages later (`git → GitHub → Cloudflare Pages`).
+   straight to Cloudflare Pages (`git → GitHub → Cloudflare Pages`).
 4. **Shiki dual themes** — `gruvbox-dark-medium` for both modes with
    `defaultColor: false`: code blocks are always dark terminal surfaces set into the
    warm paper UI, so dark mode is a CSS-only switch with no re-highlighting.
@@ -239,14 +249,14 @@ Usage rules:
 - Minimum size: 24 px for the mark; the favicon stays legible at 16 px.
 - Don’t stretch, rotate, recolor outside the palette (`#9a6b32` light / `#d0a45c` dark), or swap the route for other symbols.
 
-## Deployment (later)
+## Deployment
 
 ```text
-Local development → Git → GitHub → Cloudflare Pages → ops-handbook.pages.dev
+Local development → Git → GitHub → Cloudflare Pages → https://ops-handbook-dvp.pages.dev/
 ```
 
-Deployment is intentionally **not** configured in this milestone. The build is a plain
-static site, so no adapter or server runtime is required.
+The site is live at [**ops-handbook-dvp.pages.dev**](https://ops-handbook-dvp.pages.dev/).
+The build is a plain static site, so no adapter or server runtime is required.
 
 ## Repository
 
