@@ -64,7 +64,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    A["Application"] --> B["Pod 1 ❌"]
+    A["Application"] --> B["Pod 1 ✗"]
 ```
 
 خلاص، الـApplication اختفت من الـCluster.
@@ -90,7 +90,7 @@ flowchart TB
 
     R --> P1["Pod 1"]
     R --> P2["Pod 2"]
-    R --> P3["Pod 3 ❌"]
+    R --> P3["Pod 3 ✗"]
 
     P3 --> M["Missing"]
 ```
@@ -115,8 +115,8 @@ flowchart TB
 
     R --> P1["Pod 1"]
     R --> P2["Pod 2"]
-    R --> P3["Pod 3 ❌"]
-    R --> P4["Pod 4 ✅"]
+    R --> P3["Pod 3 ✗"]
+    R --> P4["Pod 4 ✓ "]
 ```
 
 فالنتيجة:
@@ -307,7 +307,7 @@ nginx-rs-p4m32
 لو واحدة اتمسحت:
 
 ```text
-nginx-rs-x7k91 ❌
+nginx-rs-x7k91 ✗
 ```
 
 الـReplicaSet مش بيقول:
@@ -392,10 +392,10 @@ flowchart TB
     R --> S
 
     subgraph Pods["Pods"]
-        P1["Pod 1<br/>app=nginx ✅"]
-        P2["Pod 2<br/>app=nginx ✅"]
-        P3["Pod 3<br/>app=nginx ✅"]
-        P4["Pod 4<br/>app=redis ❌"]
+        P1["Pod 1<br/>app=nginx ✓ "]
+        P2["Pod 2<br/>app=nginx ✓ "]
+        P3["Pod 3<br/>app=nginx ✓ "]
+        P4["Pod 4<br/>app=redis ✗"]
     end
 
     S --> P1
@@ -420,10 +420,10 @@ flowchart TB
 
     subgraph Pods["Pods"]
         direction TB
-        P1["app=nginx ✅"]
-        P2["app=nginx ✅"]
-        P3["app=nginx ✅"]
-        P4["app=redis ❌"]
+        P1["app=nginx ✓ "]
+        P2["app=nginx ✓ "]
+        P3["app=nginx ✓ "]
+        P4["app=redis ✗"]
     end
 
     S --> Pods
@@ -447,9 +447,9 @@ flowchart TB
 flowchart TB
     D["Desired = 3"]
 
-    D --> P1["Pod 1 ✅"]
-    D --> P2["Pod 2 ✅"]
-    D --> P3["Pod 3 ✅"]
+    D --> P1["Pod 1 ✓ "]
+    D --> P2["Pod 2 ✓ "]
+    D --> P3["Pod 3 ✓ "]
 ```
 
 حد عمل:
@@ -462,9 +462,9 @@ kubectl delete pod pod-2
 
 ```mermaid
 flowchart TB
-    P1["Pod 1 ✅"]
-    P2["Pod 2 ❌"]
-    P3["Pod 3 ✅"]
+    P1["Pod 1 ✓ "]
+    P2["Pod 2 ✗"]
+    P3["Pod 3 ✓ "]
 ```
 
 أصبح:
@@ -480,9 +480,9 @@ flowchart LR
 ```mermaid
 flowchart TB
     
-    P1["Pod 1 ✅"]
-    P2["Pod 2 ✅"]
-    P3["Pod 3 ✅"]
+    P1["Pod 1 ✓ "]
+    P2["Pod 2 ✓ "]
+    P3["Pod 3 ✓ "]
 ```
 
 فالـnumber رجع:
@@ -539,6 +539,7 @@ flowchart TB
     R --> P2["Pod 2 → Running"]
     R --> P3["Pod 3 → Running"]
 ```
+
 
 الـReplicaSet ممكن يعتبر الوضع مناسب.
 
@@ -736,7 +737,7 @@ flowchart TB
 
     RS --> P1["Pod 1"]
     RS --> P2["Pod 2"]
-    RS --> P3["Pod 3 ❌"]
+    RS --> P3["Pod 3 ✗"]
 
     P3 --> C["Current = 2"]
     C --> R["Reconciliation"]
@@ -796,13 +797,14 @@ flowchart TB
 
 الـReplicaSet يشوف:
 
+
 ```mermaid
 flowchart TB
     RS["ReplicaSet Selector<br/>app=nginx"]
 
-    RS --> A["Pod A<br/>Match ✅"]
-    RS --> B["Pod B<br/>Match ✅"]
-    RS --> C["Pod C<br/>Not Match ❌"]
+    RS --> A["Pod A<br/>Match ✓ "]
+    RS --> B["Pod B<br/>Match ✓ "]
+    RS --> C["Pod C<br/>Not Match ✗"]
 ```
 
 إذن:
@@ -818,10 +820,10 @@ flowchart LR
 flowchart TB
     RS["ReplicaSet"]
 
-    RS --> A["Pod A<br/>app=nginx ✅"]
-    RS --> B["Pod B<br/>app=nginx ✅"]
-    RS --> C["Pod C<br/>app=redis ❌"]
-    RS --> D["Pod D<br/>app=nginx ✅"]
+    RS --> A["Pod A<br/>app=nginx ✓ "]
+    RS --> B["Pod B<br/>app=nginx ✓ "]
+    RS --> C["Pod C<br/>app=redis ✗"]
+    RS --> D["Pod D<br/>app=nginx ✓ "]
 ```
 
 دلوقتي:
@@ -829,7 +831,7 @@ flowchart TB
 ```text
 flowchart LR
     D["Desired = 3"] --> C["Current = 3"]
-    C --> M["Match ✅"]
+    C --> M["Match ✓ "]
 ```
 
 الـReplicaSet وصل للـDesired State.

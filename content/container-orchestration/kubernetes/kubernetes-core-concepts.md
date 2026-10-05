@@ -98,14 +98,16 @@ flowchart TD
 
 في Kubernetes عندنا نوعين أساسيين من الـNodes من ناحية الـrole:
 
-```text
-Control Plane Nodes
-        │
-        └── Manage the Cluster
+```mermaid
+flowchart TB
+    C["Control Plane Nodes"] --> CM["Manage the Cluster"]
+    W["Worker Nodes"] --> RW["Run Workloads"]
 
-Worker Nodes
-        │
-        └── Run Workloads
+    classDef node fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef role fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C,W node;
+    class CM,RW role;
 ```
 
 ---
@@ -122,17 +124,31 @@ Worker Nodes
 
 في أغلب الـapplications البسيطة، الـPod بيكون فيه container واحد:
 
-```text
-Pod
-└── Container
+```mermaid
+flowchart TB
+    P["Pod"] --> C["Container"]
+
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class P pod;
+    class C container;
 ```
 
 لكن ممكن Pod يحتوي على multiple containers:
 
-```text
-Pod
-├── Main Container
-└── Sidecar Container
+```mermaid
+flowchart TB
+    P["Pod"]
+
+    P --> M["Main Container"]
+    P --> S["Sidecar Container"]
+
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class P pod;
+    class M,S container;
 ```
 
 الـcontainers الموجودة داخل نفس الـPod بتشارك نفس الـnetwork context وبعض الـresources زي volumes حسب configuration.
@@ -147,21 +163,36 @@ Pod
 
 الـContainer هو package/runtime environment للتطبيق.
 
-```text
-Container
-└── Application
+```mermaid
+flowchart TB
+    C["Container"] --> A["Application"]
+
+    classDef container fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef app fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C container;
+    class A app;
 ```
 
 ### Pod
 
 الـPod هو Kubernetes abstraction بيجمع container أو مجموعة containers مرتبطة ببعض.
 
-```text
-Pod
-│
-├── Container
-├── Container
-└── Shared Context
+```mermaid
+flowchart TB
+    P["Pod"]
+
+    P --> C1["Container"]
+    P --> C2["Container"]
+    P --> SC["Shared Context"]
+
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef shared fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class P pod;
+    class C1,C2 container;
+    class SC shared;
 ```
 
 العلاقة:
@@ -189,24 +220,32 @@ flowchart LR
 
 لو عندي application:
 
-```text
-Pod
-└── nginx
+```mermaid
+flowchart TB
+    P["Pod"] --> N["nginx"]
+
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef app fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class P pod;
+    class N app;
 ```
 
 ده instance واحدة من الـapplication.
 
 لو محتاج 3 instances:
 
-```text
-Pod 1
-└── nginx
+```mermaid
+flowchart TB
+    P1["Pod 1"] --> N1["nginx"]
+    P2["Pod 2"] --> N2["nginx"]
+    P3["Pod 3"] --> N3["nginx"]
 
-Pod 2
-└── nginx
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef app fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
 
-Pod 3
-└── nginx
+    class P1,P2,P3 pod;
+    class N1,N2,N3 app;
 ```
 
 كل Pod يعتبر **independent instance** من الـworkload.
@@ -292,12 +331,19 @@ flowchart TD
 
 بشكل مبسط:
 
-```text
-              Service
-                 │
-        ┌────────┼────────┐
-        ▼        ▼        ▼
-      Pod 1    Pod 2    Pod 3
+```mermaid
+flowchart TB
+    S["Service"]
+
+    S --> P1["Pod 1"]
+    S --> P2["Pod 2"]
+    S --> P3["Pod 3"]
+
+    classDef service fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef pod fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class S service;
+    class P1,P2,P3 pod;
 ```
 
 بدل ما الـclient يعرف الـIP بتاع كل Pod، يتعامل مع الـService.
@@ -414,10 +460,13 @@ flowchart TD
 
 وده بيساعدني أفصل:
 
-```text
-Application
-     +
-Configuration
+```mermaid
+flowchart LR
+    A["Application + Configuration"]
+
+    classDef app fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class A app;
 ```
 
 بدل ما أعمل container image مختلفة لكل environment.
@@ -492,14 +541,18 @@ flowchart TD
 
 مثلاً:
 
-```text
-Database Pod
-     │
-     ▼
-   Volume
-     │
-     ▼
- Persistent Data
+```mermaid
+flowchart TB
+    D["Database Pod"] --> V["Volume"]
+    V --> P["Persistent Data"]
+
+    classDef pod fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef volume fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef data fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D pod;
+    class V volume;
+    class P data;
 ```
 
 الـVolume بيفصل الـstorage عن lifecycle بتاع الـcontainer حسب نوع الـvolume.
@@ -624,12 +677,16 @@ flowchart TD
 
 أنا بدل ما أقول:
 
-```text
-Create Pod
-Start Container
-Restart if it fails
-Keep 3 copies
-Expose them
+```mermaid
+flowchart TB
+    C["Create Pod"] --> S["Start Container"]
+    S --> R["Restart if it fails"]
+    R --> K["Keep 3 Copies"]
+    K --> E["Expose Them"]
+
+    classDef action fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C,S,R,K,E action;
 ```
 
 بحدد الـdesired configuration:
@@ -640,11 +697,16 @@ replicas: 3
 
 وأحدد resources زي:
 
-```text
-Deployment
-Service
-ConfigMap
-Secret
+```mermaid
+flowchart LR
+    D["Deployment"]
+    S["Service"]
+    C["ConfigMap"]
+    SE["Secret"]
+
+    classDef resource fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D,S,C,SE resource;
 ```
 
 وبعدين Kubernetes components تتعامل مع الحالة المطلوبة.
@@ -683,11 +745,15 @@ flowchart TD
 
 والـnetworking layer:
 
-```text
-Service
-   │
-   ▼
-Pods
+```mermaid
+flowchart TB
+    S["Service"] --> P["Pods"]
+
+    classDef service fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef pod fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class S service;
+    class P pod;
 ```
 
 والـconfiguration/storage:

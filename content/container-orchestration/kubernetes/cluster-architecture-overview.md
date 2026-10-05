@@ -62,8 +62,6 @@ flowchart TD
     C3 --> D[Pods]
 ```
 
-
-
 ---
 
 
@@ -104,11 +102,15 @@ kubectl get pods
 
 الـ`kubectl` بيتكلم مع:
 
-```text
-kubectl
-   │
-   ▼
-kube-apiserver
+```mermaid
+flowchart TB
+    K["kubectl"] --> A["kube-apiserver"]
+
+    classDef client fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class K client;
+    class A api;
 ```
 
 والـAPI Server بعد كده بيتعامل مع باقي الـKubernetes Components.
@@ -141,26 +143,39 @@ flowchart TD
 
 مثلًا Kubernetes محتاج يعرف:
 
-```text
-What Nodes exist?
-What Pods exist?
-What Deployments exist?
-What is the desired state?
-What configuration exists?
+```mermaid
+flowchart TB
+    A["kube-apiserver"]
+
+    A --> N["What Nodes exist?"]
+    A --> P["What Pods exist?"]
+    A --> D["What Deployments exist?"]
+    A --> S["What is the Desired State?"]
+    A --> C["What Configuration exists?"]
+
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef query fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A api;
+    class N,P,D,S,C query;
 ```
 
 الـetcd بيخزن الـstate دي.
 
 بشكل مبسط:
 
-```text
-              kube-apiserver
-                    │
-                    ▼
-                  etcd
-                    │
-                    ▼
-             Cluster State
+```mermaid
+           flowchart TB
+    A["kube-apiserver"] --> E["etcd"]
+    E --> S["Cluster State"]
+
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef data fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef state fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A api;
+    class E data;
+    class S state;
 ```
 
 مثال:
@@ -209,8 +224,15 @@ flowchart TD
 
 يعني هو بيقول:
 
-```text
-"This Pod should run on Node B."
+```mermaid
+flowchart LR
+    D["Scheduler"] --> P["This Pod should run on Node B."]
+
+    classDef scheduler fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef decision fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D scheduler;
+    class P decision;
 ```
 
 وبعد كده الـWorker Node هي اللي تتولى تشغيله.
@@ -224,9 +246,15 @@ flowchart TD
 
 وظيفتها الأساسية إنها تفضل تقارن بين:
 
-```text             
-                      Compare
-      Desired State  ───────►  Current State
+```mermaid
+flowchart LR
+    D["Desired State"] --> C["Compare"] --> S["Current State"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef compare fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class D,S state;
+    class C compare;
 ```
 
 ولو في فرق، تحاول تصلحه.
@@ -247,15 +275,22 @@ flowchart TD
 
 الـController يلاحظ الفرق:
 
-```text
-Desired State = 3 Pods
-Current State = 2 Pods
-              │
-              ▼
-        Difference detected
-              │
-              ▼
-       Create another Pod
+```mermaid
+flowchart TB
+    D["Desired State<br/>3 Pods"]
+    C["Current State<br/>2 Pods"]
+
+    D --> X["Difference Detected"]
+    C --> X
+    X --> P["Create Another Pod"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef difference fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef action fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D,C state;
+    class X difference;
+    class P action;
 ```
 
 وده جزء أساسي من فكرة **Reconciliation** في Kubernetes.
@@ -440,8 +475,15 @@ flowchart TD
 
 لاحظ إن الـflow مش مجرد:
 
-```text
-User → Pod
+```mermaid
+flowchart LR
+    U["User"] --> P["Pod"]
+
+    classDef user fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef pod fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class U user;
+    class P pod;
 ```
 
 فيه مجموعة Components بتشتغل مع بعض علشان Kubernetes يحافظ على الـDesired State.
@@ -482,8 +524,15 @@ flowchart LR
 
 هو باستمرار بيحاول يخلي:
 
-```text
-Current State ≈ Desired State
+```mermaid
+flowchart LR
+    C["Current State"] --> M["≈"] --> D["Desired State"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef relation fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class C,D state;
+    class M relation;
 ```
 
 ---
