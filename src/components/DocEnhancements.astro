@@ -49,34 +49,61 @@
   // Code copy buttons + language badge ---------------------------------
   for (const pre of document.querySelectorAll<HTMLElement>('pre.astro-code')) {
     const language = pre.dataset.language;
+    if (language === 'mermaid') continue;
 
-    if (language && language !== 'mermaid' && !pre.querySelector('.code-lang')) {
+    // Header row above the code: language label at the start, Copy button
+    // at the end. A real flex row keeps them from ever overlapping.
+    let head = pre.querySelector<HTMLElement>('.code-head');
+    if (!head) {
+      head = document.createElement('div');
+      head.className = 'code-head';
+      pre.insertBefore(head, pre.firstChild);
+    }
+
+    if (language && !head.querySelector('.code-lang')) {
       const badge = document.createElement('span');
       badge.className = 'code-lang';
       badge.textContent = language;
-      pre.append(badge);
+      head.append(badge);
     }
 
-    if (language === 'mermaid') continue;
-    if (pre.querySelector('.code-copy')) continue;
+    if (head.querySelector('.code-copy')) continue;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'code-copy';
-    button.textContent = strings.copy;
+    button.dataset.tip = strings.copy;
     button.setAttribute('aria-label', strings.copyCode);
+    // Inline copy/check icons — no icon dependency. CSS swaps them via
+    // the button's .is-copied state.
+    button.innerHTML = `
+      <svg class="copy-icon copy-icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <svg class="copy-icon copy-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>`;
+    let resetTimer = 0;
     button.addEventListener('click', async () => {
       const code = pre.querySelector('code')?.textContent ?? '';
+      let success = true;
       try {
         await navigator.clipboard.writeText(code);
-        button.textContent = strings.copied;
       } catch {
-        button.textContent = strings.copyFailed;
+        success = false;
       }
-      window.setTimeout(() => {
-        button.textContent = strings.copy;
+      button.classList.toggle('is-copied', success);
+      button.classList.add('show-tip');
+      button.dataset.tip = success ? strings.copied : strings.copyFailed;
+      button.setAttribute('aria-label', success ? strings.copied : strings.copyFailed);
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        button.classList.remove('is-copied', 'show-tip');
+        button.dataset.tip = strings.copy;
+        button.setAttribute('aria-label', strings.copyCode);
       }, 2000);
     });
-    pre.append(button);
+    head.append(button);
   }
 
   // Responsive tables: wrap in a horizontal scroll container ------------

@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 // Ops Handbook is a fully static site so it can be deployed to Cloudflare Pages
 // (and any other static host) without an adapter.
 export default defineConfig({
-  site: 'https://ops-handbook.pages.dev',
+  site: 'https://ops-handbook-dvp.pages.dev',
   output: 'static',
   trailingSlash: 'ignore',
   integrations: [mdx()],

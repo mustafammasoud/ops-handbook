@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ops-handbook.pages.dev/sitemap.xml
+Sitemap: https://ops-handbook-dvp.pages.dev/sitemap.xml
