@@ -29,14 +29,18 @@ language: ar
 
 في البداية، ممكن يكون عندي application بسيطة:
 
-```text id="qk8q4f"
-        Application
-             │
-             ▼
-         Container
-             │
-             ▼
-           Server
+```mermaid
+     flowchart TB
+    A["Application"] --> C["Container"]
+    C --> S["Server"]
+
+    classDef app fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef server fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class A app;
+    class C container;
+    class S server;
 ```
 
 ممكن أشغل الـcontainer وأتابعه manually.
@@ -77,24 +81,36 @@ flowchart TD
 
 افترض إن عندي API شغالة في:
 
-```text id="m8r7v2"
-API
-│
-└── Container × 1
+```mermaid
+flowchart TB
+    A["API"] --> C["Container × 1"]
+
+    classDef app fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A app;
+    class C container;
 ```
 
 وفجأة الـtraffic زاد.
 
 محتاج:
 
-```text id="j3h7k9"
-API
-│
-├── Container
-├── Container
-├── Container
-├── Container
-└── Container
+```mermaid
+flowchart TB
+    A["API"]
+
+    A --> C1["Container"]
+    A --> C2["Container"]
+    A --> C3["Container"]
+    A --> C4["Container"]
+    A --> C5["Container"]
+
+    classDef app fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A app;
+    class C1,C2,C3,C4,C5 container;
 ```
 
 لو أنا بعمل ده manually، لازم أتابع:
@@ -123,27 +139,42 @@ flowchart LR
 
 افترض إن عندي:
 
-```text id="u2z8x4"
-Desired:
-3 application instances
+```mermaid
+flowchart TB
+    D["Desired:<br/>3 application instances"]
+    C["Current:<br/>3 instances"]
 
-Current:
-3 instances
+    D --> C
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class D,C state;
 ```
 
 واحد منهم وقع:
 
-```text id="7x3mqp"
-Instance 1 → Running
-Instance 2 → Failed
-Instance 3 → Running
+```mermaid
+flowchart TB
+    I1["Instance 1<br/>Running"]
+    I2["Instance 2<br/>Failed"]
+    I3["Instance 3<br/>Running"]
+
+    classDef running fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef failed fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class I1,I3 running;
+    class I2 failed;
 ```
 
 بقى عندي:
 
-```text id="b1v6cn"
-Desired = 3
-Current = 2
+```mermaid
+flowchart LR
+    D["Desired = 3"] --> C["Current = 2"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class D,C state;
 ```
 
 لو أنا مسؤول عن الـsystem manually، لازم أكتشف المشكلة وأعمل recovery.
@@ -218,14 +249,18 @@ flowchart LR
 
 ممكن يكون عندي:
 
-```text id="v2m7xq"
-Frontend
-   │
-   ▼
-Backend API
-   │
-   ▼
-Database
+```mermaid
+flowchart TB
+    F["Frontend"] --> B["Backend API"]
+    B --> D["Database"]
+
+    classDef frontend fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef backend fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef database fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class F frontend;
+    class B backend;
+    class D database;
 ```
 
 وكل جزء ممكن يكون running في مكان مختلف داخل الـcluster.
@@ -267,37 +302,58 @@ Version 2.0
 
 محتاج update تدريجي:
 
-```text id="f9q3lz"
-Version 1.0
-│
-├── Instance 1
-├── Instance 2
-├── Instance 3
-└── Instance 4
+```mermaid
+flowchart TB
+    V["Version 1.0"]
+
+    V --> I1["Instance 1"]
+    V --> I2["Instance 2"]
+    V --> I3["Instance 3"]
+    V --> I4["Instance 4"]
+
+    classDef version fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef instance fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class V version;
+    class I1,I2,I3,I4 instance;
 ```
 
 ثم:
 
-```text id="r8v2nd"
-Version 1.0
-│
-├── Instance 1
-├── Instance 2
-│
-Version 2.0
-├── Instance 3
-└── Instance 4
+```mermaid
+flowchart TB
+    V1["Version 1.0"]
+    V2["Version 2.0"]
+
+    V1 --> I1["Instance 1"]
+    V1 --> I2["Instance 2"]
+
+    V2 --> I3["Instance 3"]
+    V2 --> I4["Instance 4"]
+
+    classDef version fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef instance fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class V1,V2 version;
+    class I1,I2,I3,I4 instance;
 ```
 
 وبعدها:
 
-```text id="h3k6pw"
-Version 2.0
-│
-├── Instance 1
-├── Instance 2
-├── Instance 3
-└── Instance 4
+```mermaid
+flowchart TB
+    V["Version 2.0"]
+
+    V --> I1["Instance 1"]
+    V --> I2["Instance 2"]
+    V --> I3["Instance 3"]
+    V --> I4["Instance 4"]
+
+    classDef version fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef instance fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class V version;
+    class I1,I2,I3,I4 instance;
 ```
 
 ف Kubernetes يدعم **Rolling Updates** لمساعدتي في تحديث الـworkloads تدريجيًا.
@@ -331,11 +387,15 @@ replicas: 3
 
 أنا هنا بحدد:
 
-```text id="w7n4kc"
-Desired State
-     │
-     ▼
-3 application instances
+```mermaid
+flowchart TB
+    D["Desired State"] --> I["3 Application Instances"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef instance fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D state;
+    class I instance;
 ```
 
 و Kubernetes يقارن الـdesired state بالـcurrent state ويحاول يحافظ على التطابق بينهم.
@@ -360,14 +420,14 @@ flowchart TD
 
 مثلاً:
 
-```text id="c8m4qz"
-Application A
-CPU:    500m
-Memory: 256Mi
+```mermaid
+flowchart TB
+    A["Application A<br/>CPU: 500m<br/>Memory: 256Mi"]
+    B["Application B<br/>CPU: 2 CPU<br/>Memory: 2Gi"]
 
-Application B
-CPU:    2 CPU
-Memory: 2Gi
+    classDef app fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A,B app;
 ```
 
 لو أنا عندي مجموعة Nodes، لازم Kubernetes يعرف احتياجات الـworkloads عشان يقدر يقرر فين تتشغل.
@@ -397,11 +457,15 @@ flowchart TD
 
 في production، غالبًا مش عايز application تعتمد على:
 
-```text id="n8q3vt"
-        Single Server
-             │
-             ▼
-        Application
+```mermaid
+  flowchart TB
+    S["Single Server"] --> A["Application"]
+
+    classDef server fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef app fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class S server;
+    class A app;
 ```
 
 لأن لو الـserver وقع، الـapplication ممكن تتأثر.
@@ -426,20 +490,22 @@ flowchart TD
 
 ممكن ألخص المشكلة كلها في المقارنة دي:
 
-```text id="m4x7qz"
-Without Orchestration
+```mermaid
+flowchart TB
+    W["Without Orchestration"]
 
-Deploy manually
-     ↓
-Scale manually
-     ↓
-Monitor manually
-     ↓
-Recover manually
-     ↓
-Update manually
-     ↓
-Manage networking manually
+    W --> D["Deploy Manually"]
+    D --> S["Scale Manually"]
+    S --> M["Monitor Manually"]
+    M --> R["Recover Manually"]
+    R --> U["Update Manually"]
+    U --> N["Manage Networking Manually"]
+
+    classDef root fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef manual fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class W root;
+    class D,S,M,R,U,N manual;
 ```
 
 مع Kubernetes:
@@ -470,30 +536,36 @@ flowchart TD
 
 يهتم بشكل أساسي بـ:
 
-```text id="d8x3qp"
-Run Container
-Stop Container
-Manage Container
+```mermaid
+flowchart LR
+    R["Run Container"]
+    S["Stop Container"]
+    M["Manage Container"]
+
+    classDef action fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class R,S,M action;
 ```
 
 ### Kubernetes
 
 يهتم بمستوى أعلى:
 
-```text id="f2k7vm"
-Deploy Workloads
-       ↓
-Schedule Workloads
-       ↓
-Scale
-       ↓
-Networking
-       ↓
-Health / Recovery
-       ↓
-Updates
-       ↓
-Desired State
+```mermaid
+flowchart TB
+    D["Deploy Workloads"] --> S["Schedule Workloads"]
+    S --> SC["Scale"]
+    SC --> N["Networking"]
+    N --> H["Health / Recovery"]
+    H --> U["Updates"]
+    U --> DS["Desired State"]
+
+    classDef process fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class D,S,SC,N,H,U process;
+    class DS state;
+
 ```
 
 فالعلاقة مش:
@@ -504,14 +576,18 @@ Docker OR Kubernetes
 
 لكن أقرب إلى:
 
-```text
-Kubernetes
-    │
-    ▼
-Container Runtime
-    │
-    ▼
-Containers
+```mermaid
+flowchart TB
+    K["Kubernetes"] --> R["Container Runtime"]
+    R --> C["Containers"]
+
+    classDef k8s fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef runtime fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class K k8s;
+    class R runtime;
+    class C container;
 ```
 
 ---
@@ -522,14 +598,18 @@ Containers
 
 لو عندي:
 
-```text
-Small Application
-      │
-      ▼
-One Server
-      │
-      ▼
-Few Containers
+```mermaid
+flowchart TB
+    A["Small Application"] --> S["One Server"]
+    S --> C["Few Containers"]
+
+    classDef app fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef server fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef container fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class A app;
+    class S server;
+    class C container;
 ```
 
 ممكن Kubernetes يكون unnecessary complexity.

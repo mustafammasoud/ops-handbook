@@ -154,12 +154,13 @@ I want 3 running instances.
 
 Kubernetes بيقارن بين:
 
-```text
-Desired State
-      │
-      │
-      ▼
-Current State
+```mermaid
+flowchart TB
+    D["Desired State"] --> C["Current State"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class D,C state;
 ```
 
 ولو فيه difference، Kubernetes بيحاول يعمل changes للوصول للحالة المطلوبة.
@@ -181,22 +182,19 @@ flowchart TD
 
 بدون Kubernetes، ممكن تكون مسؤول عن حاجات كتير manually:
 
-```text
-Deploy
-  ↓
-Start Containers
-  ↓
-Check Health
-  ↓
-Replace Failed Containers
-  ↓
-Scale
-  ↓
-Configure Networking
-  ↓
-Update Application
-  ↓
-Monitor
+```mermaid
+flowchart TB
+    D["Deploy"] --> SC["Start Containers"]
+    SC --> H["Check Health"]
+    H --> R["Replace Failed Containers"]
+    R --> S["Scale"]
+    S --> N["Configure Networking"]
+    N --> U["Update Application"]
+    U --> M["Monitor"]
+
+    classDef process fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class D,SC,H,R,S,N,U,M process;
 ```
 
 ف Kubernetes بيقدم mechanisms تساعد في أتمتة العمليات دي.
@@ -339,9 +337,13 @@ flowchart TD
 
 لو واحد من الـPods اختفى:
 
-```text
-Desired = 3
-Current = 2
+```mermaid
+flowchart LR
+    D["Desired = 3"] --> C["Current = 2"]
+
+    classDef state fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class D,C state;
 ```
 
 ف Kubernetes يلاحظ إن الـcurrent state مش مطابق للـdesired state، ويبدأ mechanisms لتحقيق الحالة المطلوبة.
@@ -364,11 +366,15 @@ flowchart TD
 
 يعني بدل ما أقول:
 
-```text
-1. Start container
-2. Start another container
-3. If one dies, start it again
-4. Keep 3 instances running
+```mermaid
+flowchart TB
+    S1["1. Start Container"] --> S2["2. Start Another Container"]
+    S2 --> R["3. If One Dies<br/>Start It Again"]
+    R --> K["4. Keep 3 Instances Running"]
+
+    classDef process fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class S1,S2,R,K process;
 ```
 
 أنا بحدد الـdesired state:

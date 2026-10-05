@@ -237,16 +237,24 @@ kind create cluster --name devops-lab
 
 بعد التنفيذ، kind يقوم بإنشاء:
 
-```text
-devops-lab
+```mermaid
+flowchart TB
+    L["devops-lab"] --> C["Kubernetes Cluster"]
+    C --> CP["Control Plane Node"]
 
-┌─────────────────────┐
-│ Control Plane Node  │
-│                     │
-│ Kubernetes API      │
-│ Scheduler           │
-│ Controller Manager  │
-└─────────────────────┘
+    CP --> API["Kubernetes API"]
+    CP --> S["Scheduler"]
+    CP --> CM["Controller Manager"]
+
+    classDef lab fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef node fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+
+    class L lab;
+    class C cluster;
+    class CP node;
+    class API,S,CM component;
 ```
 
 ---
@@ -462,14 +470,19 @@ kubectl describe pod pod-name
 
 ملف kubeconfig يحتوي على 3 أجزاء رئيسية:
 
-```text
-kubeconfig
+```mermaid 
+flowchart TB
+    K["kubeconfig"]
 
-├── clusters
-│
-├── users
-│
-└── contexts
+    K --> C["clusters"]
+    K --> U["users"]
+    K --> X["contexts"]
+
+    classDef root fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef item fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class K root;
+    class C,U,X item;
 ```
 
 ---
@@ -556,14 +569,19 @@ A --> D[Namespace]
 
 في بيئة العمل ممكن يكون عندك:
 
-```text
-Kubernetes Clusters
+```mermaid
+flowchart TB
+    K["Kubernetes Clusters"]
 
-├── Development Cluster
-│
-├── Staging Cluster
-│
-└── Production Cluster
+    K --> D["Development Cluster"]
+    K --> S["Staging Cluster"]
+    K --> P["Production Cluster"]
+
+    classDef root fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef cluster fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class K root;
+    class D,S,P cluster;
 ```
 
 ولا تريد بالخطأ تنفيذ أمر على Production.
@@ -666,10 +684,15 @@ kubectx
 
 Example:
 
-```text
-kind-devops-lab
-staging
-production
+```mermaid
+flowchart TB
+    K["kind-devops-lab"]
+    S["staging"]
+    P["production"]
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+
+    class K,S,P cluster;
 ```
 
 ---
@@ -680,21 +703,21 @@ production
 
 مثال:
 
-```text
-Developer
+```mermaid
+flowchart TB
+    D["Developer"] --> K["Kubernetes Clusters"]
 
-      |
-      |
+    K --> DEV["Dev Cluster"]
+    K --> STG["Staging Cluster"]
+    K --> PROD["Production Cluster"]
 
-+----------------+
+    classDef developer fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef root fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef cluster fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
 
-Dev Cluster
-
-Staging Cluster
-
-Production Cluster
-
-+----------------+
+    class D developer;
+    class K root;
+    class DEV,STG,PROD cluster;
 ```
 
 استخدام `kubectx` يقلل:
@@ -717,14 +740,19 @@ Production Cluster
 
 مثال:
 
-```text
-Kubernetes Cluster
+```mermaid 
+flowchart TB
+    K["Kubernetes Cluster"]
 
-├── development
-│
-├── staging
-│
-└── production
+    K --> D["development"]
+    K --> S["staging"]
+    K --> P["production"]
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef environment fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class K cluster;
+    class D,S,P environment;
 ```
 
 ---
@@ -733,27 +761,42 @@ Kubernetes Cluster
 
 بدل أن تكون كل الـ Applications في مكان واحد:
 
-```text
-Cluster
+```mermaid
+flowchart TB
+    C["Cluster"]
 
-├── nginx
-├── database
-├── monitoring
+    C --> N["nginx"]
+    C --> D["database"]
+    C --> M["monitoring"]
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C cluster;
+    class N,D,M workload;
 ```
 
 نقسمها:
 
-```text
-Cluster
+```mermaid
+flowchart TB
+    C["Cluster"]
 
-├── dev
-│   └── nginx
-│
-├── staging
-│   └── nginx
-│
-└── production
-    └── nginx
+    C --> DEV["dev"]
+    C --> STG["staging"]
+    C --> PROD["production"]
+
+    DEV --> DN["nginx"]
+    STG --> SN["nginx"]
+    PROD --> PN["nginx"]
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef environment fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C cluster;
+    class DEV,STG,PROD environment;
+    class DN,SN,PN workload;
 ```
 
 ---
