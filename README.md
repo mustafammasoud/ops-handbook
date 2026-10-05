@@ -7,8 +7,6 @@
   </a>
 </p>
 
-<h1 align="center">Ops Handbook</h1>
-
 **Ops Handbook** is an open-source DevOps knowledge base and learning platform, live at
 [**ops-handbook-dvp.pages.dev**](https://ops-handbook-dvp.pages.dev/).
 It is not a blog: it is structured documentation, practical labs, diagrams, screenshots,
