@@ -14,6 +14,7 @@ import ArticleFeedback from '../components/ArticleFeedback.astro';
 import { categoryLabel, getCategory, toolLabel, levelLabel } from '../data/categories';
 import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
 import { githubEditUrl, githubFeedbackIssueUrl } from '../utils/github';
+import { readingMinutes, lastModified } from '../utils/metadata';
 import type { CollectionEntry } from 'astro:content';
 
 interface Heading {
@@ -61,15 +62,20 @@ const groupKey = groupTool ? `${category}/${groupTool}` : category;
 const progressKey = `ops-handbook:progress:${groupKey}`;
 const pathRoutes = groupDocs.map((doc) => docPath(doc.id));
 
-// Last updated: from the article's frontmatter `date` only. Omitted when
-// absent — a date is never invented or relabelled.
-const lastUpdated = entry.data.date
+// Shared article metadata — computed centrally for every document that
+// renders through this layout (no per-article configuration):
+//   * reading time from the article's actual body,
+//   * last-updated from Git/build file metadata (frontmatter `date` only
+//     as a fallback, file mtime as last resort — see utils/metadata.ts).
+const minutes = readingMinutes(entry.body);
+const updatedAt = lastModified(entry.filePath, entry.data.date);
+const lastUpdated = updatedAt
   ? new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
       timeZone: 'UTC',
-    }).format(entry.data.date)
+    }).format(updatedAt)
   : null;
 
 // Current area, reused by the collapsed sidebar rail for context.
@@ -216,11 +222,14 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
           </span>
           <span aria-hidden="true"> · </span>
           <span>{levelLabel(level)}</span>
+          <span aria-hidden="true"> · </span>
+          <span lang="en">{`${minutes} min read`}</span>
         </p>
         {
-          lastUpdated && (
+          lastUpdated && updatedAt && (
             <p class="mb-2 text-sm text-muted" lang="en">
-              {`Last updated · ${lastUpdated}`}
+              Last updated ·{' '}
+              <time datetime={updatedAt.toISOString()}>{lastUpdated}</time>
             </p>
           )
         }
