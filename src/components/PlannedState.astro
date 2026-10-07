@@ -1,0 +1,61 @@
+---
+/**
+ * Shared Planned / Coming Soon empty state for the documentation system.
+ *
+ * Rendered automatically by the shared layer (area pages, tool landing
+ * pages, article pages) whenever a section has no published content yet —
+ * never configured per area, tool, or article.
+ */
+interface Props {
+  /** Display name of the empty area, tool, or topic. */
+  name: string;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+---
+
+<section
+  class:list={[
+    'mt-10 max-w-2xl rounded-md border border-border bg-surface p-6 text-center sm:p-8',
+    className,
+  ]}
+>
+  <p class="eyebrow" lang="en">Planned</p>
+  <h2
+    class="mt-3 text-xl font-semibold leading-snug tracking-tight"
+    lang="en"
+  >
+    {name}
+  </h2>
+  <p
+    class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted"
+    lang="en"
+  >
+    This section is planned for a future release of Ops Handbook.
+  </p>
+  <p
+    class="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-muted"
+    lang="en"
+  >
+    Content will be added progressively as the documentation grows.
+  </p>
+  <div class="mt-5 flex flex-wrap justify-center gap-3 text-sm">
+    <a
+      href="/docs"
+      class="rounded-md border border-border bg-bg px-3.5 py-2 font-medium transition-colors hover:border-accent/50 hover:text-accent-ink"
+      lang="en"
+    >
+      Browse available documentation
+    </a>
+    <a
+      href="https://github.com/mustafammasoud/ops-handbook/blob/main/docs-roadmap.md"
+      target="_blank"
+      rel="noopener"
+      class="rounded-md px-3.5 py-2 font-medium text-muted transition-colors hover:text-accent-ink"
+      lang="en"
+    >
+      Content roadmap ↗
+    </a>
+  </div>
+</section>

@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { categoryLabel, toolLabel } from '../data/categories';
-import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
+import { docCategory, docPath, docTool, sortedDocs, isPlaceholderText } from '../utils/docs';
 
 interface Props {
   /** The document currently being read — related items share at least one tag. */
@@ -35,7 +35,7 @@ const related = sortedDocs(await getCollection('docs', ({ data }) => !data.draft
                 {tool ? ` · ${toolLabel(tool)}` : ''}
               </span>
               <span class="mt-1 block text-sm font-medium leading-snug">{doc.data.title}</span>
-              {doc.data.description && (
+              {doc.data.description && !isPlaceholderText(doc.data.description) && (
                 <p class="mt-1 text-xs leading-relaxed text-muted line-clamp-2">
                   {doc.data.description}
                 </p>

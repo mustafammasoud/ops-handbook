@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import TopicList from '../../../components/TopicList.astro';
+import PlannedState from '../../../components/PlannedState.astro';
 import {
   categoryLabel,
   canonicalCategoryId,
@@ -12,20 +13,27 @@ import { docCategory, docTool, sortedDocs, topicCount } from '../../../utils/doc
 
 /**
  * Tool landing page: `/docs/<area>/<tool>` — one per (area, tool) pair that
- * actually has articles. Derived entirely from the content collection, so a
- * new tool appears the moment its first article is committed.
+ * exists in the content hierarchy. Derived entirely from the content
+ * collection, so a new tool appears the moment its first article exists.
+ *
+ * Draft entries participate in routing (so a draft-only tool gets a page)
+ * but never count as published: a tool with no published content
+ * automatically renders the shared Planned / Coming Soon state.
  */
 export async function getStaticPaths() {
-  const docs = await getCollection('docs', ({ data }) => !data.draft);
-  const groups = new Map<string, { area: string; tool: string; docs: typeof docs }>();
+  const all = await getCollection('docs');
+  const publishedIds = new Set(
+    (await getCollection('docs', ({ data }) => !data.draft)).map((doc) => doc.id),
+  );
+  const groups = new Map<string, { area: string; tool: string; docs: typeof all }>();
 
-  for (const doc of docs) {
+  for (const doc of all) {
     const tool = docTool(doc);
     if (!tool) continue;
     const area = docCategory(doc);
-    const key = `${area}\u0000${tool}`;
+    const key = JSON.stringify([area, tool]);
     const group = groups.get(key) ?? { area, tool, docs: [] };
-    group.docs.push(doc);
+    if (publishedIds.has(doc.id)) group.docs.push(doc);
     groups.set(key, group);
   }
 
@@ -42,8 +50,11 @@ const areaId = canonicalCategoryId(area!);
 const areaName = categoryLabel(areaId);
 const toolName = toolLabel(tool!);
 const count = topicCount(docs.length);
+const planned = docs.length === 0;
 
-const descriptionEn = `Documentation for ${toolName} in ${areaName} — concepts, guides, and practical references from the Ops Handbook.`;
+const descriptionEn = planned
+  ? `The ${toolName} section of the Ops Handbook is planned for a future release.`
+  : `Documentation for ${toolName} in ${areaName} — concepts, guides, and practical references from the Ops Handbook.`;
 
 const pageTitle = `${toolName} | Ops Handbook`;
 ---
@@ -92,20 +103,37 @@ const pageTitle = `${toolName} | Ops Handbook`;
       </p>
 
       <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
-        <span class="tabular-nums">{count}</span>
+        {
+          planned ? (
+            <span
+              class="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs text-muted"
+              lang="en"
+            >
+              Planned
+            </span>
+          ) : (
+            <span class="tabular-nums">{count}</span>
+          )
+        }
         <span aria-hidden="true">·</span>
         <span lang="en">{areaName}</span>
       </p>
     </header>
 
-    <section class="mt-10" aria-labelledby="topics-heading">
-      <h2
-        id="topics-heading"
-        class="mb-4 text-lg font-semibold"
-      >
-        Topics
-      </h2>
-      <TopicList docs={docs} />
-    </section>
+    {
+      planned ? (
+        <PlannedState name={toolName} />
+      ) : (
+        <section class="mt-10" aria-labelledby="topics-heading">
+          <h2
+            id="topics-heading"
+            class="mb-4 text-lg font-semibold"
+          >
+            Topics
+          </h2>
+          <TopicList docs={docs} />
+        </section>
+      )
+    }
   </main>
 </BaseLayout>

@@ -85,6 +85,28 @@ export function articleCount(count: number): string {
 export const topicCount = articleCount;
 
 /**
+ * Generic placeholder copy ("Content coming soon." and close variants) —
+ * it signals a planned topic, not published content.
+ */
+export function isPlaceholderText(text: string | null | undefined): boolean {
+  if (!text) return false;
+  const normalized = text.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  return normalized === 'contentcomingsoon' || normalized === 'comingsoon';
+}
+
+/**
+ * Whether a topic entry carries actual published content. Drafts are
+ * excluded by callers upstream; a non-draft file still counts as planned
+ * when its body is empty or only the generic placeholder copy. The shared
+ * documentation layer uses this to render the Planned / Coming Soon state
+ * automatically — no per-article flags, text, or configuration.
+ */
+export function hasPublishedContent(entry: Doc): boolean {
+  const body = entry.body?.trim();
+  return Boolean(body) && !isPlaceholderText(body);
+}
+
+/**
  * Comparator for sorting articles by recency.
  * Priority:
  * 1. Explicit frontmatter `date` (descending: newest first).

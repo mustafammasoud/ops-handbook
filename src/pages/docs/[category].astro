@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import CategoryIcon from '../../components/CategoryIcon.astro';
 import TopicList from '../../components/TopicList.astro';
+import PlannedState from '../../components/PlannedState.astro';
 import {
   categories,
   getCategory,
@@ -16,11 +17,12 @@ import { docCategory, docTool, sortedDocs, topicCount } from '../../utils/docs';
 
 export async function getStaticPaths() {
   // Every registered category gets a page (even while empty/planned),
-  // plus any category id that only exists in content frontmatter.
-  const docs = await getCollection('docs', ({ data }) => !data.draft);
+  // plus any category id that only appears in content frontmatter —
+  // including draft-only content, which never counts as published but
+  // still marks the area as existing.
   const ids = new Set<string>([
     ...categories.map((category) => category.id),
-    ...docs.map((doc) => docCategory(doc)),
+    ...(await getCollection('docs')).map((doc) => docCategory(doc)),
   ]);
   return [...ids].map((category) => ({ params: { category } }));
 }
@@ -152,30 +154,7 @@ const pageTitle = `${label} | Ops Handbook`;
 
     {
       count === 0 ? (
-        <section class="mt-10 max-w-2xl rounded-md border border-border bg-surface p-8 text-center">
-          <p class="font-medium">
-            No topics yet
-          </p>
-          <p class="mt-2 text-sm leading-relaxed text-muted">
-            This section is planned in the content roadmap and will be filled in gradually.
-          </p>
-          <div class="mt-5 flex flex-wrap justify-center gap-3 text-sm">
-            <a
-              href="/docs"
-              class="rounded-md border border-border bg-bg px-3.5 py-2 font-medium transition-colors hover:border-accent/50 hover:text-accent-ink"
-            >
-              Browse available documentation
-            </a>
-            <a
-              href="https://github.com/mustafammasoud/ops-handbook/blob/main/docs-roadmap.md"
-              target="_blank"
-              rel="noopener"
-              class="rounded-md px-3.5 py-2 font-medium text-muted transition-colors hover:text-accent-ink"
-            >
-              Content roadmap ↗
-            </a>
-          </div>
-        </section>
+        <PlannedState name={label} />
       ) : (
         <>
           {

@@ -8,11 +8,12 @@ import DocEnhancements from '../components/DocEnhancements.astro';
 import MermaidRuntime from '../components/MermaidRuntime.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
 import RelatedTopics from '../components/RelatedTopics.astro';
+import PlannedState from '../components/PlannedState.astro';
 import CategoryIcon from '../components/CategoryIcon.astro';
 import ArticleActions from '../components/ArticleActions.astro';
 import ArticleFeedback from '../components/ArticleFeedback.astro';
 import { categoryLabel, getCategory, toolLabel, levelLabel } from '../data/categories';
-import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
+import { docCategory, docPath, docTool, sortedDocs, hasPublishedContent } from '../utils/docs';
 import { githubEditUrl, githubFeedbackIssueUrl } from '../utils/github';
 import { readingMinutes, lastModified } from '../utils/metadata';
 import type { CollectionEntry } from 'astro:content';
@@ -69,6 +70,11 @@ const pathRoutes = groupDocs.map((doc) => docPath(doc.id));
 //     as a fallback, file mtime as last resort — see utils/metadata.ts).
 const minutes = readingMinutes(entry.body);
 const updatedAt = lastModified(entry.filePath, entry.data.date);
+// A topic without real content (empty body or generic placeholder copy) is
+// still planned: the shared layer renders the Planned / Coming Soon state
+// instead of article content, metadata, and description — automatically,
+// with no per-article configuration.
+const hasContent = hasPublishedContent(entry);
 const lastUpdated = updatedAt
   ? new Intl.DateTimeFormat('en-US', {
       month: 'short',
@@ -222,11 +228,17 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
           </span>
           <span aria-hidden="true"> · </span>
           <span>{levelLabel(level)}</span>
-          <span aria-hidden="true"> · </span>
-          <span lang="en">{`${minutes} min read`}</span>
+          {
+            hasContent && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span lang="en">{`${minutes} min read`}</span>
+              </>
+            )
+          }
         </p>
         {
-          lastUpdated && updatedAt && (
+          hasContent && lastUpdated && updatedAt && (
             <p class="mb-2 text-sm text-muted" lang="en">
               Last updated ·{' '}
               <time datetime={updatedAt.toISOString()}>{lastUpdated}</time>
@@ -235,7 +247,7 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
         }
         <h1 class="text-2xl font-semibold leading-snug tracking-tight sm:text-3xl">{title}</h1>
         {
-          description && (
+          description && hasContent && (
             <p class="mt-3 max-w-3xl text-muted leading-relaxed">{description}</p>
           )
         }
@@ -257,10 +269,17 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
 
       <ArticleActions editUrl={editUrl} shareUrl={canonicalUrl} shareTitle={title} />
 
-      <!-- The document region owns its language and text direction. -->
-      <article class="prose max-w-3xl" dir={dir} lang={language}>
-        <slot />
-      </article>
+      <!-- The document region owns its language and text direction. Planned
+           topics (no published content) show the shared empty state instead. -->
+      {
+        hasContent ? (
+          <article class="prose max-w-3xl" dir={dir} lang={language}>
+            <slot />
+          </article>
+        ) : (
+          <PlannedState name={title} />
+        )
+      }
 
       <ArticleFeedback issueUrl={issueUrl} />
 

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { docPath, docTool } from '../utils/docs';
+import { docPath, docTool, isPlaceholderText } from '../utils/docs';
 import { toolLabel, levelLabel } from '../data/categories';
 
 type Doc = CollectionEntry<'docs'>;
@@ -31,7 +31,7 @@ const { docs, showOrder = true, showTool = false } = Astro.props;
             </span>
             <span class="min-w-0">
               <span class="block font-medium">{doc.data.title}</span>
-              {doc.data.description && (
+              {doc.data.description && !isPlaceholderText(doc.data.description) && (
                 <span class="mt-0.5 block truncate text-sm text-muted">
                   {doc.data.description}
                 </span>
