@@ -9,6 +9,7 @@
 <button
   type="button"
   id="search-trigger"
+  data-search-trigger
   class="flex h-11 w-auto items-center gap-2 rounded-full border border-border bg-bg px-3.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-text sm:h-9 sm:w-full sm:rounded-md sm:px-3"
   aria-haspopup="dialog"
   aria-controls="search-dialog"
@@ -351,6 +352,12 @@
     }
 
     trigger!.addEventListener('click', openDialog);
+    // Shared API: any element marked [data-search-trigger] (e.g. the 404
+    // page's recovery action) opens this same dialog — never a second
+    // search experience.
+    document.querySelectorAll<HTMLElement>('[data-search-trigger]').forEach((el) => {
+      if (el !== trigger) el.addEventListener('click', openDialog);
+    });
     closeButton?.addEventListener('click', () => dialog!.close());
     dialog!.addEventListener('click', (event) => {
       if (event.target === dialog) dialog!.close();

@@ -1,26 +1,112 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+
+/**
+ * Recovery links — every href verified against the built site:
+ * `/docs/<area>` (area landing), `/docs/<area>/<tool>` (tool landing),
+ * `/docs/<area>/<topic>` (article).
+ */
+const recoveryLinks = [
+  {
+    href: '/',
+    title: 'Home',
+    description: 'The handbook overview and latest articles.',
+  },
+  {
+    href: '/docs',
+    title: 'All documentation',
+    description: 'Every documentation area in one place.',
+  },
+  {
+    href: '/docs/devops-fundamentals',
+    title: 'DevOps Fundamentals',
+    description: 'Area — core principles, delivery lifecycle, and CI/CD concepts.',
+  },
+  {
+    href: '/docs/container-orchestration/kubernetes',
+    title: 'Kubernetes',
+    description: 'Tool — architecture, workloads, networking, and scheduling.',
+  },
+  {
+    href: '/docs/devops-fundamentals/what-is-devops',
+    title: 'What is DevOps?',
+    description: 'Article — a practical introduction to start from.',
+  },
+];
 ---
 
 <BaseLayout
   title="Page Not Found | Ops Handbook"
+  description="The page you requested could not be found. Search the Ops Handbook or jump back to a documentation area."
   noindex
 >
   <Header />
-  <main id="main" class="mx-auto w-full max-w-screen-2xl px-4 py-20 text-center">
-    <p class="text-sm text-muted tabular-nums" dir="ltr">404</p>
-    <h1 class="mt-2 text-2xl font-semibold tracking-tight">
-      Page not found
-    </h1>
-    <p class="mt-3 text-muted">
-      The page may have been removed or the link changed.
-    </p>
-    <a
-      href="/"
-      class="mt-8 inline-block rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90"
-    >
-      Back to home
-    </a>
+  <main id="main" class="mx-auto w-full max-w-screen-2xl px-4">
+    <section class="max-w-2xl pt-16 pb-20 sm:pt-24">
+      <p
+        class="text-6xl font-semibold tracking-tight text-accent-ink tabular-nums"
+        dir="ltr"
+      >
+        404
+      </p>
+
+      <h1 class="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+        This page wandered off the map
+      </h1>
+
+      <p class="mt-3 leading-relaxed text-muted">
+        The URL may be outdated, mistyped, or the page may have moved.
+        Search the handbook, or pick one of the starting points below.
+      </p>
+
+      <!-- Primary recovery: opens the existing search dialog (shared
+           [data-search-trigger] API — same engine as the Navbar) -->
+      <button
+        type="button"
+        data-search-trigger
+        class="mt-8 flex h-12 w-full cursor-pointer items-center gap-2.5 rounded-md border border-border bg-surface px-3.5 text-sm text-muted shadow-card transition-colors hover:border-accent/50 hover:text-text"
+        aria-haspopup="dialog"
+        aria-controls="search-dialog"
+        aria-label="Search the documentation"
+      >
+        <svg
+          class="h-4 w-4 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <span class="flex-1 text-start">Search documentation…</span>
+      </button>
+
+      <!-- Secondary recovery: curated, verified navigation links -->
+      <nav aria-label="Recovery links" class="mt-10">
+        <ul class="grid border-b border-border sm:grid-cols-2 sm:gap-x-12">
+          {
+            recoveryLinks.map((link) => (
+              <li class="border-t border-border">
+                <a
+                  href={link.href}
+                  class="group block py-4 transition-colors hover:bg-surface/70"
+                >
+                  <span class="block text-sm font-semibold tracking-tight text-text group-hover:text-accent-ink">
+                    {link.title}
+                  </span>
+                  <span class="mt-0.5 block text-xs leading-relaxed text-muted">
+                    {link.description}
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </section>
   </main>
 </BaseLayout>
