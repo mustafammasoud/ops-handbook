@@ -252,6 +252,14 @@
   unicode-bidi: isolate;
 }
 
+/* Site, article, and page headers keep their original LTR layout — logo,
+   navigation, search, header actions, breadcrumbs, titles, and metadata
+   always start from the left, on English and Arabic pages alike. Locked
+   explicitly so content direction can never flip the header chrome. */
+header {
+  direction: ltr;
+}
+
 /* Technical identifiers must stay readable in both directions. */
 .prose code,
 code,
@@ -261,42 +269,31 @@ kbd {
   text-align: left;
 }
 
-/* Mixed-direction articles (dir="rtl"): per-paragraph base direction.
-   `unicode-bidi: plaintext` makes each block resolve its own base direction
-   from its first strong character (the `dir="auto"` heuristic): Arabic
-   paragraphs/headings stay RTL, while English sentences and headings inside
-   the RTL document get a true LTR base — so trailing periods, quotes, and
-   numbers land on the correct side instead of flipping to the paragraph's
-   RTL edge. Under plaintext Chromium resolves `start` against each block's
-   detected base, so English blocks align left and Arabic blocks right — the
-   requested mixed-direction behavior. Scoped to .prose[dir='rtl'] so LTR
-   pages are untouched. Code blocks and inline <code> keep their explicit
-   LTR isolation above. */
-.prose[dir='rtl'] {
-  unicode-bidi: plaintext;
-}
+/* Mixed-direction articles (dir="rtl"): the article's language (content
+   frontmatter `language: ar` → dir=rtl) decides the base direction for
+   every block that contains Arabic script — never the first word of the
+   block. The Unicode bidi algorithm then interleaves embedded English runs
+   (Taint, Node, NoSchedule…), numbers, and neutrals inside that RTL flow,
+   so lines like `**Taint:** بتحط شرط على الـ Node…` keep their RTL base and
+   the leading English term stays at the line's RTL start.
 
-.prose[dir='rtl']
-  :where(
-    p,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    li,
-    dt,
-    dd,
-    blockquote,
-    figcaption,
-    caption,
-    th,
-    td,
-    summary
-  ) {
-  unicode-bidi: plaintext;
-}
+   Purely English blocks inside those articles (English headings, English
+   table headers, short English paragraphs) get an explicit dir="ltr" from
+   the build-time rehype plugin in astro.config.mjs, so they keep an LTR
+   base and align to the left as before.
+
+   Do NOT reintroduce `unicode-bidi: plaintext` (the dir="auto"
+   first-strong heuristic) on these blocks: it guesses an LTR base for any
+   Arabic paragraph, heading, or list item that merely BEGINS with a Latin
+   technical term — which is exactly the mixed-direction ordering bug the
+   content-based classification replaces. Direction is known from the
+   document language plus the block's actual content, so blocks never have
+   to guess.
+
+   English pages (dir=ltr) are untouched: direction simply inherits from
+   the article. Inline technical tokens stay LTR through the isolation
+   rule above; code blocks, terminals, and Mermaid declare
+   `direction: ltr` explicitly in their own rules. */
 
 /* ------------------------------------------------------------------ */
 /* Accessibility helpers                                               */

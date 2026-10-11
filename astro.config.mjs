@@ -1,10 +1,48 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import { satteri } from '@astrojs/markdown-satteri';
 import tailwindcss from '@tailwindcss/vite';
 
+// Arabic-script ranges (Arabic, Arabic Supplement/Extended-A, Thaana, and
+// Arabic presentation forms) used to classify rendered content blocks.
+const ARABIC_SCRIPT = /[\u0600-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+// Deterministic base direction for content blocks inside mixed-direction
+// articles. Arabic articles render with dir="rtl" on the <article>; purely
+// English blocks inside them (headings like "Overview", English table
+// headers, short English paragraphs) get an explicit dir="ltr" so they keep
+// an LTR base and align to the left, exactly as they did before. Any block
+// that contains Arabic script is left alone and inherits the article's RTL
+// base, so mixed lines like `**Taint:** بتحط شرط…` never mis-resolve —
+// unlike the old `unicode-bidi: plaintext` heuristic, which guessed the
+// direction from the first strong character and flipped Arabic blocks that
+// merely began with a Latin technical term. Runs at build time (Sätteri
+// hast plugin), so the shipped HTML is correct without client-side JS.
+const contentBlockDirection = {
+  name: 'content-block-direction',
+  element: {
+    // Same block set the previous per-block direction handling targeted.
+    filter: [
+      'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'dt', 'dd',
+      'blockquote', 'figcaption', 'caption', 'summary', 'th', 'td',
+    ],
+    /**
+     * @param {import('hast').Element} node
+     * @param {import('satteri').HastVisitorContext} ctx
+     */
+    visit(node, ctx) {
+      if (node.properties?.dir != null) return;
+      const text = ctx.textContent(node);
+      if (text.trim() && !ARABIC_SCRIPT.test(text)) {
+        ctx.setProperty(node, 'dir', 'ltr');
+      }
+    },
+  },
+};
+
 // Ops Handbook is a fully static site so it can be deployed to Cloudflare Pages
-// (and any other static host) without an adapter.
+// without an adapter.
 export default defineConfig({
   site: 'https://ops-handbook-dvp.pages.dev',
   output: 'static',
@@ -14,6 +52,12 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   markdown: {
+    // Astro 7's Sätteri processor — our hast plugin runs after syntax
+    // highlighting and before heading IDs and image markers, for both
+    // .md and .mdx content.
+    processor: satteri({
+      hastPlugins: [contentBlockDirection],
+    }),
     shikiConfig: {
       // Dual themes so the same markup works in light and dark mode.
       // Code blocks are always dark terminal/editor surfaces (the warm

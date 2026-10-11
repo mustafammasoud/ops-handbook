@@ -1,0 +1,78 @@
+---
+import CategoryIcon from './CategoryIcon.astro';
+import type { CategoryIconName } from '../data/categories';
+
+type InfoCardVariant = 'concept' | 'comparison' | 'insight';
+
+interface Props {
+  /** Card heading, e.g. a concept or option name. */
+  title: string;
+  /** One or two short sentences. Omit to render a title-only card. */
+  description?: string;
+  /** Icon from the project's existing icon set (`CategoryIcon`). */
+  icon?: CategoryIconName;
+  /** Small restrained tags shown under the description. */
+  tags?: string[];
+  /**
+   * Visual treatment — pick by content role, not decoration:
+   * - `concept` (default): calm card for definitions and building blocks
+   * - `comparison`: accent rail — one of several related options side by side
+   * - `insight`: solid accent rail + tinted surface — key takeaways and
+   *   common misconceptions
+   */
+  variant?: InfoCardVariant;
+}
+
+const { title, description, icon, tags, variant = 'concept' } = Astro.props;
+const hasTags = Array.isArray(tags) && tags.length > 0;
+const hasBody = Boolean(description) || Astro.slots.has('default') || hasTags;
+
+const variantClass =
+  variant === 'comparison'
+    ? 'border-s-[3px] border-s-accent/55'
+    : variant === 'insight'
+      ? 'border-s-[3px] border-s-accent bg-surface-2/60'
+      : '';
+---
+
+<div
+  class:list={[
+    'my-6 rounded-lg border border-border bg-surface shadow-card p-4 sm:p-5',
+    variantClass,
+  ]}
+>
+  <div class="flex items-start gap-3.5">
+    {
+      icon && (
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-surface-2/70 text-accent-ink">
+          <CategoryIcon name={icon} class="h-4.5 w-4.5" />
+        </span>
+      )
+    }
+
+    <div class:list={['min-w-0 flex-1', !hasBody && 'flex items-center']}>
+      <p class="text-[0.95rem] font-semibold leading-snug text-text">{title}</p>
+      {
+        hasBody && (
+          <div class="min-w-0">
+            {description && (
+              <p class="mt-1 text-sm leading-relaxed text-muted">{description}</p>
+            )}
+            {Astro.slots.has('default') && (
+              <div class="mt-2 text-sm leading-relaxed text-muted [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                <slot />
+              </div>
+            )}
+            {hasTags && (
+              <div class="mt-2.5 flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                  <span class="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs text-muted">{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</div>

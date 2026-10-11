@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Callout from '../components/Callout.astro';
 import Steps from '../components/Steps.astro';
 import Figure from '../components/Figure.astro';
+import InfoCard from '../components/InfoCard.astro';
 import PdfCard from '../components/PdfCard.astro';
 import PdfEmbed from '../components/PdfEmbed.astro';
 import DocEnhancements from '../components/DocEnhancements.astro';
@@ -45,6 +46,42 @@ const sampleDiagram = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http
         </li>
         <li>The third step — placeholder text only.</li>
       </Steps>
+
+      <h2 id="info-card">Info card</h2>
+      <InfoCard
+        title="Node 1 — General Purpose"
+        description="A general-purpose worker node."
+        icon="cube"
+        tags={['frontend', 'backend']}
+      />
+      <div class="grid gap-4 sm:grid-cols-3">
+        <InfoCard
+          variant="comparison"
+          title="Option A"
+          description="One of several related options."
+          icon="shield"
+          tags={['hard']}
+        />
+        <InfoCard
+          variant="comparison"
+          title="Option B"
+          description="A softer alternative."
+          icon="sliders"
+          tags={['soft']}
+        />
+        <InfoCard
+          variant="comparison"
+          title="Option C"
+          description="The most disruptive one."
+          icon="cycle"
+          tags={['evicts']}
+        />
+      </div>
+      <InfoCard variant="insight" title="Key takeaway" icon="pulse">
+        <p>Important distinction readers often get wrong.</p>
+      </InfoCard>
+      <InfoCard title="Minimal card" description="Title and description only." />
+      <InfoCard title="Title only" />
 
       <h2 id="figure">Figure</h2>
       <Figure
