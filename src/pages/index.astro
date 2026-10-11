@@ -175,6 +175,104 @@ const ecosystem = [
       </ul>
     </section>
 
+    <!-- Orientation: Area → Tool → Article (real, verified example chain) -->
+    <section
+      class="border-t border-border py-12"
+      aria-labelledby="orientation-heading"
+    >
+      <div class="mb-6">
+        <h2 id="orientation-heading" class="text-lg font-semibold">
+          How the documentation is organized
+        </h2>
+        <p class="mt-1 text-sm text-muted">
+          Every page follows the same three levels — Area, Tool, and Article.
+        </p>
+      </div>
+
+      <ol class="grid gap-y-8 sm:grid-cols-3 sm:gap-x-12">
+        <li class="relative">
+          <div class="flex items-center gap-2">
+            <CategoryIcon name="layers" class="h-4 w-4 text-muted" />
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+              Area
+            </h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text">
+            A knowledge domain — a family of related tools and subjects.
+          </p>
+          <a
+            href="/docs/container-orchestration"
+            class="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
+          >
+            Container Orchestration
+            <span aria-hidden="true" class="text-xs">&rarr;</span>
+          </a>
+          <span
+            aria-hidden="true"
+            class="absolute -right-6 top-0 hidden text-border sm:block"
+          >
+            &rarr;
+          </span>
+          <span
+            aria-hidden="true"
+            class="mt-4 block text-center text-border sm:hidden"
+          >
+            &darr;
+          </span>
+        </li>
+
+        <li class="relative">
+          <div class="flex items-center gap-2">
+            <CategoryIcon name="cube" class="h-4 w-4 text-muted" />
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+              Tool
+            </h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text">
+            A technology grouped inside an Area — the subject you work with.
+          </p>
+          <a
+            href="/docs/container-orchestration/kubernetes"
+            class="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
+          >
+            Kubernetes
+            <span aria-hidden="true" class="text-xs">&rarr;</span>
+          </a>
+          <span
+            aria-hidden="true"
+            class="absolute -right-6 top-0 hidden text-border sm:block"
+          >
+            &rarr;
+          </span>
+          <span
+            aria-hidden="true"
+            class="mt-4 block text-center text-border sm:hidden"
+          >
+            &darr;
+          </span>
+        </li>
+
+        <li class="relative">
+          <div class="flex items-center gap-2">
+            <CategoryIcon name="code" class="h-4 w-4 text-muted" />
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+              Article
+            </h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text">
+            A single page — a concept, guide, lab, or command reference.
+          </p>
+          <a
+            href="/docs/container-orchestration/kubernetes/scheduling/taints-and-tolerations"
+            class="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
+          >
+            Taints &amp; Tolerations
+            <span aria-hidden="true" class="text-xs">&rarr;</span>
+          </a>
+        </li>
+      </ol>
+    </section>
+
     <!-- Start Here: Fundamentals Learning Sequence -->
     {
       fundamentalsDocs.length > 0 && (
