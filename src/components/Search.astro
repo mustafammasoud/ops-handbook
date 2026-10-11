@@ -30,6 +30,7 @@
   <span class="block flex-1 text-start sm:hidden">Search</span>
   <kbd
     id="search-trigger-kbd"
+    data-search-kbd
     dir="ltr"
     class="hidden rounded border border-border bg-surface px-1.5 py-0.5 text-[0.65rem] font-medium tabular-nums md:inline"
   >
@@ -121,18 +122,18 @@
   const emptyEl = document.getElementById('search-empty');
   const statusEl = document.getElementById('search-status');
   const closeButton = document.getElementById('search-close');
-  const kbd = document.getElementById('search-trigger-kbd');
 
   // Platform-specific shortcut hint. Server always renders "Ctrl K"; the Apple
   // glyph is applied after mount (no hydration mismatch), and the badge is
   // removed entirely on touch-only devices where it is meaningless.
-  if (kbd) {
+  // Applies to every shortcut badge on the page (header trigger, hero trigger…).
+  document.querySelectorAll<HTMLElement>('[data-search-kbd]').forEach((hint) => {
     if (isTouchOnly()) {
-      kbd.style.display = 'none';
+      hint.style.display = 'none';
     } else {
-      kbd.textContent = isApplePlatform() ? '⌘ K' : 'Ctrl K';
+      hint.textContent = isApplePlatform() ? '⌘ K' : 'Ctrl K';
     }
-  }
+  });
 
   if (trigger && dialog && input && resultsEl && emptyEl && statusEl) {
     let index: SearchDoc[] | null = null;
@@ -351,6 +352,11 @@
     }
 
     trigger!.addEventListener('click', openDialog);
+    // Additional in-page triggers (e.g. the homepage Hero search field) reuse
+    // this same dialog — never a second search experience.
+    document.querySelectorAll<HTMLElement>('[data-search-trigger]').forEach((el) => {
+      if (el !== trigger) el.addEventListener('click', openDialog);
+    });
     closeButton?.addEventListener('click', () => dialog!.close());
     dialog!.addEventListener('click', (event) => {
       if (event.target === dialog) dialog!.close();
