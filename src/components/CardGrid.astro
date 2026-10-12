@@ -1,0 +1,26 @@
+---
+interface Props {
+  /** Number of columns on wider screens (default 3). */
+  columns?: 2 | 3 | 4;
+  /** Gap size — `sm`, `md` (default), or `lg`. */
+  gap?: 'sm' | 'md' | 'lg';
+  /** Optional label shown above the grid. */
+  label?: string;
+}
+
+const { columns = 3, gap = 'md', label } = Astro.props;
+
+const gapClass = gap === 'sm' ? 'gap-4' : gap === 'lg' ? 'gap-6' : 'gap-5';
+const colsClass =
+  columns === 2 ? 'sm:grid-cols-2' : columns === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3';
+---
+
+{label && (
+  <p class="eyebrow mb-3 text-[0.6875rem] font-semibold tracking-widest uppercase text-muted">
+    {label}
+  </p>
+)}
+
+<div class:list={["grid grid-cols-1", colsClass, gapClass]}>
+  <slot />
+</div>

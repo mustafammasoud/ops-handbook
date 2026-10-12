@@ -5,6 +5,7 @@ import Callout from '../components/Callout.astro';
 import Steps from '../components/Steps.astro';
 import Figure from '../components/Figure.astro';
 import InfoCard from '../components/InfoCard.astro';
+import CardGrid from '../components/CardGrid.astro';
 import PdfCard from '../components/PdfCard.astro';
 import PdfEmbed from '../components/PdfEmbed.astro';
 import DocEnhancements from '../components/DocEnhancements.astro';
@@ -23,12 +24,12 @@ const sampleDiagram = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http
 >
   <Header />
 
-  <main id="main" class="mx-auto w-full max-w-3xl px-4 py-10">
+  <main id="main" class="mx-auto w-full max-w-4xl px-4 py-10">
     <div class="prose">
       <h1>UI Components</h1>
       <p>
-        QA page for the components available in MDX content. All strings here are
-        placeholder text for display purposes only.
+        QA page for the components available in MDX content. Cards support
+        Markdown inside their body, responsive grids, and 12 semantic variants.
       </p>
 
       <h2 id="callouts">Callout</h2>
@@ -47,40 +48,81 @@ const sampleDiagram = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http
         <li>The third step — placeholder text only.</li>
       </Steps>
 
-      <h2 id="info-card">Info card</h2>
-      <InfoCard
-        title="Node 1 — General Purpose"
-        description="A general-purpose worker node."
-        icon="cube"
-        tags={['frontend', 'backend']}
-      />
-      <div class="grid gap-4 sm:grid-cols-3">
-        <InfoCard
-          variant="comparison"
-          title="Option A"
-          description="One of several related options."
-          icon="shield"
-          tags={['hard']}
-        />
-        <InfoCard
-          variant="comparison"
-          title="Option B"
-          description="A softer alternative."
-          icon="sliders"
-          tags={['soft']}
-        />
-        <InfoCard
-          variant="comparison"
-          title="Option C"
-          description="The most disruptive one."
-          icon="cycle"
-          tags={['evicts']}
-        />
-      </div>
-      <InfoCard variant="insight" title="Key takeaway" icon="pulse">
-        <p>Important distinction readers often get wrong.</p>
+      <h2 id="info-card">Info card — all variants</h2>
+      <p>Every variant uses only existing design tokens and valid icon names.</p>
+
+      <h3>Concept (default)</h3>
+      <InfoCard title="IP Address" description="A numerical label assigned to each device connected to a computer network." icon="network" tags={["Networking", "TCP/IP"]} />
+
+      <h3>Comparison</h3>
+      <InfoCard variant="comparison" title="Switch" description="Connects devices within the same local network using MAC addresses." icon="wrench" />
+      <InfoCard variant="comparison" title="Router" description="Routes packets between different networks using IP addresses." icon="wheel" />
+
+      <h3>Insight</h3>
+      <InfoCard variant="insight" title="Key insight" icon="pulse">
+        <p>A common misconception: a switch does not understand IP addresses — it operates at Layer 2 and uses MAC addresses.</p>
       </InfoCard>
-      <InfoCard title="Minimal card" description="Title and description only." />
+
+      <h3>Feature</h3>
+      <InfoCard variant="feature" title="Auto-scaling" description="Kubernetes Horizontal Pod Autoscaler adjusts replicas based on CPU or memory metrics." icon="cycle" tags={["K8s", "HPA"]} />
+
+      <h3>Callout</h3>
+      <InfoCard variant="callout" title="Note" description="Supplementary information that deserves attention but is not critical." icon="shield" eyebrow="Reference" />
+
+      <h3>Tip</h3>
+      <InfoCard variant="tip" title="Best practice" description="Always label nodes with consistent key-value pairs for scheduling." icon="wrench" tags={["Kubernetes"]} />
+
+      <h3>Warning</h3>
+      <InfoCard variant="warning" title="Scheduling conflict" description="A Pod may fail to schedule if node selectors and taints conflict." icon="shield" eyebrow="Warning" />
+
+      <h3>Danger</h3>
+      <InfoCard variant="danger" title="Destructive command" description="Running <code>kubectl delete namespace production</code> removes all resources in that namespace permanently." icon="shield" eyebrow="Danger" />
+
+      <h3>Success</h3>
+      <InfoCard variant="success" title="Deployment verified" description="All replicas are ready and the service responds with HTTP 200." icon="shield" tags={["Verified"]} />
+
+      <h3>Summary</h3>
+      <InfoCard variant="summary" title="Lesson summary" description="Networks connect devices; switches connect local devices; routers connect networks; firewalls control traffic." icon="layers" />
+
+      <h3>Command</h3>
+      <InfoCard variant="command" title="Inspect nodes" description="Show all nodes with their labels and conditions." icon="terminal" eyebrow="CLI">
+        <pre class="mt-2 overflow-x-auto rounded-md border border-code-border bg-code-chrome-bg px-3 py-2 text-xs text-code-fg font-mono leading-relaxed"><code>kubectl get nodes -o wide</code></pre>
+      </InfoCard>
+
+      <h3>Resource</h3>
+      <InfoCard variant="resource" title="Kubernetes docs" description="Official Kubernetes scheduling documentation." icon="cloud" tags={["External", "Reference"]} />
+
+      <h2 id="card-grid">Card grid layout</h2>
+      <p>Responsive three-column grid on wider screens, single column on mobile.</p>
+      <CardGrid columns={3} label="Networking concepts">
+        <InfoCard title="Subnet Mask" description="Defines the network and host portions of an IP address." icon="network" />
+        <InfoCard title="DNS" description="Translates domain names into IP addresses." icon="cloud" />
+        <InfoCard title="Firewall" description="Filters traffic based on rules and policies." icon="shield" />
+      </CardGrid>
+
+      <h2 id="cards-with-body">Cards with Markdown body</h2>
+      <InfoCard title="Linux networking commands" description="Essential terminal commands for diagnosis." icon="terminal" tags={["Linux", "CLI"]}>
+        <ul class="mt-2 list-disc pl-4 text-[0.9rem] leading-relaxed text-muted">
+          <li><code>ip addr</code> — show interfaces and addresses</li>
+          <li><code>ss -tuln</code> — list listening sockets</li>
+          <li><code>ping</code> — test connectivity</li>
+        </ul>
+      </InfoCard>
+
+      <h2 id="cards-with-tags">Cards with tags</h2>
+      <InfoCard title="Docker" description="Container runtime and image management." icon="cube" tags={["Runtime", "Images", "Compose"]} />
+      <InfoCard title="Kubernetes" description="Container orchestration platform." icon="wheel" tags={["Orchestration", "Pods", "Services"]} />
+
+      <h2 id="cards-with-code">Cards containing code blocks</h2>
+      <InfoCard variant="command" title="Check service status" description="Verify that the systemd service is active." icon="terminal">
+        <p class="text-[0.9rem] leading-relaxed text-muted">Run the following command on the host:</p>
+        <pre class="mt-2 overflow-x-auto rounded-md border border-code-border bg-code-chrome-bg px-3 py-2 text-xs text-code-fg font-mono leading-relaxed"><code>systemctl status docker</code></pre>
+      </InfoCard>
+
+      <h2 id="cards-standalone">Standalone cards (no grid)</h2>
+      <InfoCard variant="warning" title="Taint warning" description="Adding a taint without a matching toleration prevents Pods from scheduling." icon="shield" eyebrow="Kubernetes Scheduling" />
+      <InfoCard variant="danger" title="Data loss risk" description="Always back up persistent volumes before running destructive operations." icon="shield" />
+      <InfoCard variant="success" title="Verified outcome" description="Deployment completed with zero errors and all health checks passed." icon="shield" />
       <InfoCard title="Title only" />
 
       <h2 id="figure">Figure</h2>
@@ -89,9 +131,6 @@ const sampleDiagram = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http
         alt="Sample diagram (placeholder three-step flow)"
         caption="Sample caption below the figure."
       />
-
-      <h2 id="code">Code block + copy button</h2>
-      <pre class="astro-code" data-language="bash"><code>echo "copy button is added client-side"</code></pre>
 
       <h2 id="pdf">PDF</h2>
       <PdfCard
