@@ -1,5 +1,4 @@
 ---
-
 title: Kubernetes Cluster Architecture — Overview
 description: Understand the main components of a Kubernetes cluster and how the control plane and worker nodes work together.
 order: 4
