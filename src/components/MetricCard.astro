@@ -1,0 +1,18 @@
+---
+/** A metric/stat card with number, label, optional trend, and optional description. */
+interface Props {
+  value: string | number;
+  label: string;
+  description?: string;
+  trend?: 'up' | 'down' | 'neutral';
+}
+const { value, label, description, trend = 'neutral' } = Astro.props;
+---
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card p-5 text-center">
+  <p class="text-3xl font-semibold tracking-tight text-text tabular-nums">{value}</p>
+  <p class="mt-1 text-sm font-medium text-muted">{label}</p>
+  {description && <p class="mt-1 text-xs text-muted">{description}</p>}
+  {trend === 'up' && <span class="mt-2 inline-block text-xs font-bold text-tip-fg">↑ Rising</span>}
+  {trend === 'down' && <span class="mt-2 inline-block text-xs font-bold text-warning-fg">↓ Falling</span>}
+  {trend === 'neutral' && <span class="mt-2 inline-block text-xs font-medium text-muted">→ Stable</span>}
+</div>

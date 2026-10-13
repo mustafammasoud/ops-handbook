@@ -1,0 +1,27 @@
+---
+import CategoryIcon from './CategoryIcon.astro';
+import type { CategoryIconName } from '../data/categories';
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  icon?: CategoryIconName;
+}
+const { href, title, description, icon = 'network' } = Astro.props;
+---
+
+<a
+  href={href}
+  target={href.startsWith('http') ? '_blank' : undefined}
+  rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+  class="group my-6 flex items-start gap-4 rounded-lg border border-border bg-surface p-4 shadow-card transition-colors hover:border-accent/50 hover:bg-surface-2/40 sm:p-5"
+>
+  <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-surface-2/70 text-accent-ink shadow-sm">
+    <CategoryIcon name={icon} class="h-5 w-5" />
+  </span>
+  <div class="min-w-0 flex-1">
+    <p class="text-[0.95rem] font-semibold tracking-tight text-text group-hover:text-accent-ink">{title}</p>
+    {description && <p class="mt-1 text-sm leading-relaxed text-muted">{description}</p>}
+  </div>
+</a>

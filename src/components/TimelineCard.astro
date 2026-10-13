@@ -1,0 +1,13 @@
+---
+/** A vertical timeline card showing events/steps in sequence. */
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card p-5">
+  {title && <h3 class="mb-4 text-base font-semibold tracking-tight text-text">{title}</h3>}
+  <div class="relative pl-6 border-s-2 border-border space-y-6">
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,12 @@
+---
+/** A blockquote/card style for quotes or key statements with an optional source. */
+interface Props {
+  text: string;
+  source?: string;
+}
+const { text, source } = Astro.props;
+---
+<blockquote class="my-6 rounded-lg border-s-[3px] border-border bg-surface p-5 shadow-card">
+  <p class="text-lg font-medium leading-relaxed text-text tracking-tight">"{text}"</p>
+  {source && <cite class="mt-3 block text-sm text-muted not-italic">— {source}</cite>}
+</blockquote>

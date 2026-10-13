@@ -1,0 +1,31 @@
+---
+import CategoryIcon from './CategoryIcon.astro';
+
+interface Props {
+  command: string;
+  language?: string;
+  description?: string;
+  title?: string;
+}
+const { command, language = 'bash', description, title } = Astro.props;
+---
+
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card p-4 sm:p-5">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold uppercase tracking-wider text-muted">{title ?? 'Command'}</span>
+      <span class="rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[0.65rem] font-mono text-muted">{language}</span>
+    </div>
+    <button
+      type="button"
+      onclick="navigator.clipboard.writeText(this.getAttribute('data-cmd'))"
+      data-cmd={command}
+      class="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:border-accent/50 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+      aria-label="Copy command"
+    >
+      <span>Copy</span>
+    </button>
+  </div>
+  <pre class="m-0 overflow-x-auto rounded-md border border-code-border bg-code-bg p-3 text-sm leading-relaxed text-code-fg font-mono"><code>{command}</code></pre>
+  {description && <p class="mt-3 text-xs leading-relaxed text-muted">{description}</p>}
+</div>

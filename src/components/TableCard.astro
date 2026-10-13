@@ -1,0 +1,15 @@
+---
+/** A card wrapping a table with optional title and caption. */
+interface Props {
+  title?: string;
+  caption?: string;
+}
+const { title, caption } = Astro.props;
+---
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card overflow-hidden">
+  {title && <div class="border-b border-border bg-surface-2/30 px-4 py-3 text-sm font-semibold text-text">{title}</div>}
+  <div class="overflow-x-auto p-4">
+    <slot />
+  </div>
+  {caption && <p class="border-t border-border bg-surface-2/20 px-4 py-2 text-xs text-muted">{caption}</p>}
+</div>

@@ -1,0 +1,14 @@
+---
+/** A full-width banner for critical warnings or errors. */
+interface Props {
+  title: string;
+  description?: string;
+  type?: 'warning' | 'danger';
+}
+const { title, description, type = 'warning' } = Astro.props;
+const cfg = type === 'danger' ? { bg: 'bg-warning-bg', border: 'border-warning-border', fg: 'text-warning-fg' } : { bg: 'bg-warning-bg', border: 'border-warning-border', fg: 'text-warning-fg' };
+---
+<div class:list={['my-6 rounded-md border-l-[4px] p-4 sm:p-5', cfg.bg, cfg.border]}>
+  <p class:list={['text-base font-bold tracking-tight', cfg.fg]}>{title}</p>
+  {description && <p class="mt-1.5 text-sm leading-relaxed text-text">{description}</p>}
+</div>
