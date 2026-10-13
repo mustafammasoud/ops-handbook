@@ -7,6 +7,9 @@ import Figure from '../components/Figure.astro';
 import InfoCard from '../components/InfoCard.astro';
 import CardGrid from '../components/CardGrid.astro';
 import PdfCard from '../components/PdfCard.astro';
+import LinkCard from '../components/LinkCard.astro';
+import AlertCard from '../components/AlertCard.astro';
+import CodeCard from '../components/CodeCard.astro';
 import PdfEmbed from '../components/PdfEmbed.astro';
 import DocEnhancements from '../components/DocEnhancements.astro';
 
@@ -131,6 +134,19 @@ const sampleDiagram = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http
         alt="Sample diagram (placeholder three-step flow)"
         caption="Sample caption below the figure."
       />
+
+      <h2 id="link-card">Link card</h2>
+      <LinkCard href="/docs" title="All documentation" description="Browse every documentation area." icon="layers" />
+      <LinkCard href="https://github.com/mustafammasoud/ops-handbook" title="GitHub repository" description="Source and issues." icon="branch" />
+
+      <h2 id="alert-card">Alert card</h2>
+      <AlertCard title="Warning — scheduling conflict" description="A Pod may fail to schedule if selectors and taints conflict." type="warning" />
+      <AlertCard title="Success — verified" description="Deployment completed with zero errors." type="success" />
+      <AlertCard title="Info — reference" description="Check official docs for the latest API." type="info" />
+
+      <h2 id="code-card">Code card</h2>
+      <CodeCard command="kubectl get pods -o wide" language="bash" title="Inspect pods" description="Show pod state and node placement." />
+      <CodeCard command="docker ps --format 'table {{.Names}}\t{{.Status}}'" title="List containers" />
 
       <h2 id="pdf">PDF</h2>
       <PdfCard
