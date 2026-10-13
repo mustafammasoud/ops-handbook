@@ -1,0 +1,16 @@
+---
+/** A card for displaying a diagram/image with caption and optional lightbox trigger. */
+import Figure from './Figure.astro';
+interface Props {
+  src: Parameters<typeof Figure>["src"];
+  alt: string;
+  caption?: string;
+  label?: string;
+}
+const { src, alt, caption, label } = Astro.props;
+---
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card overflow-hidden">
+  {label && <div class="border-b border-border bg-surface-2/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted">{label}</div>}
+  <Figure src={src} alt={alt} caption={caption ? undefined : caption} />
+  {caption && <p class="px-4 py-2 text-xs text-muted">{caption}</p>}
+</div>

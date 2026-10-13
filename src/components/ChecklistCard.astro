@@ -1,0 +1,19 @@
+---
+/** A checklist card with interactive items. */
+interface Props {
+  title: string;
+  items: string[];
+}
+const { title, items } = Astro.props;
+---
+<div class="my-6 rounded-lg border border-border bg-surface shadow-card p-5">
+  <h3 class="mb-3 text-base font-semibold tracking-tight text-text">{title}</h3>
+  <ul class="space-y-2">
+    {items.map((item) => (
+      <li class="flex items-start gap-2.5 text-sm text-text">
+        <span class="mt-0.5 h-4 w-4 shrink-0 rounded border border-border bg-surface-2 text-[0.65rem] font-bold leading-tight text-muted flex items-center justify-center">✓</span>
+        <span class="leading-relaxed">{item}</span>
+      </li>
+    ))}
+  </ul>
+</div>

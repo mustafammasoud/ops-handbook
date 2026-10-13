@@ -1,0 +1,36 @@
+---
+import CategoryIcon from './CategoryIcon.astro';
+import type { CategoryIconName } from '../data/categories';
+
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+
+interface Props {
+  title: string;
+  description?: string;
+  type?: AlertType;
+  icon?: CategoryIconName;
+}
+const { title, description, type = 'warning', icon } = Astro.props;
+
+const config: Record<AlertType, { bg: string; border: string; fg: string; iconName: CategoryIconName }> = {
+  warning: { bg: 'bg-warning-bg', border: 'border-warning-border', fg: 'text-warning-fg', iconName: 'shield' },
+  danger: { bg: 'bg-warning-bg', border: 'border-warning-border', fg: 'text-warning-fg', iconName: 'shield' },
+  success: { bg: 'bg-tip-bg', border: 'border-tip-border', fg: 'text-tip-fg', iconName: 'pulse' },
+  info: { bg: 'bg-note-bg', border: 'border-note-border', fg: 'text-note-fg', iconName: 'layers' },
+};
+
+const cfg = config[type];
+---
+
+<aside class:list={['my-6 rounded-lg border-s-[4px] p-4 sm:p-5 shadow-card', cfg.bg, cfg.border]}>
+  <div class="flex items-start gap-3">
+    <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface shadow-sm text-accent-ink">
+      <CategoryIcon name={icon ?? cfg.iconName} class="h-5 w-5" />
+    </span>
+    <div>
+      <p class:list={['text-sm font-bold tracking-tight', cfg.fg]}>{title}</p>
+      {description && <p class="mt-1.5 text-[0.9375rem] leading-relaxed text-text">{description}</p>}
+      <slot />
+    </div>
+  </div>
+</aside>

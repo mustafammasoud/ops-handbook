@@ -1,0 +1,16 @@
+---
+/** A small status badge / pill for labels like running, failed, pending. */
+interface Props {
+  label: string;
+  status?: 'running' | 'failed' | 'pending' | 'success' | 'warning';
+}
+const { label, status = 'pending' } = Astro.props;
+const colorMap: Record<string, string> = {
+  running: 'bg-tip-bg text-tip-fg border-tip-border',
+  failed: 'bg-warning-bg text-warning-fg border-warning-border',
+  pending: 'bg-note-bg text-note-fg border-note-border',
+  success: 'bg-tip-bg text-tip-fg border-tip-border',
+  warning: 'bg-warning-bg text-warning-fg border-warning-border',
+};
+---
+<span class:list={['inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium tracking-wide', colorMap[status] || colorMap.pending]}>{label}</span>
