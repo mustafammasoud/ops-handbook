@@ -1,18 +1,23 @@
 # Ops Handbook — Content Roadmap & Learning Architecture
 
-> A **human-readable content blueprint**, not an application configuration and
-> not a fixed roadmap. It answers: *what should exist in Ops Handbook, how it
-> is organized, what to learn first, and what depends on what.* The folder
-> structure in `content/` and the presentation registry in
-> `src/data/categories.ts` may grow, merge, split or disappear at any time —
-> this document sketches the current intent and is updated whenever that
-> intent changes.
->
-> **Planning only**: topic names, scope, dependencies and priorities — no
-> educational content lives here. Nothing in this file is wired into the
-> application.
+> [!NOTE]
+> **Human-Readable Content Blueprint**  
+> This document answers: *what should exist in Ops Handbook, how it is organized, what to learn first, and what depends on what.* It defines topic scope, learning dependencies, and writing priorities. Nothing here is hardwired into application runtime — the structure adapts as the handbook evolves.
 
-## Documentation architecture
+---
+
+### Blueprint at a Glance
+
+|  Documentation Areas |  Learning Progression |  Core Target |  Scope Tiers |
+| :---: | :---: | :---: | :---: |
+| **14 Canonical Areas** | **11 Learning Stages** | **70–90 Core Articles** | **Core · Recommended · Advanced** |
+| Foundations to Triage | Sequential Journey | Maintainable Baseline | Balanced Depth |
+
+---
+
+##  Documentation Architecture
+
+The handbook organizes all knowledge into a strict three-level hierarchical model:
 
 ```text
 Documentation Area → Technology / Tool → Article
@@ -22,255 +27,221 @@ content/<area>/<tool>/<article>/index.mdx →  /docs/<area>/<tool>/<article>
 content/<area>/<concept>.md               →  /docs/<area>/<concept>
 ```
 
-- **Area** — one of the 14 registered documentation areas below. Its id is
-  the first folder level (`category` in frontmatter is derived from it and
-  only overrides it explicitly).
-- **Tool / technology** — the second folder level (`docker`, `kubernetes`,
-  `linux` …). Each tool with at least one article automatically gets a tool
-  landing page at `/docs/<area>/<tool>`. Tool names stay English.
-- **Article** — the actual page. Articles written directly under an area (no
-  tool level) are still supported and appear ungrouped on the area page.
+| Level | Component | Role & Behavior | Example Path |
+| :--- | :--- | :--- | :--- |
+| **Level 1** | **Area (Category)** | Top-level folder under `content/`. Maps directly to `/docs/<area>`. Category metadata (label, icon) is registered in `src/data/categories.ts`. | `content/operating-systems/` |
+| **Level 2** | **Technology / Tool** | Second folder level (`docker`, `kubernetes`, `linux`…). Any tool folder with at least one article automatically gets a landing page at `/docs/<area>/<tool>`. | `content/operating-systems/linux/` |
+| **Level 3** | **Article / Topic** | The actual documentation leaf. Written in Markdown (`.md`) or MDX (`.mdx`). Can live under a tool or directly under an area. | `.../linux/introduction.md` |
 
 ---
 
-## A. Documentation areas
+## A. Documentation Areas & Priorities
 
-Priority = **write order**, not importance: P0 = learning spine, write first;
-P1 = professional core; P2 = production depth (still includes a small critical
-Core tier).
+> [!TIP]
+> **Priority = Authoring Sequence (Not Importance)**  
+> - `P0 (Learning Spine)`: Foundational baseline that subsequent topics build upon. Authored first.  
+> - `P1 (Professional Core)`: Daily engineering tools (Cloud, CI/CD, Kubernetes, Terraform).  
+> - `P2 (Production Depth)`: Observability, security, configuration management, and triage playbooks.
 
-| Area (category id) | Purpose | Core technologies | Priority |
-| --- | --- | --- | --- |
-| `devops-fundamentals` | Shared fundamentals everything else assumes | SDLC, CI/CD principles, environments, toolchain concepts | P0 |
-| `operating-systems` | The OS most DevOps work happens on | Linux: shell, filesystem, permissions, processes, systemd | P0 |
-| `networking` | How systems talk to each other | TCP/IP, DNS, HTTP/TLS, SSH, firewalls, load balancing | P0 |
-| `version-control` | Source control workflow | Git (+ GitHub/GitLab collaboration flow) | P0 |
-| `programming-scripting` | Scripting and data formats | Bash, Python, YAML/JSON, regex, HTTP APIs | P1 |
-| `containers` | Container images and runtimes | Docker (+ containerd/Podman concepts) | P0 |
-| `ci-cd-automation` | Automated delivery | GitHub Actions (+ GitLab CI, Jenkins) | P1 |
-| `container-orchestration` | Container orchestration | Kubernetes (+ Helm) | P1 |
-| `cloud-platforms` | Cloud platforms and services | AWS first (+ Azure/GCP concept-level) | P1 |
-| `infrastructure-as-code` | Infrastructure as code | Terraform (+ OpenTofu) | P1 |
-| `configuration-management` | Configuration automation | Ansible | P2 |
-| `observability` | Knowing what production is doing | Prometheus, Grafana, log stack, OpenTelemetry concepts | P2 |
-| `security-devsecops` | Keeping systems and pipelines safe | Secrets, IAM, scanning (Trivy), hardening | P2 |
-| `troubleshooting-production` | Diagnosing and fixing real incidents | Method, playbooks, postmortems | P2 |
+### Priority Tiers Summary
 
-Every row is **indicative, not binding**: an area might stay empty for a long
-time, a tool might never appear, or a row might be split into two. Folders
-exist only as places to put files — nothing in the platform depends on a
-folder existing.
+| Tier | Focus Areas | Total Scope | Status / Strategy |
+| :--- | :--- | :---: | :--- |
+| **P0 · Learning Spine** | `devops-fundamentals`, `operating-systems`, `networking`, `version-control`, `containers` | 5 Areas | Active baseline; required for all subsequent tracks |
+| **P1 · Professional Core** | `programming-scripting`, `ci-cd-automation`, `container-orchestration`, `cloud-platforms`, `infrastructure-as-code` | 5 Areas | Core industry stack; write alongside real projects |
+| **P2 · Production Depth** | `configuration-management`, `observability`, `security-devsecops`, `troubleshooting-production` | 4 Areas | Operations capstone; deepens production maturity |
 
-Sizing intent: the **Core** tiers below total roughly 70–90 articles — a
-realistic long-term target for a single maintainer. Recommended follows Core;
-Advanced is written last or never.
+### 14 Canonical Areas Registry
 
----
-
-## B. Learning stages
-
-A suggested progression across the whole knowledge base. Arrows mean
-*recommended order*, not a strict course: stages can overlap, and the site
-stays documentation-first (no lessons, no progress tracking).
-
-```text
-Stage 1   Foundations + Git          — vocabulary, delivery lifecycle, source control
-    ↓
-Stage 2   Systems (Linux)            — the interface every tool runs through
-    ↓
-Stage 3   Networking core            — the transport everything uses
-    ↓
-Stage 4   Scripting & formats        — Bash/YAML/JSON glue (can start with Stage 2)
-    ↓
-Stage 5   Containers (Docker)        — the unit later stages operate on
-    ↓
-Stage 6   CI/CD                      — Git + containers → automate build/test/ship
-    ↓
-Stage 7   Orchestration (Kubernetes) — many containers, many hosts
-    ↓
-Stage 8   Cloud (AWS primitives)     — managed versions of what you already know
-    ↓
-Stage 9   Infrastructure as Code     — codify the cloud you just clicked through
-    ↓
-Stage 10  Configuration Management   — OS state on those servers
-    ↓
-Stage 11  Observability · Security · Production  (parallel capstone)
-```
-
-Why each stage sits where it does (concise):
-
-1. **Foundations + Git** — every later article assumes this vocabulary and a
-   place to keep change history.
-2. **Linux** — all tooling is Linux processes, files, permissions and
-   services; nothing is debuggable without it.
-3. **Networking** — DNS/HTTP/TCP underpin containers, CI APIs, cloud, and
-   most outages.
-4. **Scripting & formats** — automation glue and every tool's config
-   language; overlaps stages 2–3 (start early, deepen over time).
-5. **Docker** — packages app + dependencies deterministically; needs Linux
-   and basic networking.
-6. **CI/CD** — with Git and containers in place, changes can be built, tested
-   and shipped automatically — first professional-workflow payoff.
-7. **Kubernetes** — assumes containers, networking and YAML; solves running
-   many services on many hosts.
-8. **Cloud** — managed equivalents of everything already met; networking
-   knowledge transfers directly.
-9. **Terraform** — manual cloud clicking taught the primitives; IaC now has
-   something real to codify.
-10. **Ansible** — needs Linux + SSH; complements IaC (OS state vs resource
-    state).
-11. **Observability · Security · Production** — there is finally something
-    running to observe, secure and debug; the three are parallel endgame
-    tracks, not a sequence.
+| Priority | Area (`category` ID) | Core Purpose | Primary Technologies |
+| :---: | :--- | :--- | :--- |
+| `P0` | `devops-fundamentals` | Shared principles, culture, and delivery models | SDLC, CI/CD principles, environments, toolchains |
+| `P0` | `operating-systems` | Host OS where modern DevOps workloads execute | Linux: shell, filesystem, permissions, systemd |
+| `P0` | `networking` | Protocols and transport layers connecting systems | TCP/IP, DNS, HTTP/TLS, SSH, firewalls, routing |
+| `P0` | `version-control` | Source control workflows and collaboration | Git (+ GitHub / GitLab pull request flows) |
+| `P0` | `containers` | Packaging, container images, and runtime engines | Docker (+ containerd / Podman fundamentals) |
+| `P1` | `programming-scripting` | Automation glue, APIs, and data serialization | Bash, Python, YAML, JSON, regex, REST APIs |
+| `P1` | `ci-cd-automation` | Continuous integration and deployment pipelines | GitHub Actions (+ GitLab CI, Jenkins orientation) |
+| `P1` | `container-orchestration` | Multi-host container scheduling and lifecycle | Kubernetes (+ Helm package manager) |
+| `P1` | `cloud-platforms` | Cloud infrastructure and managed services | AWS core (+ Azure / GCP conceptual comparisons) |
+| `P1` | `infrastructure-as-code` | Declarative cloud resource provisioning | Terraform (+ OpenTofu) |
+| `P2` | `configuration-management` | OS state automation and server configuration | Ansible |
+| `P2` | `observability` | Production metrics, log aggregation, and tracing | Prometheus, Grafana, Loki/ELK, OpenTelemetry |
+| `P2` | `security-devsecops` | Pipeline security, secrets, and vulnerability scans | Secrets management, IAM, Trivy scanning, hardening |
+| `P2` | `troubleshooting-production` | Incident debugging methods and postmortems | Diagnostics methodology, runbooks, RCA |
 
 ---
 
-## C. Technology scope
+## B. Learning Stages & Curriculum Flow
 
-Topic names only — no explanations. **Core** = must exist · **Recommended** =
-rounds out real work · **Advanced** = depth, optional.
-
-### devops-fundamentals (concepts)
-
-- **Core:** SDLC · CI/CD principles · Environments (dev/stage/prod) · IaC vs
-  config management idea · Toolchain overview · DevOps culture in brief
-- **Recommended:** Release strategies · SLO/SLI vocabulary · DORA metrics ·
-  Technical debt
-- **Advanced:** Platform engineering intro · Site reliability concepts
-
-### Linux (`operating-systems`)
-
-- **Core:** Shell basics · Filesystem & paths · Permissions & ownership ·
-  Users & groups · Processes · Package management · Text processing
-- **Recommended:** Services & systemd · Networking commands (ss, firewall-cmd,
-  iptables basics) · Disks & mounts · Logs (journalctl) · Bash scripting
-  basics
-- **Advanced:** Kernel parameters · SELinux/AppArmor · Performance basics
-  (top, iostat) · Cron & systemd timers
-
-### Networking (concept area)
-
-- **Core:** OSI & TCP/IP models · IP addressing & subnets · DNS · HTTP/HTTPS ·
-  TLS basics · SSH
-- **Recommended:** Load balancing · Firewalls & security groups · NAT &
-  routing · Diagnostics (ping, dig, curl)
-- **Advanced:** Packet analysis (tcpdump) · IPv6 · Service mesh concepts
-
-### Git (`version-control`)
-
-- **Core:** Commits & history · Staging · Branching · Merging & conflicts ·
-  Remotes & pull request flow
-- **Recommended:** Rebasing · Stashing · Tags & releases · Hooks ·
-  Monorepo tips
-- **Advanced:** Reflog & recovery · Submodules · Worktrees · Git internals
-
-### Bash / Python (`programming-scripting`)
-
-- **Core:** Bash syntax, pipes & substitution · Variables & conditions ·
-  Loops · Exit codes & error handling · JSON & YAML · Regex
-- **Recommended:** Python basics for automation · HTTP APIs (curl, REST) ·
-  File parsing tasks
-- **Advanced:** Python testing · Async/batch scripting · Performance &
-  portability
-
-### Docker (`containers`)
-
-- **Core:** Images · Containers · Dockerfile · Volumes · Networks · CLI
-  essentials
-- **Recommended:** Compose · Registries & tagging · Multi-stage builds ·
-  Logs & basic monitoring
-- **Advanced:** Image scanning & hardening · Size/performance optimization ·
-  containerd & Podman · Rootless & resource limits
-
-### CI/CD (`ci-cd-automation`)
-
-- **Core:** Pipeline concepts · GitHub Actions workflows · Build & test stages ·
-  Secrets in CI · Artifacts
-- **Recommended:** GitLab CI · Jenkins (orientation) · Deployment strategies
-  (rolling, blue/green) · Branch protection & review flow
-- **Advanced:** Self-hosted runners · Matrix builds · Release automation ·
-  GitOps introduction
-
-### Kubernetes (`container-orchestration`)
-
-- **Core:** Cluster architecture · Pods · Deployments · Services · Namespaces ·
-  Labels & selectors · kubectl basics
-- **Recommended:** Ingress · ConfigMaps & Secrets · Storage (PV/PVC) ·
-  StatefulSets · Helm basics
-- **Advanced:** Network policies · RBAC · Autoscaling · Operators · Cluster
-  troubleshooting
-
-### AWS (`cloud-platforms`)
-
-- **Core:** IAM · Compute (EC2) · Object storage (S3) · VPC & networking
-  basics · Pricing model
-- **Recommended:** Managed databases · Load balancers · DNS (Route 53) ·
-  Serverless orientation · Availability & multi-AZ ideas
-- **Advanced:** CDN · Advanced networking (endpoints, peering) ·
-  Well-Architected review topics
-
-### Terraform (`infrastructure-as-code`)
-
-- **Core:** HCL basics · Providers · Resources · State · Plan/Apply workflow
-- **Recommended:** Variables & outputs · Modules · Remote state & locking ·
-  Import
-- **Advanced:** Workspaces · Drift management · CI integration · Testing
-  conventions
-
-### Ansible (`configuration-management`)
-
-- **Core:** Ad-hoc commands · Inventory · Playbooks · Modules · Idempotency
-- **Recommended:** Roles · Variables & facts · Handlers
-- **Advanced:** Ansible Vault · Dynamic inventory · AWX orientation
-
-### Observability (concept area)
-
-- **Core:** Metrics vs logs vs traces · Prometheus basics · Grafana
-  dashboards · RED/USE · Alerting basics
-- **Recommended:** Loki/ELK log stack · Structured logging · SLOs in practice ·
-  OpenTelemetry concepts
-- **Advanced:** Cardinality & cost · Tail sampling · On-call practices
-
-### Security / DevSecOps (concept area)
-
-- **Core:** Secrets management · Least privilege · Dependency & image
-  scanning (Trivy) · Basic hardening
-- **Recommended:** IAM deep dive · SAST/DAST orientation · Supply chain
-  (SBOM, signing) · Container security
-- **Advanced:** Policy as code · Zero trust orientation · Incident response
-
-### Troubleshooting & Production (concept area)
-
-- **Core:** Troubleshooting method · Reading logs · HTTP/status debugging ·
-  Resource saturation (CPU, memory, disk)
-- **Recommended:** Network diagnostics · Database failure modes · Performance
-  baselines · Postmortems
-- **Advanced:** Chaos/ fault injection · Capacity planning · Complex failure
-  case studies
-
----
-
-## D. Dependency map
-
-Topic-level rule: a topic may have **several** prerequisites; dependencies are
-guidance for reading order, never a locking mechanism.
+A suggested sequential progression across the knowledge base. Arrows indicate **recommended learning order**, not an enforced course engine — stages can overlap and the site remains reference-first.
 
 ```mermaid
 flowchart TD
-    S1[Stage 1 · Foundations + Git] --> S2[Stage 2 · Linux]
-    S2 --> S3[Stage 3 · Networking]
-    S3 --> S4[Stage 4 · Bash / YAML / JSON]
-    S4 --> S5[Stage 5 · Docker]
-    S5 --> S6[Stage 6 · CI/CD]
-    S6 --> S7[Stage 7 · Kubernetes]
-    S7 --> S8[Stage 8 · Cloud]
-    S8 --> S9[Stage 9 · Terraform]
-    S9 --> S10[Stage 10 · Ansible]
-    S10 --> S11[Stage 11 · Observability / Security / Production]
+    S1["Stage 1 · Foundations + Git"] --> S2["Stage 2 · Systems (Linux)"]
+    S2 --> S3["Stage 3 · Networking Core"]
+    S3 --> S4["Stage 4 · Scripting & Formats"]
+    S4 --> S5["Stage 5 · Containers (Docker)"]
+    S5 --> S6["Stage 6 · CI/CD Automation"]
+    S6 --> S7["Stage 7 · Orchestration (Kubernetes)"]
+    S7 --> S8["Stage 8 · Cloud Platforms (AWS)"]
+    S8 --> S9["Stage 9 · Infrastructure as Code"]
+    S9 --> S10["Stage 10 · Configuration Management"]
+    S10 --> S11["Stage 11 · Observability · Security · Triage (Capstone)"]
 ```
 
-Cross-technology prerequisites (focused graph — recommended reading edges, not
-a DAG to enforce):
+### Stage-by-Stage Rationale
+
+1. **Stage 1 — Foundations + Git:** Every subsequent topic assumes deployment vocabulary and Git change tracking.
+2. **Stage 2 — Linux:** Modern tools run as Linux processes, files, permissions, and services; systems cannot be debugged without this foundation.
+3. **Stage 3 — Networking:** DNS, HTTP, and TCP underpin containers, cloud APIs, ingress, and the vast majority of production outages.
+4. **Stage 4 — Scripting & Formats:** Bash, YAML, and JSON are the configuration glue for every pipeline and manifest (overlaps Stages 2–3).
+5. **Stage 5 — Docker:** Packages applications and dependencies deterministically; requires Linux and basic networking.
+6. **Stage 6 — CI/CD:** Combines Git and containers to automate building, testing, and shipping — the first automated workflow payoff.
+7. **Stage 7 — Kubernetes:** Assumes containers, networking, and YAML; solves running multiple services across multiple nodes.
+8. **Stage 8 — Cloud (AWS):** Managed versions of compute, networking, and storage; network fundamentals transfer directly.
+9. **Stage 9 — Terraform:** Replaces manual console clicking with repeatable, declarative code.
+10. **Stage 10 — Ansible:** Complements IaC by managing inside-the-OS software state and server configuration.
+11. **Stage 11 — Observability · Security · Triage:** A parallel capstone track. With real services running, you now have workloads to monitor, secure, and troubleshoot.
+
+---
+
+## C. Technology Scope by Area
+
+> Topic definitions by tier:  
+> - **Core:** Must exist for the area to function as a learning track.  
+> - **Recommended:** Practical depth for day-to-day engineering.  
+> - **Advanced:** Specialized concepts written last or on demand.
+
+<details open>
+<summary><strong>1. DevOps Fundamentals (<code>devops-fundamentals</code>)</strong></summary>
+
+- **Core:** Software Delivery Lifecycle (SDLC) · CI/CD core principles · Environment tiers (dev/stage/prod) · IaC vs. Config Management concepts · DevOps toolchain overview · DevOps culture & collaboration
+- **Recommended:** Release strategies (blue/green, canary) · SLO/SLI vocabulary · DORA metrics · Managing technical debt
+- **Advanced:** Platform engineering intro · Site reliability engineering (SRE) foundations · Value stream mapping
+</details>
+
+<details open>
+<summary><strong>2. Operating Systems: Linux (<code>operating-systems</code>)</strong></summary>
+
+- **Core:** Shell navigation & basics · Filesystem hierarchy & paths · Permissions & ownership (chmod, chown) · Users, groups & sudo · Process lifecycle (ps, kill, signals) · Package managers (apt, dnf) · Text processing (grep, sed, awk)
+- **Recommended:** Systemd services & unit files · Network commands (ss, ip, curl) · Disks, partitions & mounts · System logs with `journalctl` · Bash scripting basics
+- **Advanced:** Kernel tuning with `sysctl` · SELinux & AppArmor profiles · Performance analysis (top, iostat, vmstat) · Systemd timers & cron
+</details>
+
+<details open>
+<summary><strong>3. Networking (<code>networking</code>)</strong></summary>
+
+- **Core:** OSI 7-layer & TCP/IP models · IPv4 addressing & CIDR subnetting · DNS resolution architecture · HTTP & HTTPS protocols · TLS/SSL handshakes & certificates · SSH authentication & key management
+- **Recommended:** Load balancing (L4 vs. L7) · Firewalls & security groups · NAT, gateways & routing tables · Diagnostic commands (ping, dig, traceroute)
+- **Advanced:** Packet analysis (tcpdump, Wireshark) · IPv6 deployment · Service mesh concepts · eBPF network monitoring
+</details>
+
+<details open>
+<summary><strong>4. Version Control: Git (<code>version-control</code>)</strong></summary>
+
+- **Core:** Commits & object history · Staging mechanics · Branching & branch strategies · Merging & conflict resolution · Remotes & Pull Request collaboration
+- **Recommended:** Interactive rebasing · Stashing changes · Semantic tags & releases · Git hooks (pre-commit) · Monorepo workflow tips
+- **Advanced:** Reflog commit recovery · Git submodules · Git worktrees for concurrent branches · Packfiles & internals
+</details>
+
+<details open>
+<summary><strong>5. Programming & Scripting (<code>programming-scripting</code>)</strong></summary>
+
+- **Core:** Bash syntax, pipes & process substitution · Variables, loops & conditionals · Exit codes & strict mode (`set -euo pipefail`) · JSON manipulation with `jq` · YAML structure & validation · Regular expressions
+- **Recommended:** Python automation scripts · REST APIs with `curl` & Python requests · File parsing & format transformation · Environment variables & secrets loading
+- **Advanced:** Script test frameworks · Async automation jobs · Go fundamentals for cloud-native tools · Cross-platform CLI patterns
+</details>
+
+<details open>
+<summary><strong>6. Containers: Docker (<code>containers</code>)</strong></summary>
+
+- **Core:** Containers vs. VMs · Dockerfile syntax & best practices · Image building & layer caching · Container storage & volumes · Container networking & port mapping · CLI essentials (run, exec, logs, ps)
+- **Recommended:** Docker Compose multi-service apps · Container registries & image tagging · Multi-stage builds for minimal size · Container logging stdout/stderr
+- **Advanced:** Container vulnerability scanning with Trivy · Rootless containers & cgroup limits · Alternative runtimes (containerd, Podman) · Image signing
+</details>
+
+<details open>
+<summary><strong>7. CI/CD & Automation (<code>ci-cd-automation</code>)</strong></summary>
+
+- **Core:** Pipeline concepts: triggers, jobs, runners, steps · GitHub Actions syntax · Automated build & test workflows · Secret management in CI · Workflow artifacts & caching
+- **Recommended:** GitLab CI & Jenkins comparisons · Deployment strategies (rolling, blue/green) · Branch protection & status checks · Automated versioning & changelog generation
+- **Advanced:** Self-hosted runners & autoscaling · Matrix builds across platforms · Release workflows · GitOps delivery intro (Argo CD)
+</details>
+
+<details open>
+<summary><strong>8. Container Orchestration: Kubernetes (<code>container-orchestration</code>)</strong></summary>
+
+- **Core:** Cluster architecture (Control Plane & Nodes) · Pods lifecycle & restart policies · Deployments & ReplicaSets · Services (ClusterIP, NodePort, LoadBalancer) · Namespaces & isolation · Labels & selectors · `kubectl` inspection & debugging
+- **Recommended:** Ingress controllers & HTTP routing · ConfigMaps & Secrets · Storage: Volumes, PVs, and PVCs · StatefulSets & DaemonSets · Helm charts & release management
+- **Advanced:** NetworkPolicies for pod isolation · RBAC Roles & ServiceAccounts · Horizontal Pod Autoscaler (HPA) · Custom Resource Definitions (CRDs) & Operators · Control plane disaster recovery
+</details>
+
+<details open>
+<summary><strong>9. Cloud Platforms: AWS (<code>cloud-platforms</code>)</strong></summary>
+
+- **Core:** IAM: users, roles, and least privilege · Compute: EC2 instances, security groups, AMIs · Storage: S3 buckets, permissions, lifecycle · Networking: VPC, subnets, route tables, IGWs · Cloud billing & cost models
+- **Recommended:** Managed databases (RDS) · Application Load Balancers (ALB) · DNS with Route 53 · Serverless intro (AWS Lambda) · Multi-AZ high availability
+- **Advanced:** CloudFront CDN · Advanced VPC (peering, Transit Gateway, PrivateLink) · AWS Organizations & multi-account security · Well-Architected framework
+</details>
+
+<details open>
+<summary><strong>10. Infrastructure as Code: Terraform (<code>infrastructure-as-code</code>)</strong></summary>
+
+- **Core:** HCL syntax & structure · Providers & provider blocks · Resources & data sources · State file fundamentals · Core workflow (`init`, `plan`, `apply`, `destroy`)
+- **Recommended:** Input variables, locals & outputs · Terraform module composition · Remote backends (S3 + DynamoDB locking) · Importing pre-existing infrastructure
+- **Advanced:** Terraform workspaces · State drift detection & fixes · Automated Terraform pipelines · OpenTofu differences
+</details>
+
+<details open>
+<summary><strong>11. Configuration Management: Ansible (<code>configuration-management</code>)</strong></summary>
+
+- **Core:** Ad-hoc commands over SSH · Inventory files and groupings · Playbook structure and syntax · Core modules (copy, file, apt, service) · The idempotency principle
+- **Recommended:** Ansible Roles architecture · Variables & host facts · Handlers for service restarts · Jinja2 template rendering
+- **Advanced:** Ansible Vault for secrets · Dynamic inventory plugins · AWX / AAP automation · Testing roles with Molecule
+</details>
+
+<details open>
+<summary><strong>12. Observability (<code>observability</code>)</strong></summary>
+
+- **Core:** Three pillars: Metrics, Logs, and Traces · Prometheus architecture & exporters · PromQL queries · Grafana dashboards & alerts · Alertmanager routing
+- **Recommended:** Grafana Loki / ELK log aggregation · Structured JSON logging · USE and RED monitoring methods · Service Level Objectives (SLOs) in practice · OpenTelemetry overview
+- **Advanced:** High-cardinality metric tuning · Distributed tracing with Jaeger · Tail-based sampling · On-call rotation & incident escalation
+</details>
+
+<details open>
+<summary><strong>13. Security / DevSecOps (<code>security-devsecops</code>)</strong></summary>
+
+- **Core:** Secrets management (preventing hardcoded credentials) · Principle of least privilege · Trivy vulnerability scanning in CI · SSH key hardening · Host-level Linux hardening
+- **Recommended:** Vault / AWS Secrets Manager · SAST and DAST scanning in pipelines · Software Bill of Materials (SBOM) & signing · Container security best practices
+- **Advanced:** Policy as Code (OPA / Kyverno) · Zero Trust security model · Incident response playbooks · CIS compliance benchmarks
+</details>
+
+<details open>
+<summary><strong>14. Troubleshooting & Production (<code>troubleshooting-production</code>)</strong></summary>
+
+- **Core:** Systematic triage methodology · Correlating logs and metrics · HTTP status code debugging · Host resource bottlenecks (CPU, RAM, I/O) · Essential tools (curl, journalctl, dmesg)
+- **Recommended:** Network diagnostics (DNS timeouts, MTU, packet drops) · Database connection pool exhaustion · Establishing baseline performance · Blameless postmortems
+- **Advanced:** Chaos Engineering & fault injection · Capacity modeling & load testing · Cascading failure case studies · Memory leak profiling
+</details>
+
+---
+
+## D. Dependency Map
+
+Prerequisites are **guidelines for natural reading order**, never an application locking mechanism.
+
+### Multi-Prerequisite Breakdown
+
+```text
+Kubernetes
+├── Linux (processes, cgroups, systemd services)
+├── Networking (DNS, CNI, routing, port forwarding)
+├── Containers (Docker images, container runtime)
+└── Data Formats (YAML syntax, JSON schemas)
+```
+
+### Cross-Technology Prerequisite Graph
 
 ```mermaid
 flowchart TD
@@ -290,179 +261,71 @@ flowchart TD
     Obs --> TS[Troubleshooting]
 ```
 
-Examples of what the edges mean (multi-prerequisite node):
+---
+
+## E. Hands-On Project Opportunities
+
+> [!IMPORTANT]
+> **Documentation First, Projects Second**  
+> Projects validate and reinforce learning outcomes *after* the Core topics for a stage are written.
+
+| Stage | Practical Project Concept | Primary Skills Reinforced |
+| :---: | :--- | :--- |
+| **Stage 5** | Containerize a multi-tier web application; manage with Docker Compose | Dockerfile, images, volumes, port binding |
+| **Stage 6** | Automated CI pipeline: lint → test → security scan → push container image | GitHub Actions, secrets, container registry |
+| **Stage 7** | Deploy the containerized application to a local Kubernetes cluster | Pods, Deployments, Services, ConfigMaps, Ingress |
+| **Stage 8** | Provision a free-tier AWS footprint: VPC, subnets, EC2, S3 | Cloud networking, security groups, IAM policies |
+| **Stage 9** | Codify the entire AWS infrastructure using modular Terraform | Terraform HCL, remote state, variables, modules |
+| **Stage 10** | Configure and harden provisioned servers using an Ansible playbook | Ansible inventory, roles, systemd, idempotency |
+| **Stage 11** | **Capstone:** Git push → CI → Registry → Cluster → Dashboards & Alerts | Full-lifecycle DevOps delivery & observability |
+
+### Stage 11 Capstone Milestones
+
+- [ ] **Source Control:** Git branching model with pull requests and branch protection
+- [ ] **Automated CI:** Pipeline with linting, unit tests, and Trivy container vulnerability scanning
+- [ ] **Artifact Management:** Tagged, immutable container image published to registry
+- [ ] **Infrastructure as Code:** Declarative cloud infrastructure provisioned with Terraform
+- [ ] **Server Configuration:** Automated host provisioning and hardening via Ansible
+- [ ] **Continuous Delivery:** Automated zero-downtime deployment rollout to cluster
+- [ ] **Telemetry:** Prometheus metrics scraped and displayed in Grafana with alerting rules
+- [ ] **Production Runbook:** Tested incident triage playbook simulating a service outage
+
+---
+
+## F. Boundary Disambiguation Matrix
+
+Where two areas touch the same topic, the **canonical home** owns the primary article. Cross-cutting audiences are served via `tags` and the automated *Related topics* section.
+
+| Overlapping Areas | Boundary Rule & Canonical Home |
+| :--- | :--- |
+| **Networking vs. Troubleshooting** | Explaining how DNS, TLS, or routing *works* belongs in `networking`. Diagnosing and fixing an active network failure belongs in `troubleshooting-production`. |
+| **Observability vs. Troubleshooting** | Instrumenting metrics and configuring Grafana belongs in `observability`. Using alerts and metrics to triage an incident belongs in `troubleshooting-production`. |
+| **Fundamentals vs. CI/CD** | Theoretical definitions and delivery philosophies belong in `devops-fundamentals`. Concrete tool workflows (e.g. GitHub Actions) belong in `ci-cd-automation`. |
+| **Programming vs. Operating Systems** | Language syntax, Bash scripts, and jq parsing belong in `programming-scripting`. Interactive shell administration and systemd units belong in `operating-systems`. |
+| **Containers vs. Orchestration** | Single-host container runtimes and Dockerfiles belong in `containers`. Multi-host scheduling, Pods, and clusters belong in `container-orchestration`. |
+| **Cloud vs. Infrastructure as Code** | Cloud primitives and managed services belong in `cloud-platforms`. The declarative code that provisions them belongs in `infrastructure-as-code`. |
+| **IaC vs. Configuration Management** | Creating infrastructure resources belongs in `infrastructure-as-code`. Configuring software packages on those resources belongs in `configuration-management`. |
+| **Security vs. CI/CD** | Pipeline mechanics belong in `ci-cd-automation`. Pipeline vulnerability scanning, secrets protection, and signing belong in `security-devsecops`. |
+
+---
+
+## G. Architecture Evolution Workflow
 
 ```text
-Kubernetes
-├── Linux
-├── Networking
-├── Containers (Docker)
-└── YAML
+1. Add an Article  ──► Copy content/_template/article.mdx to content/<area>/<tool>/<article>.mdx
+2. Add a Tool     ──► Create content/<area>/<tool>/; landing page auto-generates with 1st article
+3. Add an Area     ──► Create content/<area>/ and register in src/data/categories.ts
+4. Reorder Content ──► Update frontmatter `order:` (10, 20, 30...); never use numeric folder prefixes
+5. Retire Content  ──► Set frontmatter `draft: true` or delete file
 ```
 
----
-
-## E. Project opportunities
-
-Proposals only — projects are **not** articles and are not implemented here.
-They reinforce a stage when the documentation for it exists.
-
-| Stage | Project idea | Reinforces |
-| --- | --- | --- |
-| 5 | Containerize a sample app; run it with Compose | Docker core |
-| 6 | GitHub Actions pipeline: build → test → publish image | CI/CD core |
-| 7 | Deploy the Stage-5 app to a local cluster (kind/minikube) | Kubernetes core |
-| 8 | Free-tier AWS footprint: VPC + compute + storage | Cloud core |
-| 9 | Reprovision the Stage-8 footprint with Terraform | IaC core |
-| 10 | Configure the Stage-8 servers with Ansible | Config management |
-| 11 | Capstone: repo → CI → registry → cluster/VM → dashboards → alert | Observability + production |
-
-Rule: **documentation first, project second** — a project section or article
-only after its stage's Core topics exist.
+> [!WARNING]
+> **Never Prefix Folder Names with Numbers**  
+> Keep directory paths clean (e.g. `content/operating-systems/linux/`). Never name folders `01-linux` or `02-networking`. Ordering belongs exclusively in frontmatter metadata.
 
 ---
 
-## F. Future / optional topics
+## 🔗 Related References
 
-Deliberately outside the core roadmap (write only if real need appears):
-
-- GitOps (Argo CD / Flux) · Service mesh (Istio / Linkerd) · Serverless depth
-- Helm advanced · Python-for-DevOps depth · Cost optimization · Multi-cloud
-  strategy · eBPF/network debugging · Platform engineering / internal
-  developer portals · Chaos engineering · ChatOps · PowerShell/Windows ops
-
-**Area candidates considered, not added** (see also report): data/databases
-(backup, replication, migrations) and developer-experience/platform — for now
-they fold into `cloud-platforms`, `troubleshooting-production` and
-`devops-fundamentals`; revisit only if content volume justifies a 15th area.
-
----
-
-## Boundaries & overlap
-
-Where two areas could compete for the same topic — the canonical home wins;
-the other side links via `tags` (one article, two audiences — never
-duplicated).
-
-| Overlap | Boundary |
-| --- | --- |
-| Networking vs Troubleshooting | Teaches how DNS/TLS/LB *work* → Networking. Symptom → diagnosis → fix playbook → Troubleshooting. |
-| Observability vs Troubleshooting | Instrumenting and reading signals (Prometheus, logs, SLOs) → Observability. Using those signals to repair an incident → Troubleshooting. |
-| Fundamentals vs CI/CD | Principles and vocabulary (what/why of delivery) → Fundamentals. Concrete tool workflows (how) → CI/CD. |
-| Programming vs Operating Systems | Language/format skills (Bash as a language, YAML, regex) → Programming. Interactive shell and OS administration → Operating Systems. |
-| Containers vs Orchestration | Single-host runtime (images, compose) → Containers. Multi-host scheduling, cluster objects → Orchestration. |
-| Cloud vs IaC | The platform's primitives and services → Cloud. The method of provisioning them declaratively → IaC. |
-| IaC vs Configuration Management | Creating/changing *resources* (servers exist) → IaC. State of software *on* those servers → Config Management. |
-| Security vs CI/CD | How pipelines are built → CI/CD. Scanning, secrets and hardening inside them → Security / DevSecOps. |
-
-Duplication rule: every topic gets exactly **one** canonical article in one
-area; cross-cutting audiences are served by `tags` + the automatic *Related
-topics* section.
-
----
-
-## Production relevance (planning metadata)
-
-For scope planning, important topics are tagged mentally as: **Conceptual** ·
-**Practical** · **Production-oriented** · **Troubleshooting-oriented**
-(a topic can be several). Rough orientation per scope:
-
-- Conceptual-heavy: fundamentals, networking theory, cloud architecture.
-- Practical-heavy: Docker, Git, CI/CD, Terraform, Ansible.
-- Production-heavy: observability, security, cloud operations.
-- Troubleshooting-heavy: troubleshooting area itself + Linux, network
-  diagnostics, database failure modes.
-
-This is **roadmap metadata only** — it is intentionally NOT a frontmatter
-field (no schema change, no new UI).
-
----
-
-## Content ordering: navigation vs learning
-
-- Frontmatter `order:` = **navigation order** inside one group (a tool or an
-  area's direct articles): intro → core → deeper, readable top to bottom.
-  Keep it local — multiples like 10, 20, 30 leave room to insert later.
-- **Learning dependency** lives in this document (stages + dependency map),
-  not in frontmatter. Do not try to encode a global curriculum into per-group
-  `order` fields; the site is a reference, and readers arrive at different
-  points.
-- If stage membership ever needs to be *visible*, express it as a `tags`
-  entry (`stage-5`) or a presentation-side grouping — never as a new schema
-  field or a course engine.
-
----
-
-## How the structure evolves
-
-- **Add an article**: copy `content/_template/article.mdx` to
-  `content/<area>/<tool>/` (or drop a plain `topic.md` under `content/<area>/`).
-  It appears in navigation, search, the area page and the tool landing page
-  after the next build — no code changes. `category`/`tool` are derived from
-  the folders, so frontmatter stays minimal.
-- **Add a tool**: create `content/<area>/<newtool>/`. The tool landing page
-  `/docs/<area>/<newtool>` is generated automatically from the collection the
-  moment its first article exists. No registry, no route file, no config.
-- **Add an area**: create `content/<area>/` and register it in
-  `src/data/categories.ts` *to* give it a display name (English/technical),
-  bilingual descriptions, an icon, and a visual position among the known
-  areas.
-- **Reorder material inside a group**: change frontmatter `order:` — never
-  rename folders with numeric prefixes (`01-linux`). Folder names stay
-  stable; ordering lives in metadata.
-- **Split or merge areas**: move files, update their `category:` field only
-  if the area id itself changes (it is normally derived), done. URLs change
-  (old ones keep working via the redirects in `astro.config.mjs`).
-- **Retire an area**: delete the folder (or set its pages `draft: true`).
-
-## Learning paths are not folders
-
-The same article can serve several audiences (e.g. a networking article useful
-to both `container-orchestration` and `cloud-platforms` readers). Each page has
-exactly **one** sidebar home (its area folder) but any number of **tags**.
-Future curated learning paths (beginner track, exam prep, …) should be
-assembled from tags and metadata — never by duplicating or relocating content.
-
-```yaml
----
-tags:
-  - containers
-  - kubernetes
-  - networking
----
-```
-
-If explicit learning phases (beginner track, ordered module, exam prep) are
-needed later, they should be **views over this metadata** — tag-curated lists
-or an `order`+`level` grouping in presentation code — not a new content
-schema, a course engine, or progress tracking. The reference-first architecture
-stays as-is.
-
-## Current limitations
-
-- **Unregistered areas are second-class in presentation only**: they work
-  fully (routing, sidebar, search) but display their raw English id as the
-  label, sort after all registered areas, and are omitted from the
-  `/docs` area index — until added to `src/data/categories.ts` (one entry).
-- **Tool landing pages exist only where articles exist**: an area page lists
-  exactly the tools that have at least one article. Tools reserved in the
-  roadmap but without content are not shown — there is intentionally no
-  separate tool registry to maintain.
-- **Article paths are one level deeper than tool pages**: `/docs/<area>/<tool>`
-  is the tool landing page, so an article sits at
-  `/docs/<area>/<tool>/<article>`. A flat file `content/<area>/<tool>.md`
-  would collide with the tool landing page and should not be used.
-- **Category presentation lives in one file**: descriptions, icons and
-  tool display names are defined in `src/data/categories.ts` alongside labels
-  and order — adding or changing them never requires touching content.
-- **Learning paths are implicit**: tags carry cross-cutting membership today;
-  a first-class path view does not exist yet and should be built from tags
-  when needed.
-- **This roadmap is invisible to the site**: scope entries, stages and
-  dependencies have no representation in the UI until their articles exist —
-  by design (documentation-first).
-
-## Related documents
-
-- [`content/README.md`](content/README.md) — authoring guide (day-to-day)
-- [`README.md`](README.md) — platform overview and architecture decisions
+- [Content Authoring Guide](content/README.md) — Day-to-day writing instructions, frontmatter specification, and components cheatsheet
+- [Platform Technical Overview](README.md) — Architecture decisions, Astro configuration, and build pipeline
