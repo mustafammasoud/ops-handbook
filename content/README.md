@@ -229,14 +229,36 @@ import placeholder from './images/placeholder.svg';
 <PdfEmbed src="/pdf/file.pdf" title="معاينة" />
 ```
 
+```mdx
+{/* بطاقة مفهوم افتراضية */}
+<InfoCard title="Node" description="عامل في الـ cluster." icon="cube" />
+
+{/* مقارنة خيارات مترابطة — تُوضع ٢–٣ بطاقات داخل grid بعرض الشاشات الكبيرة */}
+<div class="grid gap-4 sm:grid-cols-3">
+  <InfoCard variant="comparison" title="NoSchedule" description="…" icon="shield" />
+  <InfoCard variant="comparison" title="NoExecute" description="…" icon="cycle" />
+</div>
+
+{/* إنباه مهم أو تصور خاطئ شائع */}
+<InfoCard variant="insight" title="Common misconception" icon="pulse">
+  نص الإنباه — يمكن أن يحتوي شيفرة inline مثل <code>kubectl</code>.
+</InfoCard>
+```
+
 | المكوّن | الخصائص | الاستخدام |
 | --- | --- | --- |
 | `Callout` | `type` (`note\|tip\|warning\|lab`), `title?` | ملاحظة/تلميح/تحذير/مختبر |
 | `Steps` | أبناء مباشرة `li` | إجراء مرقّم |
 | `Figure` | `src`, `alt`, `caption?` | صورة مع تعليق |
+| `InfoCard` | `title`, `description?`, `icon?`, `tags?`, `variant?` (`concept`\|`comparison`\|`insight`\|`feature`\|`callout`\|`tip`\|`warning`\|`danger`\|`success`\|`summary`\|`command`\|`resource`), `eyebrow?` | بطاقة مفهوم/مقارنة/إنباه/مهمة/نصيحة/تحذير/خطر/نجاح/ملخص/أمر/مرجع |
+| `CardGrid` | `columns?` (`2`\|`3`\|`4`), `gap?` (`sm`\|`md`\|`lg`), `label?` | شبكة بطاقات متجاوبة |
 | `PdfCard` | `href`, `title?`, `description?` | زرّا فتح/تحميل |
 | `PdfEmbed` | `src`, `title`, `height?` | معاينة PDF مدمجة |
 
+* **`InfoCard`**: تُختار الأيقونة من قائمة `CategoryIcon` الموجودة (`shield`،
+  `sliders`، `cycle`، `pulse`، `cube` …) — لا أيقونات إيموجي ولا مكتبات جديدة.
+  تُستخدم البطاقات للـ **مقارنة خيارات مترابطة** أو **مفاهيم أساسية أو إنباهات
+  مهمة فقط** — لا تُغلَّف كل فقرة أو جدول أو مخطط بها.
 * **Related Topics** يُضاف تلقائياً أسفل كل مقال من الوسوم — لا يُكتب يدوياً.
 * **في ملفات `.md` العادية**: Markdown الخالص فقط (المكوّنات JSX تعمل في MDX).
 
