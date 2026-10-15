@@ -22,10 +22,18 @@ const ARABIC_SCRIPT = /[\u0600-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
 const contentBlockDirection = {
   name: 'content-block-direction',
   element: {
-    // Same block set the previous per-block direction handling targeted.
+    // Direction is set per LIST (ul/ol/dl), never per list item: a
+    // dir="ltr" on individual <li>/<dt>/<dd> inside an RTL <ul> resolves
+    // the surrounding gap/bullet differently in Chromium vs Firefox
+    // (Chromium collapses the gap at the item start, Firefox at the end).
+    // Purely-English lists get dir="ltr" here; mixed lists inherit the
+    // article's RTL and each item's text reorders via the Unicode bidi
+    // algorithm. A defensive CSS rule (.prose list items) in global.css
+    // covers hand-authored dir-less items in LTR pages.
     filter: [
-      'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'dt', 'dd',
+      'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'blockquote', 'figcaption', 'caption', 'summary', 'th', 'td',
+      'ul', 'ol', 'dl',
     ],
     /**
      * @param {import('hast').Element} node
