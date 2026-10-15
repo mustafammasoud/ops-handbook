@@ -19,7 +19,7 @@ language: ar
 
 الفكرة ببساطة إنك بتحدد بنفسك الـ Node اللي الـ Pod هيتخصص لها، بدل ما تعتمد على الـ Scheduler في اتخاذ القرار.
 
-في الملف ده هنتعلم:
+المواضيع الل هنتعلمها :
 
 - إزاي الـ Scheduler بيتعامل مع الـ Pods اللي لسه متعملهاش Scheduling.
 - إزاي تستخدم `spec.nodeName` لتحديد الـ Node.
@@ -528,8 +528,7 @@ flowchart TB
     class K result;
 ```
 
-في الـ Production، مش بنلجأ عادةً إلى `nodeName` لكل Pod؛ لأننا بنحتاج الـ Scheduler يراعي الموارد والـ constraints. لما نحتاج نتحكم في الـ placement، بنستخدم آليات زي `nodeSelector` وNode Affinity وTaints & Tolerations، وهنشرح كل واحدة بالتفصيل في الملفات الجاية.
-
+في الـ Production، مش بنلجأ عادةً إلى `nodeName` لكل Pod؛ لأننا بنحتاج الـ Scheduler يراعي الموارد والـ constraints. لما نحتاج نتحكم في الـ placement، بنستخدم آليات زي `nodeSelector` وNode Affinity وTaints & Tolerations،
 ---
 
 ## 8. Troubleshooting
