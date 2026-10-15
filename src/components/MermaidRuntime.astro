@@ -6,13 +6,19 @@
 ---
 
 <script>
+  /** Dark state used for the most recent render (null until first render). */
+  let lastRenderedDark: boolean | null = null;
+  /** Serializes renders so overlapping theme flips cannot interleave. */
+  let renderChain: Promise<void> = Promise.resolve();
+  const siteIsDark = () => document.documentElement.classList.contains('dark');
+
   async function renderMermaid() {
+    const dark = siteIsDark();
+    lastRenderedDark = dark;
+
     const codes = document.querySelectorAll<HTMLElement>(
       'pre[data-language="mermaid"] > code, pre > code.language-mermaid',
     );
-    if (codes.length === 0) return;
-
-    const dark = document.documentElement.classList.contains('dark');
 
     /* Content diagrams use classDef lines with hardcoded warm LIGHT colors
        (fills like #E8D8C2, ink like #3E2B1F) — great on paper, but they
@@ -86,14 +92,15 @@
         return remapHexForDark(m);
       });
 
-    const containers: HTMLElement[] = [];
+    // First pass: turn any unprocessed <pre data-language="mermaid"> blocks
+    // into .mermaid mounts, preserving the ORIGINAL (un-remapped) source on
+    // the element so a later theme change can re-render from pristine input.
     for (const code of Array.from(codes)) {
       const pre = code.closest('pre');
       if (!pre) continue;
       const div = document.createElement('div');
       div.className = 'mermaid';
-      const rawSource = code.textContent ?? '';
-      div.textContent = dark ? remapSourceForDark(rawSource) : rawSource;
+      div.dataset.mermaidSource = code.textContent ?? '';
 
       // Optional caption: only used when the source block provides one
       // (e.g. a data-caption attribute) — captions are never invented.
@@ -110,6 +117,23 @@
       } else {
         pre.replaceWith(div);
       }
+    }
+
+    // Second pass: every mount (fresh or previously rendered) gets its source
+    // set for the ACTIVE theme, then is queued for (re)render. Re-rendering in
+    // place is what keeps diagrams in sync when the site theme toggles —
+    // Mermaid bakes colors into the SVG, so CSS alone cannot restyle them.
+    const mounts = Array.from(
+      document.querySelectorAll<HTMLElement>('.mermaid[data-mermaid-source]'),
+    );
+    if (mounts.length === 0) return;
+
+    const containers: HTMLElement[] = [];
+    for (const div of mounts) {
+      const original = div.dataset.mermaidSource ?? '';
+      div.textContent = dark ? remapSourceForDark(original) : original;
+      // Mermaid marks processed nodes; clear it so a re-render is allowed.
+      div.removeAttribute('data-processed');
       containers.push(div);
     }
 
@@ -299,5 +323,30 @@
     await mermaid.run({ nodes: containers });
   }
 
-  renderMermaid();
+  /** Serialize renders so a rapid theme flip cannot interleave two runs. */
+  function scheduleRender(): void {
+    renderChain = renderChain
+      .then(() => {
+        // Re-check at execution time: a queued render may already be moot.
+        if (siteIsDark() !== lastRenderedDark) return renderMermaid();
+      })
+      .catch((e) => console.error('Mermaid render error:', e));
+  }
+
+  // Route the first render through the same serialized queue as theme
+  // toggles. Calling renderMermaid() directly here would let a toggle that
+  // lands during the initial `await import('mermaid')` run concurrently with
+  // this in-flight render (two mermaid.run calls on the same nodes).
+  scheduleRender();
+
+  // Mermaid bakes themeVariables into the SVG at render time; CSS cannot
+  // recolor it afterwards. Watch the root <html> class (where ThemeToggle
+  // flips .dark) and re-render every diagram with the matching palette.
+  const observer = new MutationObserver(() => {
+    if (siteIsDark() !== lastRenderedDark) scheduleRender();
+  });
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
 </script>
