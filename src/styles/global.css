@@ -13,35 +13,40 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Warm editorial color system                                         */
-/* Printed-manual paper (light) / dark coffee graphite (dark), one     */
-/* muted coffee-amber accent. No blue, no gradients, no neon.          */
+/* Warm Coffee & Beige (light) / Monkeytype Midnight (dark)            */
+/* Printed-manual beige paper (light) / blue-slate midnight (dark).    */
+/* One muted coffee accent (light) / slate-blue accent (dark).         */
+/* No pure white, no cold gray, no neon, no gradients.                 */
 /* Every value below is a design token — adjust the palette here, not  */
 /* in individual components.                                           */
 /* ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
 
-  /* Surfaces — warm paper, never pure white. */
-  --c-bg: #f5efe4; /* page background              (--background)   */
-  --c-surface: #fffaf1; /* cards, panels, nav surfaces    (--surface)     */
-  --c-surface-alt: #fffdf8; /* nested panels, table headers (--surface-alt) */
-  --c-surface-2: #f1e7d6; /* hover fills, inline code (= accent-soft)  */
-  --c-border: #d8cdbb; /* hairline borders             (--border)      */
+  /* Surfaces — warm beige paper, never pure white. */
+  --c-bg: #e9dfce; /* page background              (--background)   */
+  --c-surface: #f4ecdf; /* cards, panels, nav surfaces    (--surface)     */
+  --c-surface-alt: #faf4e9; /* nested panels, table headers (--surface-alt) */
+  --c-surface-2: #faf4e9; /* hover fills, inline code (= accent-soft)  */
+  --c-border: #c7b69d; /* hairline borders             (--border)      */
+  --c-border-light: #d6c8b0; /* softest hairlines (tables, hr)               */
 
   /* Text. */
-  --c-text: #25231f; /* body copy                 (--text-primary)   */
-  --c-muted: #70695f; /* metadata, captions        (--text-secondary) */
-  --c-secondary: #5f665f; /* calm slate secondary      (--secondary)     */
+  --c-text: #49382b; /* headings + strong           (--text-primary)   */
+  --c-text-body: #5a4736; /* body copy                 (--text-body)     */
+  --c-muted: #6e5b49; /* metadata, captions        (--text-secondary) */
+  --c-secondary: #6e5b49; /* calm secondary                  (--secondary)     */
 
   /* Accent — used intentionally: links, active states, section numbers,
      arrows, small highlights. `--c-accent-ink` is the same accent sized
      for text (≥ 4.5:1 on the paper background); `--c-accent` stays the
      spec value for borders, bars, icons and fills. */
-  --c-accent: #9a6b32; /* (--accent)                                        */
-  --c-accent-ink: #8f6230; /* 4.64:1 on #f5efe4                               */
-  --c-accent-soft: #f1e7d6; /* tinted fills              (--accent-soft)    */
-  --c-accent-contrast: #fffcf5; /* text on accent fills                           */
+  --c-accent: #8a674b; /* (--accent)                                        */
+  --c-accent-ink: #7a5940; /* 5.5:1 on #f4ecdf                                 */
+  --c-accent-hover: #7a5a41; /* hover state                    (--accent-hover)  */
+  --c-accent-soft: #ede2ce; /* tinted fills              (--accent-soft)    */
+  --c-accent-contrast: #faf4e9; /* text on accent fills                           */
+  --c-accent-fill: #8a674b; /* accent for text-bearing fills (buttons)          */
 
   /* Code blocks stay dark in both themes — terminal/editor surfaces. */
   --c-code-bg: #24231f; /* (--code-background)                                 */
@@ -52,58 +57,65 @@
   --c-code-chrome-border: #4a463f;
 
   /* Elevation — barely-there, like pages resting on a desk. */
-  --c-shadow-card: 0 1px 2px rgb(45 35 20 / 0.05), 0 10px 30px rgb(45 35 20 / 0.06);
-  --c-shadow-code: 0 8px 24px rgb(45 35 20 / 0.1);
+  --c-shadow-card: 0 1px 2px rgb(74 56 43 / 0.06), 0 10px 30px rgb(74 56 43 / 0.07);
+  --c-shadow-code: 0 8px 24px rgb(74 56 43 / 0.12);
 
   /* Callouts — same warm palette, only lightly tinted. */
-  --c-note-bg: #f2ede2;
-  --c-note-border: #d8cdbb;
-  --c-note-fg: #57503f;
-  --c-tip-bg: #f1e7d6;
-  --c-tip-border: #dcc7a6;
-  --c-tip-fg: #7e5527;
-  --c-warning-bg: #f6e6d7;
-  --c-warning-border: #e0c3a4;
-  --c-warning-fg: #93492a;
-  --c-lab-bg: #eeeae0;
-  --c-lab-border: #d1cabb;
+  --c-note-bg: #f0e8d8;
+  --c-note-border: #c7b69d;
+  --c-note-fg: #5a4736;
+  --c-tip-bg: #efe3cb;
+  --c-tip-border: #c9a06a;
+  --c-tip-fg: #7a5940;
+  --c-warning-bg: #f4e2cd;
+  --c-warning-border: #d9a27a;
+  --c-warning-fg: #8f4527;
+  --c-lab-bg: #e9e8db;
+  --c-lab-border: #bebba6;
   --c-lab-fg: #4d5548;
 }
 
 .dark {
   color-scheme: dark;
-  --c-bg: #17130f;
-  --c-surface: #201a14;
-  --c-surface-alt: #201a14; /* same as surface — keeps dark tables unchanged */
-  --c-surface-2: #2a231a;
-  --c-border: #3a3226;
-  --c-text: #e8e1d4;
-  --c-muted: #a79c8a;
-  --c-secondary: #8b9187;
-  --c-accent: #d0a45c;
-  --c-accent-ink: #d0a45c; /* the dark accent already passes on dark surfaces */
-  --c-accent-soft: #2a231a;
-  --c-accent-contrast: #1c1610;
+  --c-bg: #0b0e13;
+  --c-surface: #141a24;
+  --c-surface-alt: #141a24; /* same as surface — keeps dark tables unchanged */
+  --c-surface-2: #1c2430;
+  --c-border: #2a3444;
+  --c-border-light: #232c3a;
+  --c-text: #9fadc6;
+  --c-text-body: #9fadc6;
+  --c-muted: #7d8ea8; /* 5.2:1 on #141a24 */
+  --c-secondary: #394760; /* UI/border tone (Monkeytype secondary), not text */
+  --c-accent: #60759f;
+  --c-accent-ink: #7d91b8; /* accent lightened for text on dark surfaces */
+  --c-accent-hover: #8ba0c9;
+  --c-accent-soft: #1c2430;
+  --c-accent-contrast: #0b0e13; /* dark ink on slate-blue accent fills */
+  /* Spec accent #60759f + near-black ink is 4.18:1 — just under AA for
+     button text. Text-bearing fills use a barely-lightened accent;
+     #0b0e13 ink on this is 4.53:1. Marks/borders keep --c-accent. */
+  --c-accent-fill: #667ba3;
   /* Code chrome in dark mode mirrors the current surface/border tokens. */
   --c-code-bg: #282828; /* gruvbox-dark background, unchanged */
-  --c-code-border: #3a3226;
+  --c-code-border: #2a3444;
   --c-code-fg: #ebdbb2;
   --c-code-muted: #a79c8a;
-  --c-code-chrome-bg: #201a14;
-  --c-code-chrome-border: #3a3226;
+  --c-code-chrome-bg: #141a24;
+  --c-code-chrome-border: #2a3444;
   --c-shadow-card: none;
   --c-shadow-code: none;
-  --c-note-bg: #211c15;
-  --c-note-border: #3b3427;
-  --c-note-fg: #c5bba9;
-  --c-tip-bg: #1b1f15;
-  --c-tip-border: #374129;
+  --c-note-bg: #161d29;
+  --c-note-border: #2a3444;
+  --c-note-fg: #a8b4c8;
+  --c-tip-bg: #15201a;
+  --c-tip-border: #2e4033;
   --c-tip-fg: #9db77c;
-  --c-warning-bg: #261a14;
-  --c-warning-border: #4d352a;
+  --c-warning-bg: #241a15;
+  --c-warning-border: #4a3328;
   --c-warning-fg: #cf8a63;
-  --c-lab-bg: #231a1f;
-  --c-lab-border: #463340;
+  --c-lab-bg: #1d1822;
+  --c-lab-border: #3c3044;
   --c-lab-fg: #c295a6;
 }
 
@@ -113,6 +125,7 @@
   --color-surface-alt: var(--c-surface-alt);
   --color-surface-2: var(--c-surface-2);
   --color-border: var(--c-border);
+  --color-border-light: var(--c-border-light);
   --color-text: var(--c-text);
   --color-muted: var(--c-muted);
   --color-secondary: var(--c-secondary);
@@ -120,6 +133,7 @@
   --color-accent-ink: var(--c-accent-ink);
   --color-accent-soft: var(--c-accent-soft);
   --color-accent-contrast: var(--c-accent-contrast);
+  --color-accent-fill: var(--c-accent-fill);
   --shadow-card: var(--c-shadow-card);
   --shadow-code: var(--c-shadow-code);
   --color-note-bg: var(--c-note-bg);
@@ -146,10 +160,19 @@
 
   body {
     background-color: var(--c-bg);
-    color: var(--c-text);
+    color: var(--c-text-body);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--c-text);
   }
 
   ::selection {
@@ -181,15 +204,15 @@
 /* brighter hover (plus pill) and an accent active state.              */
 /* ------------------------------------------------------------------ */
 :root {
-  --nav-link: #4f4636; /* 8.93:1 on #fffaf1 */
-  --nav-link-hover: #25231f; /* 15.10:1 */
-  --nav-link-active: #8f6230; /* 5.10:1 — accent sized for text */
+  --nav-link: #5a4736; /* 6.7:1 on #e9dfce */
+  --nav-link-hover: #49382b; /* 8.5:1 */
+  --nav-link-active: #7a5940; /* 4.8:1 — accent sized for text */
 }
 
 .dark {
-  --nav-link: #cfc6b6; /* 10.92:1 on #17130f */
-  --nav-link-hover: #e8e1d4; /* 14.21:1 */
-  --nav-link-active: #d0a45c; /* 8.05:1 */
+  --nav-link: #9fadc6; /* 8.5:1 on #0b0e13 */
+  --nav-link-hover: #c3cede; /* 12.2:1 */
+  --nav-link-active: #8ba0c9; /* 7.3:1 */
 }
 
 .nav-link {
@@ -252,6 +275,17 @@
   unicode-bidi: isolate;
 }
 
+/* List items inherit their list's base direction. The build-time plugin
+   sets dir="ltr" on purely-English lists (never on <li>/<dt>/<dd> —
+   per-item dir resolves the bullet gap differently in Chromium vs
+   Firefox); this rule pins inheritance for hand-authored markup and
+   keeps markers/text aligned in mixed-direction (RTL) articles. */
+.prose :where(ul, ol, dl) :where(li, dt, dd) {
+  direction: inherit;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
 /* Site, article, and page headers keep their original LTR layout — logo,
    navigation, search, header actions, breadcrumbs, titles, and metadata
    always start from the left, on English and Arabic pages alike. Locked
@@ -304,7 +338,7 @@ kbd {
   inset-inline-start: 0.5rem;
   z-index: 100;
   border-radius: 0.375rem;
-  background-color: var(--c-accent);
+  background-color: var(--c-accent-fill);
   color: var(--c-accent-contrast);
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -337,8 +371,7 @@ kbd {
 }
 
 .prose :where(a:hover) {
-  /* Darken in place — no second hue. */
-  color: color-mix(in srgb, var(--c-accent-ink) 84%, #000);
+  color: var(--c-accent-hover);
   text-decoration-thickness: 2px;
 }
 
@@ -399,7 +432,7 @@ kbd {
 .prose :where(hr) {
   margin-block: 2.5rem;
   border: 0;
-  border-block-start: 1px solid var(--c-border);
+  border-block-start: 1px solid var(--c-border-light);
 }
 
 .prose :where(img) {
@@ -422,7 +455,7 @@ kbd {
 
 .prose :where(th),
 .prose :where(td) {
-  border: 1px solid var(--c-border);
+  border: 1px solid var(--c-border-light);
   padding: 0.5rem 0.75rem;
   text-align: start;
 }
@@ -885,7 +918,7 @@ pre.astro-code span {
   color: var(--c-text);
   padding: 0;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgb(45 35 20 / 0.2);
+  box-shadow: 0 24px 60px rgb(74 56 43 / 0.22);
 }
 
 .search-dialog::backdrop {

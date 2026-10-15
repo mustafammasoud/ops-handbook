@@ -12,13 +12,88 @@
     );
     if (codes.length === 0) return;
 
+    const dark = document.documentElement.classList.contains('dark');
+
+    /* Content diagrams use classDef lines with hardcoded warm LIGHT colors
+       (fills like #E8D8C2, ink like #3E2B1F) — great on paper, but they
+       render as light boxes on the dark theme. Instead of rewriting dozens
+       of content files, remap hexes in the diagram source at render time
+       (dark mode only): light pastel fills → dark surface tones by hue
+       family, dark ink → light text by hue family, mid-tone strokes stay
+       (visible on dark fills). Light mode keeps the authored colors. */
+    const parseHex = (hex: string): [number, number, number] | null => {
+      let h = hex.slice(1);
+      if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+      return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    };
+
+    const toHsl = (r: number, g: number, b: number) => {
+      const rn = r / 255, gn = g / 255, bn = b / 255;
+      const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+      const l = (max + min) / 2;
+      const d = max - min;
+      let h = 0, s = 0;
+      if (d > 0) {
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === rn) h = (gn - bn) / d + (gn < bn ? 6 : 0);
+        else if (max === gn) h = (bn - rn) / d + 2;
+        else h = (rn - gn) / d + 4;
+        h *= 60;
+      }
+      return { h, s, l };
+    };
+
+    const DARK_FILLS = {
+      warm: '#1c2430', // tan / cream / brown pastels → surface-2
+      green: '#15201a', // sage / mint pastels → tip-family
+      blue: '#161d29', // sky / steel pastels → note-family
+      purple: '#1d1822', // lavender / plum pastels → lab-family
+      red: '#241a15', // peach / rose / brick pastels → warning-family
+    };
+    const DARK_INK = {
+      warm: '#9fadc6', // muted browns → primary text
+      green: '#9db77c',
+      blue: '#a8b4c8',
+      purple: '#c295a6',
+      red: '#cf8a63',
+    };
+
+    const hueFamily = (h: number, s: number): keyof typeof DARK_FILLS => {
+      if (s < 0.12) return 'warm';
+      if (h < 20 || h >= 330) return 'red';
+      if (h < 70) return 'warm';
+      if (h < 175) return 'green';
+      if (h < 260) return 'blue';
+      return 'purple';
+    };
+
+    const remapHexForDark = (hex: string): string => {
+      const rgb = parseHex(hex);
+      if (!rgb) return hex;
+      const { h, s, l } = toHsl(rgb[0], rgb[1], rgb[2]);
+      const family = hueFamily(h, s);
+      if (l > 0.55) return DARK_FILLS[family]; // light pastel fill → dark surface
+      if (l <= 0.35) return DARK_INK[family]; // dark ink / dark stroke → light text
+      return hex; // mid-tone strokes keep their hue (visible on dark)
+    };
+
+    const remapSourceForDark = (src: string) =>
+      src.replace(/#[0-9a-fA-F]{3,8}\b/g, (m) => {
+        // Leave 4/8-digit (with alpha) and malformed values untouched.
+        const body = m.slice(1);
+        if (body.length !== 3 && body.length !== 6) return m;
+        return remapHexForDark(m);
+      });
+
     const containers: HTMLElement[] = [];
     for (const code of Array.from(codes)) {
       const pre = code.closest('pre');
       if (!pre) continue;
       const div = document.createElement('div');
       div.className = 'mermaid';
-      div.textContent = code.textContent ?? '';
+      const rawSource = code.textContent ?? '';
+      div.textContent = dark ? remapSourceForDark(rawSource) : rawSource;
 
       // Optional caption: only used when the source block provides one
       // (e.g. a data-caption attribute) — captions are never invented.
@@ -39,101 +114,187 @@
     }
 
     const { default: mermaid } = await import('mermaid');
-    const dark = document.documentElement.classList.contains('dark');
 
-    // Light diagrams use the warm palette: off-white panels, dark text,
-    // muted borders, amber accents and slate/gray secondary lines — no
-    // default blues/purples/greens. Dark mode keeps Mermaid's own theme.
+    // Both themes render with Mermaid's `base` theme plus explicit
+    // themeVariables, so diagrams always match the site palette — the
+    // named `dark` theme ships its own fixed colors that ignore parts of
+    // themeVariables. Light = Warm Coffee & Beige (beige panels, coffee
+    // accents); dark = Monkeytype Midnight (blue-slate panels, slate-blue
+    // accents). No default blues/purples/greens/neons in either mode.
     const lightThemeVariables = {
       fontFamily:
         'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       fontSize: '14px',
 
       // Panels / nodes
-      primaryColor: '#FFFDF8',
-      mainBkg: '#FFFDF8',
-      nodeBorder: '#D8CDBB',
-      clusterBkg: '#F1E7D6',
-      clusterBorder: '#D8CDBB',
-      titleColor: '#25231F',
-      background: '#FFFAF1',
+      primaryColor: '#FAF4E9',
+      mainBkg: '#FAF4E9',
+      nodeBorder: '#C7B69D',
+      clusterBkg: '#F4ECDF',
+      clusterBorder: '#C7B69D',
+      titleColor: '#49382B',
+      background: '#F4ECDF',
 
       // Text and lines
-      primaryTextColor: '#25231F',
-      textColor: '#25231F',
-      lineColor: '#5F665F',
-      defaultLinkColor: '#5F665F',
-      secondaryColor: '#F1E7D6',
-      tertiaryColor: '#F5EFE4',
-      edgeLabelBackground: '#FFFAF1',
+      primaryTextColor: '#49382B',
+      textColor: '#49382B',
+      lineColor: '#6E5B49',
+      defaultLinkColor: '#6E5B49',
+      secondaryColor: '#F4ECDF',
+      tertiaryColor: '#E9DFCE',
+      edgeLabelBackground: '#FAF4E9',
 
       // Sequence diagrams
-      actorBkg: '#F1E7D6',
-      actorBorder: '#9A6B32',
-      actorTextColor: '#25231F',
-      actorLineColor: '#70695F',
-      signalColor: '#25231F',
-      signalTextColor: '#25231F',
-      labelBoxBkgColor: '#F1E7D6',
-      labelBoxBorderColor: '#D8CDBB',
-      labelTextColor: '#25231F',
-      loopTextColor: '#25231F',
-      activationBkgColor: '#F1E7D6',
-      activationBorderColor: '#9A6B32',
-      sequenceNumberColor: '#25231F',
-      noteBkgColor: '#F1E7D6',
-      noteBorderColor: '#9A6B32',
-      noteTextColor: '#25231F',
+      actorBkg: '#F4ECDF',
+      actorBorder: '#8A674B',
+      actorTextColor: '#49382B',
+      actorLineColor: '#6E5B49',
+      signalColor: '#49382B',
+      signalTextColor: '#49382B',
+      labelBoxBkgColor: '#F4ECDF',
+      labelBoxBorderColor: '#C7B69D',
+      labelTextColor: '#49382B',
+      loopTextColor: '#49382B',
+      activationBkgColor: '#F4ECDF',
+      activationBorderColor: '#8A674B',
+      sequenceNumberColor: '#FAF4E9',
+      noteBkgColor: '#F4ECDF',
+      noteBorderColor: '#8A674B',
+      noteTextColor: '#49382B',
 
       // State / class / misc
-      forkBkgColor: '#F1E7D6',
-      joinBkgColor: '#F1E7D6',
-      classBkgColor: '#FFFDF8',
-      classBorder: '#D8CDBB',
-      fillType0: '#FFFDF8',
-      fillType1: '#F1E7D6',
-      fillType2: '#F5EFE4',
+      forkBkgColor: '#F4ECDF',
+      joinBkgColor: '#F4ECDF',
+      classBkgColor: '#FAF4E9',
+      classBorder: '#C7B69D',
+      fillType0: '#FAF4E9',
+      fillType1: '#F4ECDF',
+      fillType2: '#E9DFCE',
 
       // Categorical palettes (mindmap sections, scales, pie) — warm
-      // neutrals, amber and slate only; no default blues/purples/greens.
-      // Text on these fills is derived automatically (cScaleInv).
-      git0: '#9A6B32',
-      git1: '#5F665F',
-      git2: '#70695F',
-      git3: '#8F6230',
-      cScaleLabel0: '#FFFCF5',
-      cScaleLabel1: '#25231F',
-      cScale0: '#9A6B32',
-      cScale1: '#F1E7D6',
-      cScale2: '#D8CDBB',
-      cScale3: '#C9CEC3',
-      cScale4: '#E0C3A4',
-      cScale5: '#5F665F',
-      cScale6: '#B9B0A0',
-      pie1: '#9A6B32',
-      pie2: '#F1E7D6',
-      pie3: '#D8CDBB',
-      pie4: '#C9CEC3',
-      pie5: '#E0C3A4',
-      pie6: '#5F665F',
-      pie7: '#B9B0A0',
-      pie8: '#8F6230',
-      pie9: '#E9E2D2',
-      pie10: '#A9A192',
-      pie11: '#70695F',
-      pie12: '#EDE9DF',
-      pieTitleTextColor: '#25231F',
-      pieSectionTextColor: '#25231F',
-      pieOuterStrokeColor: '#D8CDBB',
-      pieStrokeColor: '#FFFAF1',
-      pieChartBackground: '#FFFAF1',
+      // neutrals and coffee accents only. Text on these fills is derived
+      // automatically (cScaleInv).
+      git0: '#8A674B',
+      git1: '#6E5B49',
+      git2: '#6E5B49',
+      git3: '#7A5940',
+      cScaleLabel0: '#FAF4E9',
+      cScaleLabel1: '#49382B',
+      cScale0: '#8A674B',
+      cScale1: '#F4ECDF',
+      cScale2: '#C7B69D',
+      cScale3: '#B8BBA8',
+      cScale4: '#D9A27A',
+      cScale5: '#6E5B49',
+      cScale6: '#B5A892',
+      pie1: '#8A674B',
+      pie2: '#F4ECDF',
+      pie3: '#C7B69D',
+      pie4: '#B8BBA8',
+      pie5: '#D9A27A',
+      pie6: '#6E5B49',
+      pie7: '#B5A892',
+      pie8: '#7A5940',
+      pie9: '#EDE2CE',
+      pie10: '#A39684',
+      pie11: '#6E5B49',
+      pie12: '#D6C8B0',
+      pieTitleTextColor: '#49382B',
+      pieSectionTextColor: '#49382B',
+      pieOuterStrokeColor: '#C7B69D',
+      pieStrokeColor: '#F4ECDF',
+      pieChartBackground: '#F4ECDF',
+    };
+
+    const darkThemeVariables = {
+      fontFamily:
+        'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      fontSize: '14px',
+
+      // Panels / nodes
+      primaryColor: '#1C2430',
+      mainBkg: '#1C2430',
+      nodeBorder: '#2A3444',
+      clusterBkg: '#141A24',
+      clusterBorder: '#2A3444',
+      titleColor: '#9FADC6',
+      background: '#141A24',
+
+      // Text and lines
+      primaryTextColor: '#9FADC6',
+      textColor: '#9FADC6',
+      lineColor: '#6E7F9C',
+      defaultLinkColor: '#6E7F9C',
+      secondaryColor: '#1C2430',
+      tertiaryColor: '#0B0E13',
+      edgeLabelBackground: '#141A24',
+
+      // Sequence diagrams
+      actorBkg: '#1C2430',
+      actorBorder: '#60759F',
+      actorTextColor: '#9FADC6',
+      actorLineColor: '#6E7F9C',
+      signalColor: '#9FADC6',
+      signalTextColor: '#9FADC6',
+      labelBoxBkgColor: '#1C2430',
+      labelBoxBorderColor: '#2A3444',
+      labelTextColor: '#9FADC6',
+      loopTextColor: '#9FADC6',
+      activationBkgColor: '#1C2430',
+      activationBorderColor: '#60759F',
+      sequenceNumberColor: '#0B0E13',
+      noteBkgColor: '#1C2430',
+      noteBorderColor: '#60759F',
+      noteTextColor: '#9FADC6',
+
+      // State / class / misc
+      forkBkgColor: '#1C2430',
+      joinBkgColor: '#1C2430',
+      classBkgColor: '#1C2430',
+      classBorder: '#2A3444',
+      fillType0: '#1C2430',
+      fillType1: '#141A24',
+      fillType2: '#0B0E13',
+
+      // Categorical palettes — slate-blue accents and blue-gray neutrals
+      // only; no default purples/greens/neons.
+      git0: '#60759F',
+      git1: '#6E7F9C',
+      git2: '#394760',
+      git3: '#7D91B8',
+      cScaleLabel0: '#9FADC6',
+      cScaleLabel1: '#0B0E13',
+      cScale0: '#60759F',
+      cScale1: '#1C2430',
+      cScale2: '#2A3444',
+      cScale3: '#394760',
+      cScale4: '#7D91B8',
+      cScale5: '#6E7F9C',
+      cScale6: '#232C3A',
+      pie1: '#60759F',
+      pie2: '#1C2430',
+      pie3: '#2A3444',
+      pie4: '#394760',
+      pie5: '#7D91B8',
+      pie6: '#6E7F9C',
+      pie7: '#232C3A',
+      pie8: '#8BA0C9',
+      pie9: '#161D29',
+      pie10: '#4A5B78',
+      pie11: '#6E7F9C',
+      pie12: '#1C2430',
+      pieTitleTextColor: '#9FADC6',
+      pieSectionTextColor: '#9FADC6',
+      pieOuterStrokeColor: '#2A3444',
+      pieStrokeColor: '#141A24',
+      pieChartBackground: '#141A24',
     };
 
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: 'strict',
-      theme: dark ? 'dark' : 'base',
-      ...(dark ? {} : { themeVariables: lightThemeVariables }),
+      theme: 'base',
+      themeVariables: dark ? darkThemeVariables : lightThemeVariables,
     });
     await mermaid.run({ nodes: containers });
   }
