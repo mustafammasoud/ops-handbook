@@ -77,6 +77,7 @@ const ecosystem = [
 <BaseLayout
   title="Ops Handbook — DevOps Knowledge Base"
   description="A practical DevOps knowledge base covering fundamentals, Linux, containers, Kubernetes, CI/CD, cloud, infrastructure, and production operations."
+  hideFooter={true}
 >
   <Header />
 
@@ -477,56 +478,58 @@ const ecosystem = [
       </div>
     </section>
 
-    <!-- Author attribution -->
-    <section
-      class="border-t border-border py-8"
-      aria-label="Author attribution"
-    >
-      <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
-        <p
-          class="max-w-2xl text-sm leading-relaxed text-muted"
-        >
-          Built and maintained by Mustafa Masoud — a personal knowledge base for
-          learning and documenting DevOps.
-        </p>
-
-        <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <li>
-            <a
-              href="https://github.com/mustafammasoud"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
-              lang="en"
-            >
-              <SocialIcon name="github" class="h-5 w-5 shrink-0" />
-              <span>GitHub</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.linkedin.com/in/mustafammasoud/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
-              lang="en"
-            >
-              <SocialIcon name="linkedin" class="h-5 w-5 shrink-0" />
-              <span>LinkedIn</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="mailto:masoudmustafa90@gmail.com"
-              class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
-              lang="en"
-            >
-              <SocialIcon name="mail" class="h-5 w-5 shrink-0" />
-              <span>Email</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </section>
   </main>
+
+  <!-- Author attribution footer -->
+  <footer
+    class="border-t border-border py-8"
+    aria-label="Site footer"
+    style="padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));"
+  >
+    <div class="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center justify-between gap-x-8 gap-y-4 px-4">
+      <p
+        class="max-w-2xl text-sm leading-relaxed text-muted"
+      >
+        Built and maintained by Mustafa Masoud — a personal knowledge base for
+        learning and documenting DevOps.
+      </p>
+
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <li>
+          <a
+            href="https://github.com/mustafammasoud"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
+            lang="en"
+          >
+            <SocialIcon name="github" class="h-5 w-5 shrink-0" />
+            <span>GitHub</span>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.linkedin.com/in/mustafammasoud/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
+            lang="en"
+          >
+            <SocialIcon name="linkedin" class="h-5 w-5 shrink-0" />
+            <span>LinkedIn</span>
+          </a>
+        </li>
+        <li>
+          <a
+            href="mailto:masoudmustafa90@gmail.com"
+            class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent-ink focus-visible:text-accent-ink"
+            lang="en"
+          >
+            <SocialIcon name="mail" class="h-5 w-5 shrink-0" />
+            <span>Email</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
 </BaseLayout>

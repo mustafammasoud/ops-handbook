@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PwaOfflineIndicator from '../components/PwaOfflineIndicator.astro';
 
 const DEFAULT_DESCRIPTION =
   'Ops Handbook — a structured DevOps knowledge base: documentation, labs, diagrams, and command references.';
@@ -13,6 +14,8 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Content language, used in structured data. */
   lang?: string;
+  /** Suppress default footer when page defines its own footer landmark */
+  hideFooter?: boolean;
 }
 
 const {
@@ -21,6 +24,7 @@ const {
   noindex = false,
   ogType = 'website',
   lang = 'en',
+  hideFooter = false,
 } = Astro.props;
 
 if (!Astro.site) {
@@ -63,12 +67,22 @@ const structuredData = {
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
+
+    <!-- Web App Manifest & Mobile Web App -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content={siteName} />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="theme-color" content="#e9dfce" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0e13" media="(prefers-color-scheme: dark)" />
+
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={siteName} />
@@ -114,6 +128,12 @@ const structuredData = {
             (mode === 'system' &&
               window.matchMedia('(prefers-color-scheme: dark)').matches);
           document.documentElement.classList.toggle('dark', dark);
+
+          var themeColor = dark ? '#0b0e13' : '#e9dfce';
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < metas.length; i++) {
+            metas[i].setAttribute('content', themeColor);
+          }
         } catch (e) {
           /* storage unavailable — keep the light default */
         }
@@ -123,5 +143,33 @@ const structuredData = {
   <body class="min-h-screen">
     <a class="skip-link" href="#main">Skip to content</a>
     <slot />
+
+    {!hideFooter && (
+      <footer class="border-t border-border py-6 text-center text-xs text-muted" style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));">
+        <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between gap-4 px-4">
+          <p>Ops Handbook — Arabic-first DevOps knowledge base</p>
+          <p class="flex items-center gap-3">
+            <a href="/docs" class="transition-colors hover:text-accent-ink">Docs</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://github.com/mustafammasoud/devops-atlas" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent-ink">GitHub</a>
+          </p>
+        </div>
+      </footer>
+    )}
+
+    <PwaOfflineIndicator />
+
+    <!-- Service Worker Registration -->
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .catch(function (err) {
+              console.warn('[PWA] Service Worker registration failed:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

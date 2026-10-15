@@ -1259,3 +1259,22 @@ body.is-resizing * {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* PWA Standalone & Mobile Safe Area Insets -------------------------------- */
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  header.sticky {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+@media all and (display-mode: standalone) {
+  /* Prevent overscroll bounce glitching in standalone app frame */
+  html {
+    overscroll-behavior-y: contain;
+  }
+}
