@@ -251,121 +251,9 @@ kubectl describe limitrange
 kubectl get resourcequota
 kubectl describe resourcequota
 ```
+---
 
-## 7. Practical Lab: Inspect Resource Requests
-
-<Callout type="lab" title="Hands-on: Inspect Requests" />
-
-<Steps>
-<li>
-
-<InfoCard title="Step 1: Inspect a Pod" description="راجع Requests و Limits في Pod مثل `rabbit`." icon="layers" tags={["Inspect"]} />
-
-```bash
-kubectl get pod rabbit
-kubectl describe pod rabbit
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 2: Check Failing Pod" description="افحص `elephant` لمعرفة سبب `OOMKilled` أو `Pending`." icon="pulse" tags={["Troubleshoot"]} />
-
-```bash
-kubectl describe pod elephant
-```
-
-</li>
-</Steps>
-
-لو عندك Pod اسمها `rabbit`:
-
-```bash
-kubectl get pod rabbit
-kubectl describe pod rabbit
-```
-
-في الـ output، راجع قسم `Containers` وابحث عن:
-
-- `Requests`
-- `Limits`
-
-تقدر كمان تعرض الـ YAML:
-
-```bash
-kubectl get pod rabbit -o yaml
-```
-
-واستخرج الـ Resources من تعريف الـ Container.
-
-### II. Step 2: Check why a Pod is failing
-
-لو عندك Pod اسمها `elephant` ومش بتستقر في حالة `Running`:
-
-```bash
-kubectl get pod elephant
-kubectl describe pod elephant
-```
-
-راجع:
-
-- `State`
-- `Last State`
-- `Reason`
-- `Events`
-
-لو لقيت:
-
-`Reason: OOMKilled`
-
-فده مؤشر قوي إن الـ Container اتقتلت بسبب نفاد الذاكرة. راجع الـ Memory Limit وأي رسائل مرتبطة بالـ Pod.
-
-ممكن تستخدم كمان:
-
-```bash
-kubectl get pod elephant -o yaml
-```
-
-علشان تفحص الـ Resources المعرّفة في الـ Pod.
-
-## 8. Practical Lab: Fix an OOMKilled Pod
-
-<Callout type="lab" title="Hands-on: Fix OOMKilled" />
-
-<Steps>
-<li>
-
-<InfoCard title="Step 1: Inspect Configuration" description="راجع `elephant.yaml` والـ Memory Limit الحالية." icon="layers" tags={["Inspect"]} />
-
-```bash
-kubectl get pod elephant -o yaml
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 2: Update Memory Limit" description="عدّل الـ Limit إلى `20Mi` في ملف الـ Manifest." icon="wrench" tags={["Edit", "Limit"]} />
-
-```yaml
-resources:
-  limits:
-    memory: "20Mi"
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 3: Recreate the Pod" description="احذف الـ Pod وأعد تطبيق الـ Manifest المحدّث." icon="cube" tags={["Recreate"]} />
-
-```bash
-kubectl delete pod elephant
-kubectl apply -f elephant.yaml
-```
-
-</li>
-</Steps>
-
-## 9. Useful Troubleshooting Commands
+## 7. Useful Troubleshooting Commands
 
 ```bash
 # List Pods and their Nodes
@@ -390,7 +278,7 @@ kubectl top pods
 
 `kubectl top` بيعرض الاستهلاك الحالي التقريبي، لكنه محتاج Metrics Server شغال. وهو مختلف عن الـ Requests والـ Limits المعرّفة في الـ Pod.
 
-## 10. Common Mistakes
+## 8. Common Mistakes
 
 - **Mistake:** اعتبار الـ Request حدًا أقصى للاستهلاك.  
   **Correction:** الـ Request بتدخل في قرارات الـ Scheduling، بينما الـ Limit بتحدد سقف الاستهلاك.
@@ -407,7 +295,7 @@ kubectl top pods
 - **Mistake:** زيادة الـ Memory Limit من غير التأكد إن الـ Node تقدر تستوعب الحمل.  
   **Correction:** راجع موارد الـ Node وطلبات الـ Pods الأخرى، لأن زيادة الحدود مش معناها إن الذاكرة الفعلية بقت متاحة.
 
-## 11. Key Takeaways
+## 9. Key Takeaways
 
 <InfoCard
   title="Requests"

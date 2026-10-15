@@ -255,42 +255,9 @@ kubectl get daemonset node-monitor
 - `AVAILABLE`: عدد الـ Pods المتاحة وفقًا لمتطلبات الجاهزية.
 - `UP-TO-DATE`: عدد الـ Pods اللي اتحدّثت للنسخة الحالية من الـ template.
 
-## 8. Practical Lab
+----
 
-<Callout type="lab" title="Hands-on: DaemonSet" />
-
-<Steps>
-<li>
-
-<InfoCard title="Lab 1: Inspect DaemonSets" description="اعرض كل الـ DaemonSets وقارنها في Namespace `kube-system`." icon="layers" tags={["Inspect"]} />
-
-```bash
-kubectl get ds -A
-kubectl describe ds kube-proxy -n kube-system
-```
-
-</li>
-<li>
-
-<InfoCard title="Lab 2: Create Logging DaemonSet" description="أنشئ `logging-agent` باستخدام Manifest وحدّد `matchLabels`." icon="wrench" tags={["Create", "YAML"]} />
-
-```bash
-kubectl apply -f logging-daemonset.yaml
-```
-
-</li>
-<li>
-
-<InfoCard title="Lab 3: Clean Up" description="احذف الـ DaemonSet بعد التجربة." icon="shield" tags={["Cleanup"]} />
-
-```bash
-kubectl delete -f logging-daemonset.yaml
-```
-
-</li>
-</Steps>
-
-## 9. Common Mistakes
+## 8. Common Mistakes
 
 - **Mistake:** افتراض إن الـ DaemonSet لازم تشغّل Pod على كل Node بلا استثناء.  
   **Correction:** هي بتستهدف الـ Nodes المؤهلة فقط وفقًا للـ scheduling constraints.
@@ -307,7 +274,7 @@ kubectl delete -f logging-daemonset.yaml
 - **Mistake:** اعتبار DaemonSet بديلًا لكل أنواع الـ workload.  
   **Correction:** استخدم Deployment للتطبيقات اللي محتاجة عدد نسخ محدد، وDaemonSet للـ agents اللي محتاجة تغطي الـ Nodes المؤهلة.
 
-## 10. Key Takeaways
+## 9. Key Takeaways
 
 <InfoCard
   title="One Pod per Eligible Node"

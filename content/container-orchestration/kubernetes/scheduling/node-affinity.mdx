@@ -149,7 +149,7 @@ affinity:
 
 ### III. Exists — Check Whether a Label Exists
 
-في الكورس، استخدمنا `Exists` لاستهداف الـ Control Plane Node، لأن الـ Label المستهدفة مش محتاجة قيمة محددة؛ المهم إن الـ Key موجودة.
+ استخدمنا `Exists` لاستهداف الـ Control Plane Node، لأن الـ Label المستهدفة مش محتاجة قيمة محددة؛ المهم إن الـ Key موجودة.
 
 ```yaml
 affinity:
@@ -298,8 +298,6 @@ flowchart TD
     class F,I,J,M running
     class K note
 ```
-
-**تصحيح مهم من تسجيل الكورس:** تسجيل الفيديو بيتكلم عن أنواع إضافية مستقبلية بتكون `RequiredDuringExecution`، لكن ما تعتمدش عليها كأنها نوع متاح في الـ API العادي. النوعان الأساسيان المذكوران فوق هما اللي هنستخدمهم هنا.
 
 ## 8. Practice Lab — Blue Deployment on node01
 

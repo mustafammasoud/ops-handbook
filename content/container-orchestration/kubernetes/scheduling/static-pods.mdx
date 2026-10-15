@@ -192,7 +192,7 @@ etcd-controlplane
 
 الـ suffix ده علامة مفيدة، لكنه مش دليل كافي لوحده.
 
-### How to Verify a Static Pod
+### I. How to Verify a Static Pod
 
 استخدم:
 
@@ -276,63 +276,9 @@ flowchart TD
 
 **تصحيح مهم:** مش صحيح إن كل Pods الخاصة بالـ `DaemonSet` بيتجاهلها الـ `kube-scheduler`. في السلوك المعتاد، الـ DaemonSet controller بيجهّز Pods مناسبة للـ Nodes، والـ Scheduler بيشارك في جدولتها. أما الـ Static Pods، فالـ `kubelet` هو اللي بيديرها مباشرةً من الـ Manifests، من غير ما الـ Scheduler يختار لها Node.
 
-## 8. Practical Lab
+---
 
-<Callout type="lab" title="Hands-on: Static Pods" />
-
-<Steps>
-<li>
-
-<InfoCard title="Step 1 — Identify Path" description="حدد `staticPodPath` من إعدادات الـ `kubelet`." icon="layers" tags={["Inspect", "Kubelet"]} />
-
-```bash
-sudo grep -n 'staticPodPath' /var/lib/kubelet/config.yaml
-systemctl cat kubelet
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 2 — Inspect Pods" description="راجع الـ Mirror Pods وأسامي الـ Nodes في `ownerReferences`." icon="pulse" tags={["Inspect", "Mirror"]} />
-
-```bash
-kubectl get pods -A
-kubectl get pod kube-apiserver-controlplane -n kube-system -o yaml
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 3 — Create Static Pod" description="أنشئ ملف `static-busybox.yaml` في الـ manifest directory." icon="cube" tags={["Create", "Manifest"]} />
-
-```bash
-sudo nano /etc/kubernetes/manifests/static-busybox.yaml
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 4 — Update Pod" description="غيّر الـ Image في الـ Manifest وراقب الـ Reconciliation." icon="wrench" tags={["Update", "Reconcile"]} />
-
-```yaml
-image: busybox:1.36.1
-```
-
-</li>
-<li>
-
-<InfoCard title="Step 5 — Delete Correctly" description="احذف ملف الـ Manifest من الـ Node؛ لا تعتمد على `kubectl delete`." icon="shield" tags={["Cleanup"]} />
-
-```bash
-sudo rm /etc/kubernetes/manifests/static-busybox.yaml
-```
-
-</li>
-</Steps>
-
-## 9. Common Mistakes
-
-## 9. Common Mistakes
+## 8. Common Mistakes
 
 - **الاعتماد على اسم الـ Pod فقط:** وجود اسم الـ Node في النهاية علامة مفيدة، لكن الأفضل مراجعة `ownerReferences` وإعدادات الـ Node.
 - **حذف الـ Pod باستخدام `kubectl delete`:** لازم تشيل مصدر تعريفه، وهو ملف الـ Manifest، من الـ Node الصحيح.
@@ -340,7 +286,7 @@ sudo rm /etc/kubernetes/manifests/static-busybox.yaml
 - **الخلط بين Static Pods وDaemonSets:** الـ Static Pods مصدرها Manifests محلية؛ الـ DaemonSets موارد داخل الـ API Server.
 - **الاعتقاد إن كل Static Pod لازم يكون في Cluster:** الـ `kubelet` يقدر يدير Static Pods محليًا حتى من غير Cluster متكامل، لكن وقتها مش هيكون عندك API Server تعرض من خلاله Mirror Pods.
 
-## 10. Key Takeaways
+## 9. Key Takeaways
 
 - الـ Static Pod بيتنشأ وبيتدار مباشرةً بواسطة الـ `kubelet`.
 - الـ `staticPodPath` بيحدد مكان ملفات الـ Manifest.
