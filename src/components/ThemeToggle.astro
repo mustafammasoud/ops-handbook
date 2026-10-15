@@ -77,6 +77,11 @@
     button?.setAttribute('title', label);
     dot?.classList.toggle('hidden', mode !== 'system');
 
+    const themeColor = dark ? '#0b0e13' : '#e9dfce';
+    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+      meta.setAttribute('content', themeColor);
+    });
+
     try {
       localStorage.setItem(STORAGE_KEY, mode);
     } catch {

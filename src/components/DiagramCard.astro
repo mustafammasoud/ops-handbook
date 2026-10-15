@@ -2,7 +2,7 @@
 /** A card for displaying a diagram/image with caption and optional lightbox trigger. */
 import Figure from './Figure.astro';
 interface Props {
-  src: Parameters<typeof Figure>["src"];
+  src: Parameters<typeof Figure>[0]["src"];
   alt: string;
   caption?: string;
   label?: string;
