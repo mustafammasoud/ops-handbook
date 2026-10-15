@@ -1,0 +1,9 @@
+# Cloudflare Pages Custom Headers
+
+/sw.js
+  Cache-Control: no-cache, must-revalidate
+  Service-Worker-Allowed: /
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8
+  Cache-Control: no-cache, must-revalidate

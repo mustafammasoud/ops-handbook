@@ -1,0 +1,55 @@
+---
+/**
+ * PwaOfflineIndicator:
+ * Subtle, non-intrusive status notification for offline mode and reconnection.
+ * Uses design system tokens, respects safe areas, and provides accessible live region feedback.
+ */
+---
+
+<div
+  id="pwa-status-pill"
+  role="status"
+  aria-live="polite"
+  class="pointer-events-none fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted shadow-md transition-all duration-300 translate-y-12 opacity-0"
+  style="bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); right: calc(1rem + env(safe-area-inset-right, 0px));"
+>
+  <span id="pwa-status-dot" class="inline-block h-2 w-2 rounded-full bg-amber-600 dark:bg-amber-400" aria-hidden="true"></span>
+  <span id="pwa-status-text">Offline · Reading cached copy</span>
+</div>
+
+<script>
+  const pill = document.getElementById('pwa-status-pill');
+  const dot = document.getElementById('pwa-status-dot');
+  const text = document.getElementById('pwa-status-text');
+
+  let resetTimer: number | null = null;
+
+  function showOffline() {
+    if (!pill || !dot || !text) return;
+    if (resetTimer) clearTimeout(resetTimer);
+
+    dot.className = 'inline-block h-2 w-2 rounded-full bg-amber-600 dark:bg-amber-400';
+    text.textContent = 'Offline · Reading cached copy';
+    pill.classList.remove('translate-y-12', 'opacity-0');
+  }
+
+  function showOnline() {
+    if (!pill || !dot || !text) return;
+    if (resetTimer) clearTimeout(resetTimer);
+
+    dot.className = 'inline-block h-2 w-2 rounded-full bg-emerald-600 dark:bg-emerald-400';
+    text.textContent = 'Online · Connected';
+    pill.classList.remove('translate-y-12', 'opacity-0');
+
+    resetTimer = window.setTimeout(() => {
+      pill.classList.add('translate-y-12', 'opacity-0');
+    }, 2500);
+  }
+
+  window.addEventListener('offline', showOffline);
+  window.addEventListener('online', showOnline);
+
+  if (!navigator.onLine) {
+    showOffline();
+  }
+</script>

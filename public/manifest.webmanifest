@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Ops Handbook",
+  "short_name": "Ops Handbook",
+  "description": "Arabic-first DevOps knowledge base: documentation, labs, diagrams, and command references.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#e9dfce",
+  "theme_color": "#e9dfce",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "books", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo/mark-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Documentation Index",
+      "short_name": "Docs",
+      "description": "Browse all DevOps documentation",
+      "url": "/docs",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Kubernetes",
+      "short_name": "Kubernetes",
+      "description": "Kubernetes architecture, pods, deployments, and scheduling",
+      "url": "/docs/container-orchestration/kubernetes",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Linux & OS",
+      "short_name": "Linux",
+      "description": "Linux operating system fundamentals and administration",
+      "url": "/docs/operating-systems/linux",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
