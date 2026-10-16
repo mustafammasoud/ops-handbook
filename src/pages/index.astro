@@ -7,16 +7,11 @@ import CategoryIcon from '../components/CategoryIcon.astro';
 import SocialIcon from '../components/SocialIcon.astro';
 import {
   categories,
-  categoryLabel,
-  toolLabel,
-  levelLabel,
 } from '../data/categories';
 import {
   docCategory,
   docPath,
-  docTool,
   sortedDocs,
-  latestDocs,
 } from '../utils/docs';
 
 /**
@@ -54,9 +49,6 @@ const fundamentalsDocs = docs.filter(
 // Primary CTA: begin with DevOps Fundamentals when it has content, else the first
 // available topic.
 const primaryTarget = fundamentalsDocs[0] ?? docs[0];
-
-// Latest articles: 3-4 articles sorted by recency/order
-const latestArticles = latestDocs(docs, 4);
 
 // Handbook statistics (dynamically derived)
 const totalArticles = docs.length;
@@ -199,74 +191,6 @@ const ecosystem = [
               </li>
             ))}
           </ol>
-        </section>
-      )
-    }
-
-    <!-- Latest Articles -->
-    {
-      latestArticles.length > 0 && (
-        <section
-          class="border-t border-border py-12"
-          aria-labelledby="latest-heading"
-        >
-          <div class="mb-6">
-            <h2 id="latest-heading" class="text-lg font-semibold">
-              Latest articles
-            </h2>
-            <p class="mt-1 text-sm text-muted">
-              Recently published guides and references across the handbook.
-            </p>
-          </div>
-
-          <ul class="grid border-b border-border sm:grid-cols-2 sm:gap-x-12">
-            {latestArticles.map((doc) => {
-              const areaId = docCategory(doc);
-              const toolId = docTool(doc);
-              const area = categoryLabel(areaId);
-              const tool = toolId ? toolLabel(toolId) : undefined;
-              return (
-                <li class="border-t border-border">
-                  <a
-                    href={docPath(doc.id)}
-                    class="group flex flex-col justify-between py-5 transition-colors hover:bg-surface/70"
-                  >
-                    <div>
-                      <div class="flex flex-wrap items-center gap-2 text-xs text-muted">
-                        <span class="font-medium text-text">{area}</span>
-                        {tool && (
-                          <>
-                            <span class="text-border" aria-hidden="true">
-                              &middot;
-                            </span>
-                            <span
-                              class="rounded border border-border bg-surface px-1.5 py-0.5"
-                              lang="en"
-                            >
-                              {tool}
-                            </span>
-                          </>
-                        )}
-                        <span class="ml-auto rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-muted">
-                          {levelLabel(doc.data.level)}
-                        </span>
-                      </div>
-
-                      <h3 class="mt-2 text-base font-semibold tracking-tight text-text group-hover:text-accent-ink">
-                        {doc.data.title}
-                      </h3>
-
-                      {doc.data.description && (
-                        <p class="mt-1 text-sm leading-relaxed text-muted line-clamp-2">
-                          {doc.data.description}
-                        </p>
-                      )}
-                    </div>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
         </section>
       )
     }
