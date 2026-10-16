@@ -1,0 +1,45 @@
+---
+/**
+ * Secondary arrow button — an outlined/soft pill used for "View all"/
+ * secondary navigation. Deliberately quieter than the primary filled
+ * accent CTA so visual hierarchy is preserved.
+ *
+ * The arrow is decorative only (aria-hidden); meaning comes from `label`.
+ */
+interface Props {
+  href: string;
+  label: string;
+  /** Extra classes appended to the base pill styles. */
+  class?: string;
+}
+
+const { href, label, class: className } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text',
+    'transition-[color,border-color,box-shadow,transform] duration-150 ease-out',
+    'hover:border-accent hover:text-accent-ink hover:shadow-card',
+    'active:translate-y-px',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+    'motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:active:translate-y-0',
+    className,
+  ]}
+>
+  <span>{label}</span>
+  <svg
+    class="h-5 w-5 shrink-0 transition-transform duration-150 ease-out group-hover:translate-x-[3px] motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14"></path>
+    <path d="m12 5 7 7-7 7"></path>
+  </svg>
+</a>

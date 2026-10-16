@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+import ArrowButton from '../components/ArrowButton.astro';
 import CategoryCard from '../components/CategoryCard.astro';
 import CategoryIcon from '../components/CategoryIcon.astro';
 import SocialIcon from '../components/SocialIcon.astro';
@@ -149,19 +150,13 @@ const ecosystem = [
           primaryTarget && (
             <a
               href={docPath(primaryTarget.id)}
-              class="rounded-md bg-accent-fill px-4 py-2.5 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90"
+              class="rounded-full bg-accent-fill px-5 py-2.5 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90"
             >
               Start with the fundamentals
             </a>
           )
         }
-        <a
-          href="/docs"
-          class="inline-flex items-center gap-1.5 text-sm font-medium text-accent-ink underline-offset-4 transition-colors hover:underline"
-        >
-          Browse the documentation
-          <span aria-hidden="true" class="text-xs">&rarr;</span>
-        </a>
+        <ArrowButton href="/docs" label="Browse the documentation" />
       </div>
 
       <!-- Technical ecosystem visual (monochrome, no stock images) -->
@@ -174,11 +169,21 @@ const ecosystem = [
           ecosystem.map((item, index) => (
             <li class="flex items-center gap-2">
               {index > 0 && (
-                <span class="text-border" aria-hidden="true">
-                  →
-                </span>
+                <svg
+                  class="h-4 w-4 shrink-0 text-border"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
               )}
-              <span class="flex items-center gap-1.5 px-1.5 py-1">
+              <span class="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5">
                 <CategoryIcon name={item.icon} class="h-5 w-5" />
                 <span class="text-xs font-medium tracking-wide" lang="en">
                   {item.label}
@@ -197,16 +202,22 @@ const ecosystem = [
           class="border-t border-border py-12"
           aria-labelledby="start-here-heading"
         >
-          <div class="mb-6">
-            <h2
-              id="start-here-heading"
-              class="text-xs font-semibold uppercase tracking-wider text-muted"
-            >
-              Start Here
-            </h2>
-            <p class="mt-1 text-lg font-semibold tracking-tight text-text sm:text-xl">
-              New to DevOps? Start with the Fundamentals
-            </p>
+          <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2
+                id="start-here-heading"
+                class="text-xs font-semibold uppercase tracking-wider text-muted"
+              >
+                Start Here
+              </h2>
+              <p class="mt-1 text-lg font-semibold tracking-tight text-text sm:text-xl">
+                New to DevOps? Start with the Fundamentals
+              </p>
+            </div>
+            <ArrowButton
+              href="/docs/devops-fundamentals"
+              label={`View all ${fundamentalsDocs.length} fundamentals`}
+            />
           </div>
 
           <ol class="grid gap-x-8 border-b border-border lg:grid-cols-3">
@@ -233,30 +244,17 @@ const ecosystem = [
               </li>
             ))}
           </ol>
-
-          <a
-            href="/docs/devops-fundamentals"
-            class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
-          >
-            View all {fundamentalsDocs.length} fundamentals
-            <span aria-hidden="true" class="text-xs">&rarr;</span>
-          </a>
         </section>
       )
     }
 
     <!-- Documentation areas: editorial index rows -->
     <section class="border-t border-border py-12" aria-labelledby="areas-heading">
-      <div class="mb-4 flex items-baseline justify-between gap-4">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
         <h2 id="areas-heading" class="text-lg font-semibold">
           Documentation areas
         </h2>
-        <a
-          href="/docs"
-          class="text-sm text-muted transition-colors hover:text-accent-ink"
-        >
-          View all →
-        </a>
+        <ArrowButton href="/docs" label="View all" />
       </div>
 
       <ul class="grid border-b border-border sm:grid-cols-2 sm:gap-x-12">
