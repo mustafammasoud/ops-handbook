@@ -7,7 +7,7 @@
 BT
 /F1 11 Tf
 14 TL
-1 0 0 1 72 760 Tm (DevOps Atlas - Linux Cheatsheet \(sample\)) Tj
+1 0 0 1 72 760 Tm (Ops Handbook - Linux Cheatsheet \(sample\)) Tj
 1 0 0 1 72 738 Tm (pwd            print working directory) Tj
 1 0 0 1 72 720 Tm (ls -lt         list files by modification time) Tj
 1 0 0 1 72 702 Tm (grep -R pattern DIR   search files recursively) Tj

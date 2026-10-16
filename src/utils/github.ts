@@ -1,10 +1,9 @@
 /**
  * GitHub links for article pages.
  *
- * The header and the `origin` remote both use `ops-handbook`.
- * `package.json`'s `repository` field still names `devops-atlas`, which
- * GitHub redirects to this repository — edit and issue links use the
- * current name so they don't depend on that redirect.
+ * The header, the `origin` remote, and `package.json`'s `repository`
+ * field all use `ops-handbook`. Edit and issue links use that name
+ * directly.
  */
 export const GITHUB_REPO_URL = 'https://github.com/mustafammasoud/ops-handbook';
 

@@ -6,7 +6,7 @@
   "description": "Ops Handbook — Arabic-first DevOps knowledge base and learning platform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mustafammasoud/devops-atlas.git"
+    "url": "https://github.com/mustafammasoud/ops-handbook.git"
   },
   "scripts": {
     "dev": "astro dev",
