@@ -15,6 +15,13 @@ export type CategoryIconName =
   | 'shield'
   | 'wrench';
 
+/**
+ * Optional manual status override for an area. When omitted, the status is
+ * derived from the article count at build time (count > 0 → "published",
+ * count === 0 → "planned").
+ */
+export type CategoryStatus = 'published' | 'in-progress' | 'planned';
+
 export interface Category {
   /**
    * Stable id used in document frontmatter (`category:`) and as the
@@ -34,6 +41,11 @@ export interface Category {
   icon: CategoryIconName;
   /** Visual ordering only. */
   order: number;
+  /**
+   * Optional status override for the homepage "Coverage & Roadmap" section.
+   * Leave undefined to derive the status from the article count.
+   */
+  status?: CategoryStatus;
 }
 
 /**

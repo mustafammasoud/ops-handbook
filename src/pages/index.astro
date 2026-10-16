@@ -7,8 +7,10 @@ import CategoryIcon from '../components/CategoryIcon.astro';
 import SocialIcon from '../components/SocialIcon.astro';
 import {
   categories,
+  type CategoryStatus,
 } from '../data/categories';
 import {
+  articleCount,
   docCategory,
   docPath,
   sortedDocs,
@@ -62,8 +64,48 @@ const primaryTarget = fundamentalsDocs[0] ?? docs[0];
 
 // Handbook statistics (dynamically derived)
 const totalArticles = docs.length;
-const totalAreas = categories.length;
-const fundamentalsCount = fundamentalsDocs.length;
+
+// Coverage & Roadmap: per-area status. A manual `status` override in
+// categories.ts wins; otherwise it is derived from the article count.
+const areaRows = categories.map((category) => {
+  const count = counts.get(category.id) ?? 0;
+  const status: CategoryStatus =
+    category.status ?? (count > 0 ? 'published' : 'planned');
+  return { category, count, status };
+});
+
+// Display order: Published → In progress → Planned, each in canonical order.
+const STATUS_ORDER: Record<CategoryStatus, number> = {
+  published: 0,
+  'in-progress': 1,
+  planned: 2,
+};
+const groupedAreas = [...areaRows].sort(
+  (a, b) =>
+    STATUS_ORDER[a.status] - STATUS_ORDER[b.status] ||
+    a.category.order - b.category.order,
+);
+
+// Stats row — count-derived only (not affected by manual overrides).
+const publishedAreaCount = areaRows.filter((row) => row.count > 0).length;
+const plannedAreaCount = areaRows.filter((row) => row.count === 0).length;
+
+// Badge styling per status. Always rendered together with a text label so
+// status is never conveyed by color alone.
+const STATUS_BADGES: Record<CategoryStatus, { label: string; cls: string }> = {
+  published: {
+    label: 'Published',
+    cls: 'border-border-light bg-accent-soft text-accent-ink',
+  },
+  'in-progress': {
+    label: 'In progress',
+    cls: 'border-warning-border bg-warning-bg text-warning-fg',
+  },
+  planned: {
+    label: 'Planned',
+    cls: 'border-border-light bg-surface-2 text-muted',
+  },
+};
 
 // Ecosystem strip: communicates the infrastructure toolchain, LTR like code.
 const ecosystem = [
@@ -226,90 +268,95 @@ const ecosystem = [
       </ul>
     </section>
 
-    <!-- Handbook statistics / analysis -->
+    <!-- Coverage & Roadmap -->
     <section
       class="border-t border-border py-12"
-      aria-labelledby="statistics-heading"
+      aria-labelledby="coverage-heading"
     >
       <div class="mb-6">
-        <h2 id="statistics-heading" class="text-lg font-semibold">
-          Handbook overview
+        <h2 id="coverage-heading" class="text-lg font-semibold">
+          Coverage &amp; Roadmap
         </h2>
         <p class="mt-1 text-sm text-muted">
-          Key metrics and content distribution across the documentation.
+          The handbook is growing — here is where every documentation area stands.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div
-          class="group rounded-lg border border-border bg-surface p-5 shadow-card transition-colors hover:border-accent/40 sm:p-6"
-        >
-          <div class="flex items-center justify-between">
-            <span
-              class="text-3xl font-semibold tracking-tight text-text tabular-nums group-hover:text-accent-ink sm:text-4xl"
-            >
-              {totalArticles}
-            </span>
-            <span
-              class="rounded border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted"
-            >
-              Published
-            </span>
-          </div>
-          <span class="mt-3 block text-sm font-semibold tracking-tight text-text">
-            Total Articles
-          </span>
-          <p class="mt-1 text-xs leading-relaxed text-muted">
-            Technical guides, labs, diagrams, and command references.
-          </p>
+      <!-- Compact stats row (all derived from the content collection) -->
+      <dl class="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="rounded-lg border border-border bg-surface px-4 py-3">
+          <dt class="text-xs text-muted">Total articles</dt>
+          <dd class="mt-0.5 text-2xl font-semibold tabular-nums text-text">
+            {totalArticles}
+          </dd>
         </div>
+        <div class="rounded-lg border border-border bg-surface px-4 py-3">
+          <dt class="text-xs text-muted">Published areas</dt>
+          <dd class="mt-0.5 text-2xl font-semibold tabular-nums text-text">
+            {publishedAreaCount}
+          </dd>
+        </div>
+        <div class="rounded-lg border border-border bg-surface px-4 py-3">
+          <dt class="text-xs text-muted">Planned areas</dt>
+          <dd class="mt-0.5 text-2xl font-semibold tabular-nums text-text">
+            {plannedAreaCount}
+          </dd>
+        </div>
+      </dl>
 
-        <div
-          class="group rounded-lg border border-border bg-surface p-5 shadow-card transition-colors hover:border-accent/40 sm:p-6"
-        >
-          <div class="flex items-center justify-between">
-            <span
-              class="text-3xl font-semibold tracking-tight text-text tabular-nums group-hover:text-accent-ink sm:text-4xl"
-            >
-              {totalAreas}
-            </span>
-            <span
-              class="rounded border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted"
-            >
-              Curated
-            </span>
-          </div>
-          <span class="mt-3 block text-sm font-semibold tracking-tight text-text">
-            Documentation Areas
-          </span>
-          <p class="mt-1 text-xs leading-relaxed text-muted">
-            Covering systems, networking, containers, CI/CD, and orchestration.
-          </p>
-        </div>
-
-        <div
-          class="group rounded-lg border border-border bg-surface p-5 shadow-card transition-colors hover:border-accent/40 sm:p-6"
-        >
-          <div class="flex items-center justify-between">
-            <span
-              class="text-3xl font-semibold tracking-tight text-text tabular-nums group-hover:text-accent-ink sm:text-4xl"
-            >
-              {fundamentalsCount}
-            </span>
-            <span
-              class="rounded border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted"
-            >
-              Core Path
-            </span>
-          </div>
-          <span class="mt-3 block text-sm font-semibold tracking-tight text-text">
-            Fundamentals Articles
-          </span>
-          <p class="mt-1 text-xs leading-relaxed text-muted">
-            The sequential foundational path for new DevOps learners.
-          </p>
-        </div>
-      </div>
+      <!-- All 14 areas, grouped Published → In progress → Planned -->
+      <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          groupedAreas.map(({ category, count, status }) => {
+            const badge = STATUS_BADGES[status];
+            const quiet = status === 'planned';
+            return (
+              <li
+                class:list={[
+                  'flex items-start gap-3 rounded-lg border px-4 py-3',
+                  quiet
+                    ? 'border-border-light bg-transparent'
+                    : 'border-border bg-surface',
+                ]}
+              >
+                <CategoryIcon
+                  name={category.icon}
+                  class:list={[
+                    'mt-0.5 h-5 w-5 shrink-0',
+                    quiet ? 'text-muted/70' : 'text-muted',
+                  ]}
+                />
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span
+                      class:list={[
+                        'text-sm font-semibold tracking-tight',
+                        quiet ? 'text-muted' : 'text-text',
+                      ]}
+                      lang="en"
+                    >
+                      {category.label}
+                    </span>
+                    <span
+                      class:list={[
+                        'rounded-full border px-2 py-0.5 text-[0.65rem] font-medium',
+                        badge.cls,
+                      ]}
+                    >
+                      {badge.label}
+                    </span>
+                  </div>
+                  {!quiet && count > 0 && (
+                    <span class="mt-1 block text-xs text-muted tabular-nums">
+                      {articleCount(count)}
+                    </span>
+                  )}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
     </section>
 
   </main>
