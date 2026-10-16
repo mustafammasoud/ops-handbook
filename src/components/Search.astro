@@ -10,7 +10,7 @@
   type="button"
   id="search-trigger"
   data-search-trigger
-  class="flex h-11 w-auto items-center gap-2 rounded-full border border-border bg-bg px-3.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-text sm:h-9 sm:w-full sm:rounded-md sm:px-3"
+  class="flex h-11 w-auto items-center gap-2 rounded-full border border-border bg-bg px-3.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg motion-reduce:transition-none sm:h-10 sm:w-full sm:rounded-xl sm:bg-surface sm:px-3.5 sm:hover:border-accent sm:hover:bg-surface-2 sm:hover:text-text"
   aria-haspopup="dialog"
   aria-controls="search-dialog"
   aria-label="Search the documentation"
@@ -27,12 +27,14 @@
     <circle cx="11" cy="11" r="7"></circle>
     <path d="m21 21-4.3-4.3"></path>
   </svg>
-  <span class="block flex-1 text-start max-sm:hidden">Search the documentation…</span>
+  <span class="block min-w-0 flex-1 truncate text-start max-sm:hidden"
+    >Search the documentation…</span
+  >
   <span class="block flex-1 text-start sm:hidden">Search</span>
   <kbd
     id="search-trigger-kbd"
     dir="ltr"
-    class="hidden rounded border border-border bg-surface px-1.5 py-0.5 text-[0.65rem] font-medium tabular-nums md:inline"
+    class="hidden shrink-0 rounded-md border border-border bg-bg px-1.5 py-0.5 font-mono text-[0.65rem] font-medium tabular-nums sm:inline"
   >
     Ctrl K
   </kbd>

@@ -8,12 +8,17 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
 ---
 
 <header
-  class="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/75"
+  data-site-header
+  class="sticky top-0 z-40 border-b border-border backdrop-blur transition-shadow duration-200 motion-reduce:transition-none"
 >
   <div class="mx-auto flex h-14 max-w-screen-2xl items-center gap-3 px-4 sm:gap-4">
     <!-- Left: logo + primary nav -->
-    <div class="flex flex-1 items-center gap-3">
-      <a href="/" class="flex shrink-0 items-center gap-2.5 font-semibold tracking-tight" dir="ltr">
+    <div class="flex min-w-0 flex-1 items-center gap-3">
+      <a
+        href="/"
+        class="flex shrink-0 items-center gap-2.5 font-semibold tracking-tight transition-opacity hover:opacity-75 motion-reduce:transition-none"
+        dir="ltr"
+      >
         <!-- Atlas Plate mark: monochrome frame + route, accent terminus node. -->
         <svg class="h-7 w-7" viewBox="0 0 32 32" fill="none" aria-hidden="true">
           <rect
@@ -37,14 +42,11 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
         <span class="hidden sm:inline">Ops Handbook</span>
       </a>
 
-      <nav
-        aria-label="Main navigation"
-        class="hidden sm:block"
-      >
+      <nav aria-label="Main navigation" class="hidden sm:block">
         <a
           href="/docs"
           aria-current={isDocs ? 'page' : undefined}
-          class="nav-link rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors"
+          class="docs-link nav-link rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
         >
           Docs
         </a>
@@ -65,7 +67,7 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
         rel="noopener noreferrer"
         aria-label="GitHub repository"
         title="GitHub repository"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-bg text-muted transition-colors hover:border-accent/50 hover:text-text"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg motion-reduce:transition-none"
       >
         <SocialIcon name="github" class="h-5 w-5 shrink-0" />
       </a>
@@ -73,3 +75,56 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
     </div>
   </div>
 </header>
+
+<style>
+  /* Navbar surface: semi-transparent page background so the backdrop blur
+     reads through, plus a soft shadow that only appears once scrolled. */
+  header {
+    background-color: color-mix(in srgb, var(--c-bg) 80%, transparent);
+  }
+
+  header[data-scrolled] {
+    box-shadow:
+      0 1px 2px color-mix(in srgb, var(--c-text) 8%, transparent),
+      0 10px 28px color-mix(in srgb, var(--c-text) 6%, transparent);
+  }
+
+  /* Docs pill: accent-tinted active fill replaces the global underline. */
+  .docs-link[aria-current='page'] {
+    background-color: var(--c-accent-soft);
+  }
+
+  .docs-link[aria-current='page']::after {
+    display: none;
+  }
+</style>
+
+<script>
+  // Adds [data-scrolled] to the header after a few pixels of scroll so the
+  // soft shadow fades in — rAF-throttled, passive, no dependency.
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+
+  if (header) {
+    let ticking = false;
+
+    const update = (): void => {
+      header.toggleAttribute('data-scrolled', window.scrollY > 4);
+      ticking = false;
+    };
+
+    const onScroll = (): void => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    // Sync the initial state (e.g. restored scroll position on reload).
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener(
+      'pagehide',
+      () => window.removeEventListener('scroll', onScroll),
+      { once: true },
+    );
+  }
+</script>
