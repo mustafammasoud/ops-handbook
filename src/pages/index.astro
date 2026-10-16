@@ -17,21 +17,19 @@ import {
 /**
  * The homepage shows a curated subset of the documentation areas;
  * /docs keeps listing all of them. Metadata stays in `categories` —
- * this is only a selection of ids, in display order.
+ * this is only a selection of ids, in display order. Fundamentals is
+ * intentionally omitted (the Start Here section already covers it).
  */
 const HOMEPAGE_AREA_IDS = [
-  'devops-fundamentals',
-  'operating-systems',
+  'container-orchestration',
   'networking',
   'version-control',
-  'programming-scripting',
-  'containers',
-  'ci-cd-automation',
-  'container-orchestration',
+  'operating-systems',
 ];
-const homepageAreas = categories.filter((category) =>
-  HOMEPAGE_AREA_IDS.includes(category.id),
-);
+const homepageAreas = HOMEPAGE_AREA_IDS.flatMap((id) => {
+  const category = categories.find((item) => item.id === id);
+  return category ? [category] : [];
+});
 
 const docs = sortedDocs(await getCollection('docs', ({ data }) => !data.draft));
 
