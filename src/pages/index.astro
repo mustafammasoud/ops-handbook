@@ -46,6 +46,18 @@ const fundamentalsDocs = docs.filter(
   (doc) => docCategory(doc) === 'devops-fundamentals',
 );
 
+// Start Here: 3 curated fundamentals articles, selected by id (not index).
+// A missing id is skipped gracefully — the section still builds.
+const START_HERE_IDS = [
+  'devops-fundamentals/what-is-devops',
+  'devops-fundamentals/why-devops',
+  'devops-fundamentals/ci-cd-fundamentals',
+];
+const startHereDocs = START_HERE_IDS.flatMap((id) => {
+  const doc = docs.find((d) => d.id === id);
+  return doc ? [doc] : [];
+});
+
 // Primary CTA: begin with DevOps Fundamentals when it has content, else the first
 // available topic.
 const primaryTarget = fundamentalsDocs[0] ?? docs[0];
@@ -139,36 +151,25 @@ const ecosystem = [
 
     <!-- Start Here: Fundamentals Learning Sequence -->
     {
-      fundamentalsDocs.length > 0 && (
+      startHereDocs.length > 0 && (
         <section
           class="border-t border-border py-12"
           aria-labelledby="start-here-heading"
         >
-          <div class="mb-6 flex flex-wrap items-baseline justify-between gap-4">
-            <div>
-              <h2
-                id="start-here-heading"
-                class="text-xs font-semibold uppercase tracking-wider text-muted"
-              >
-                Start Here
-              </h2>
-              <a
-                href={docPath(primaryTarget.id)}
-                class="group mt-1 inline-flex items-center gap-1.5 text-lg font-semibold tracking-tight text-text transition-colors hover:text-accent-ink sm:text-xl"
-              >
-                <span>New to DevOps? Start with the Fundamentals</span>
-                <span
-                  class="transition-transform group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                >
-                  &rarr;
-                </span>
-              </a>
-            </div>
+          <div class="mb-6">
+            <h2
+              id="start-here-heading"
+              class="text-xs font-semibold uppercase tracking-wider text-muted"
+            >
+              Start Here
+            </h2>
+            <p class="mt-1 text-lg font-semibold tracking-tight text-text sm:text-xl">
+              New to DevOps? Start with the Fundamentals
+            </p>
           </div>
 
-          <ol class="grid border-b border-border sm:grid-cols-2 lg:grid-cols-3 sm:gap-x-8">
-            {fundamentalsDocs.map((doc, index) => (
+          <ol class="grid gap-x-8 border-b border-border lg:grid-cols-3">
+            {startHereDocs.map((doc, index) => (
               <li class="border-t border-border">
                 <a
                   href={docPath(doc.id)}
@@ -191,6 +192,14 @@ const ecosystem = [
               </li>
             ))}
           </ol>
+
+          <a
+            href="/docs/devops-fundamentals"
+            class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
+          >
+            View all {fundamentalsDocs.length} fundamentals
+            <span aria-hidden="true" class="text-xs">&rarr;</span>
+          </a>
         </section>
       )
     }
