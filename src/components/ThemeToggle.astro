@@ -1,120 +1,382 @@
-<button
-  type="button"
-  id="theme-toggle"
-  class="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-bg text-muted transition-colors hover:border-accent/50 hover:text-text"
-  aria-label="Switch to dark theme"
-  title="Switch to dark theme"
->
-  <!-- Icon reflects the current theme: sun in light, moon in dark. -->
-  <svg
-    class="block h-4 w-4 dark:hidden"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
+---
+/**
+ * Theme menu: a button that opens a dropdown with Light / Dark / System.
+ * Stores the choice in localStorage['theme'] as 'light' | 'dark' | 'system'
+ * — the same key/format the pre-paint script in BaseLayout reads, so there
+ * is no flash of wrong theme and existing saved preferences keep working.
+ */
+---
+
+<div class="relative" data-theme-root>
+  <button
+    type="button"
+    id="theme-toggle"
+    class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-bg text-muted transition-colors hover:border-accent/50 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-controls="theme-menu"
+    aria-label="Theme: System"
+    title="Theme: System"
   >
-    <circle cx="12" cy="12" r="4"></circle>
-    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-  </svg>
-  <svg
-    class="hidden h-4 w-4 dark:block"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
+    <!-- Button icon reflects the current choice: sun / moon / monitor. -->
+    <svg
+      data-theme-icon="light"
+      class="hidden h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="4"></circle>
+      <path
+        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+      ></path>
+    </svg>
+    <svg
+      data-theme-icon="dark"
+      class="hidden h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+    <svg
+      data-theme-icon="system"
+      class="block h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+      <path d="M8 21h8M12 17v4"></path>
+    </svg>
+  </button>
+
+  <div
+    id="theme-menu"
+    role="menu"
+    aria-labelledby="theme-toggle"
+    data-theme-menu
+    class="invisible absolute right-0 top-full z-50 mt-2 min-w-[10rem] origin-top-right rounded-xl border border-border bg-surface p-1 opacity-0 shadow-card transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none"
   >
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-  </svg>
-  <!-- Shown only while following the system theme. -->
-  <span
-    id="theme-mode-dot"
-    class="absolute right-0.5 top-0.5 hidden h-1.5 w-1.5 rounded-full bg-accent"
-    aria-hidden="true"
-  ></span>
-</button>
+    <button
+      type="button"
+      role="menuitemradio"
+      aria-checked="false"
+      data-theme-value="light"
+      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-text transition-colors hover:bg-surface-2 aria-checked:bg-surface-2 aria-checked:text-accent-ink focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+    >
+      <svg
+        class="h-4 w-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+        ></path>
+      </svg>
+      <span class="flex-1">Light</span>
+      <svg
+        data-theme-check
+        class="hidden h-4 w-4 shrink-0 text-accent-ink"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      role="menuitemradio"
+      aria-checked="false"
+      data-theme-value="dark"
+      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-text transition-colors hover:bg-surface-2 aria-checked:bg-surface-2 aria-checked:text-accent-ink focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+    >
+      <svg
+        class="h-4 w-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <span class="flex-1">Dark</span>
+      <svg
+        data-theme-check
+        class="hidden h-4 w-4 shrink-0 text-accent-ink"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      role="menuitemradio"
+      aria-checked="false"
+      data-theme-value="system"
+      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-text transition-colors hover:bg-surface-2 aria-checked:bg-surface-2 aria-checked:text-accent-ink focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+    >
+      <svg
+        class="h-4 w-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+        <path d="M8 21h8M12 17v4"></path>
+      </svg>
+      <span class="flex-1">System</span>
+      <svg
+        data-theme-check
+        class="hidden h-4 w-4 shrink-0 text-accent-ink"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </button>
+  </div>
+</div>
 
 <script>
   type ThemeMode = 'light' | 'dark' | 'system';
   const STORAGE_KEY = 'theme';
+  const MODE_LABEL: Record<ThemeMode, string> = {
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+  };
 
+  const root = document.querySelector<HTMLElement>('[data-theme-root]');
   const button = document.getElementById('theme-toggle');
-  const dot = document.getElementById('theme-mode-dot');
-  const systemQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const menu = document.querySelector<HTMLElement>('[data-theme-menu]');
 
-  function readMode(): ThemeMode {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'light' || stored === 'dark' || stored === 'system') {
-        return stored;
+  if (root && button && menu) {
+    // Non-null aliases so nested closures keep the narrowed types.
+    const rootEl: HTMLElement = root;
+    const buttonEl: HTMLElement = button;
+    const menuEl: HTMLElement = menu;
+
+    const items = Array.from(
+      menuEl.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]'),
+    );
+    const systemQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function readMode(): ThemeMode {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === 'light' || stored === 'dark' || stored === 'system') {
+          return stored;
+        }
+      } catch {
+        /* storage unavailable */
       }
-    } catch {
-      /* storage unavailable */
+      return 'system';
     }
-    return 'system';
-  }
 
-  let mode: ThemeMode = readMode();
+    let mode: ThemeMode = readMode();
+    let open = false;
 
-  /** Label describes the next click: light → dark → system → light. */
-  function nextActionLabel(current: ThemeMode): string {
-    if (current === 'light') return 'Switch to dark theme';
-    if (current === 'dark') return 'Switch to system theme';
-    return 'Switch to light theme';
-  }
+    /** Apply resolved theme to <html>, meta theme-color, button icon/label. */
+    function apply(): void {
+      const dark = mode === 'dark' || (mode === 'system' && systemQuery.matches);
+      document.documentElement.classList.toggle('dark', dark);
 
-  function apply(): void {
-    const dark = mode === 'dark' || (mode === 'system' && systemQuery.matches);
-    document.documentElement.classList.toggle('dark', dark);
+      const themeColor = dark ? '#0b0e13' : '#e9dfce';
+      document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+        meta.setAttribute('content', themeColor);
+      });
 
-    const label = nextActionLabel(mode);
-    button?.setAttribute('aria-label', label);
-    button?.setAttribute('title', label);
-    dot?.classList.toggle('hidden', mode !== 'system');
+      const label = `Theme: ${MODE_LABEL[mode]}`;
+      buttonEl.setAttribute('aria-label', label);
+      buttonEl.setAttribute('title', label);
+      rootEl.querySelectorAll<SVGSVGElement>('[data-theme-icon]').forEach((icon) => {
+        icon.classList.toggle(
+          'hidden',
+          icon.getAttribute('data-theme-icon') !== mode,
+        );
+      });
+    }
 
-    const themeColor = dark ? '#0b0e13' : '#e9dfce';
-    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-      meta.setAttribute('content', themeColor);
+    /** Sync menuitemradio aria-checked + checkmark visibility. */
+    function syncMenu(): void {
+      for (const item of items) {
+        const checked = item.getAttribute('data-theme-value') === mode;
+        item.setAttribute('aria-checked', String(checked));
+        item
+          .querySelector('[data-theme-check]')
+          ?.classList.toggle('hidden', !checked);
+      }
+    }
+
+    function persist(): void {
+      try {
+        localStorage.setItem(STORAGE_KEY, mode);
+      } catch {
+        /* storage unavailable */
+      }
+    }
+
+    function setOpen(next: boolean): void {
+      open = next;
+      buttonEl.setAttribute('aria-expanded', String(open));
+      menuEl.classList.toggle('invisible', !open);
+      menuEl.classList.toggle('opacity-0', !open);
+      menuEl.classList.toggle('scale-95', !open);
+      menuEl.classList.toggle('visible', open);
+      menuEl.classList.toggle('opacity-100', open);
+      menuEl.classList.toggle('scale-100', open);
+    }
+
+    function focusChecked(): void {
+      const target =
+        items.find((item) => item.getAttribute('aria-checked') === 'true') ??
+        items[0];
+      target?.focus();
+    }
+
+    function openMenu(focusItem = true): void {
+      if (open) return;
+      setOpen(true);
+      if (focusItem) focusChecked();
+    }
+
+    function closeMenu(returnFocus = true): void {
+      if (!open) return;
+      setOpen(false);
+      if (returnFocus) buttonEl.focus();
+    }
+
+    function select(next: ThemeMode): void {
+      mode = next;
+      apply();
+      syncMenu();
+      persist();
+      watchSystemPreference();
+      closeMenu();
+    }
+
+    function onSystemChange(): void {
+      apply();
+    }
+
+    /** Follow OS preference live — but only while in system mode. */
+    function watchSystemPreference(): void {
+      systemQuery.removeEventListener('change', onSystemChange);
+      if (mode === 'system') {
+        systemQuery.addEventListener('change', onSystemChange);
+      }
+    }
+
+    buttonEl.addEventListener('click', () => {
+      if (open) closeMenu(false);
+      else openMenu();
     });
 
-    try {
-      localStorage.setItem(STORAGE_KEY, mode);
-    } catch {
-      /* storage unavailable */
-    }
-  }
+    buttonEl.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        openMenu();
+      } else if (event.key === 'Escape' && open) {
+        event.preventDefault();
+        closeMenu();
+      }
+    });
 
-  function onSystemChange(): void {
+    menuEl.addEventListener('click', (event) => {
+      const item = (event.target as HTMLElement).closest<HTMLElement>(
+        '[data-theme-value]',
+      );
+      const value = item?.getAttribute('data-theme-value');
+      if (value === 'light' || value === 'dark' || value === 'system') {
+        select(value);
+      }
+    });
+
+    menuEl.addEventListener('keydown', (event) => {
+      const currentIndex = items.indexOf(
+        document.activeElement as HTMLButtonElement,
+      );
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu();
+      } else if (event.key === 'Tab') {
+        closeMenu(false);
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        items[(currentIndex + 1) % items.length]?.focus();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        items[(currentIndex - 1 + items.length) % items.length]?.focus();
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        items[0]?.focus();
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        items[items.length - 1]?.focus();
+      }
+    });
+
+    // Close on outside press (mousedown/mousedown area). Ignore presses
+    // inside the root so the button toggle isn't double-handled.
+    document.addEventListener('pointerdown', (event) => {
+      if (open && !rootEl.contains(event.target as Node)) closeMenu(false);
+    });
+
+    // Sync with the theme the inline head script already applied — no flash.
     apply();
-  }
-
-  /** Follow OS preference changes live — but only while in system mode. */
-  function watchSystemPreference(): void {
-    systemQuery.removeEventListener('change', onSystemChange);
-    if (mode === 'system') {
-      systemQuery.addEventListener('change', onSystemChange);
-    }
-  }
-
-  button?.addEventListener('click', () => {
-    mode = mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light';
-    apply();
+    syncMenu();
     watchSystemPreference();
-  });
 
-  // Sync labels/dot with the theme the inline head script already applied —
-  // no flash, no re-reading of the resolved state.
-  apply();
-  watchSystemPreference();
-
-  window.addEventListener(
-    'pagehide',
-    () => systemQuery.removeEventListener('change', onSystemChange),
-    { once: true },
-  );
+    window.addEventListener(
+      'pagehide',
+      () => systemQuery.removeEventListener('change', onSystemChange),
+      { once: true },
+    );
+  }
 </script>
