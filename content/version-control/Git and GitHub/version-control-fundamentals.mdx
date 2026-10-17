@@ -75,6 +75,12 @@ flowchart LR
 
 أنظمة الـ Version Control مش كلها بتشتغل بنفس الطريقة. لفهم Git، محتاجين نعرف الفرق بين ثلاثة أنواع أساسية.
 
+<CardGrid columns={3} label="VCS Types">
+<InfoCard variant="comparison" title="Local VCS" description="التاريخ محفوظ على نفس الجهاز — تراجع نسخ سابقة محليًا." icon="cube" tags={["Single machine"]} />
+<InfoCard variant="comparison" title="Centralized VCS" description="مستودع مركزي واحد بيتشاركه الفريق — كل تعامل بيمر على السيرفر." icon="cloud" tags={["SVN"]} />
+<InfoCard variant="comparison" title="Distributed VCS" description="كل Developer عنده Local Repository كامل بالتاريخ — Git مثال عليه." icon="branch" tags={["Git"]} />
+</CardGrid>
+
 ### I. Local Version Control
 
 في الـ Local Version Control، نظام إدارة الإصدارات بيحتفظ بالتاريخ على نفس الجهاز اللي بتشتغل عليه.
@@ -159,6 +165,7 @@ flowchart TB
 
 ### IV. Centralized vs Distributed
 
+<TableCard title="Centralized vs Distributed VCS" caption="الفرق الأساسي في مكان تخزين التاريخ وطريقة التعاون.">
 | Comparison | Centralized VCS | Distributed VCS |
 |---|---|---|
 | Repository model | مستودع مركزي مشترك | مستودعات محلية كاملة مع إمكانية وجود Remotes |
@@ -166,6 +173,7 @@ flowchart TB
 | Offline work | بيعتمد على العملية والنظام | معظم عمليات Git المحلية متاحة |
 | Collaboration | غالبًا من خلال السيرفر المركزي | من خلال تبادل التغييرات بين المستودعات |
 | Example | SVN | Git |
+</TableCard>
 
 مش معنى كده إن كل نظام Distributed مناسب لكل سيناريو؛ الفكرة إن Git بيدينا نموذج مرن لإدارة التاريخ والعمل محليًا والتعاون مع الآخرين.
 
@@ -236,9 +244,39 @@ flowchart LR
 
 ده تصور مبسط للـ Workflow، مش تسلسل إجباري لكل تغيير. مثلًا، ممكن تعمل عدة Commits قبل الـ Push، وممكن تحتاج تزامن التغييرات من الـ Remote قبل ما تشارك شغلك.
 
+<Steps>
+<li>
+
+<InfoCard title="Modify Files" description="عدّل الملفات في الـ working directory حسب المطلوب." icon="wrench" tags={["Edit"]} />
+
+</li>
+<li>
+
+<InfoCard title="Review Changes" description="راجع الـ diff عشان تعرف إيه اللي اتغير قبل التسجيل." icon="pulse" tags={["Diff"]} />
+
+</li>
+<li>
+
+<InfoCard title="Create Commit" description="سجّل لقطة من المشروع مع رسالة توضح الهدف." icon="layers" tags={["Snapshot"]} />
+
+</li>
+<li>
+
+<InfoCard title="Push to Remote" description="انشر الـ commits على الـ remote repository لمشاركة الفريق." icon="git-pull-request" tags={["Share"]} />
+
+</li>
+<li>
+
+<InfoCard title="Review & Collaborate" description="افتح Pull Request وراجع شغل الفريق قبل الدمج النهائي." icon="cycle" tags={["Teamwork"]} />
+
+</li>
+</Steps>
+
 هنفصّل كل خطوة في الصفحات القادمة، بدايةً من Git Architecture & Core Concepts، وبعدها الـ Basic Git Workflow.
 
 ## 6. Key Takeaways
+
+<InfoCard variant="summary" title="The One-Line Version" description="Version Control = إدارة تاريخ التغييرات. Git = نظام Distributed VCS محلي. GitHub/GitLab = منصات استضافة بتضيف collaboration فوق Git." icon="layers" tags={["Mental Model"]} />
 
 <CardGrid columns={2} label="Fundamental Concepts">
   <InfoCard variant="summary" title="Version Control" description="إدارة تاريخ التغييرات ومراجعتها واسترجاعها." icon="layers" />

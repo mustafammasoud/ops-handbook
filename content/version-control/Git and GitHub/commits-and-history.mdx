@@ -174,6 +174,7 @@ the application to prevent startup failures.
 
 ### III. Choosing the Right Level of Detail
 
+<TableCard title="Weak vs Better Commit Messages" caption="الرسالة الواضحة بتشرح الهدف مش بس إن فيه تغيير.">
 | Weak Message | Better Message |
 |---|---|
 | `fix` | `Fix null reference in user lookup` |
@@ -181,6 +182,7 @@ the application to prevent startup failures.
 | `changes` | `Remove unused configuration options` |
 | `bug fixed` | `Handle missing environment variables` |
 | `stuff` | `Add tests for invalid input` |
+</TableCard>
 
 مش مطلوب إن كل رسالة تبقى طويلة. لو الـ Subject بيوضح التغيير بشكل كافي، مش محتاج تضيف Body.
 
@@ -204,6 +206,7 @@ the application to prevent startup failures.
 
 ### I. Common Commit Types
 
+<TableCard title="Conventional Commit Types" caption="أنواع شائعة بتستخدم في صيغة Conventional Commits.">
 | Type | Purpose | Example |
 |---|---|---|
 | `feat` | إضافة Feature جديدة | `feat: add user registration` |
@@ -216,6 +219,7 @@ the application to prevent startup failures.
 | `ci` | تغييرات إعدادات CI | `ci: adjust workflow permissions` |
 | `perf` | تحسين الأداء | `perf: reduce repeated database queries` |
 | `chore` | أعمال صيانة أخرى | `chore: remove obsolete files` |
+</TableCard>
 
 الـ Types دي شائعة، لكن مش كلها إلزامية في كل مشروع. اتبع الـ Convention المعتمد في الـ Repository لو موجود.
 
@@ -455,6 +459,7 @@ git log -G"validate_.*input" --oneline
 
 ### IX. History Commands Summary
 
+<TableCard title="git log Command Reference" caption="مرجع سريع لأهم أوامر عرض وتصفية التاريخ.">
 | Goal | Command |
 |---|---|
 | عرض التاريخ الكامل | `git log` |
@@ -466,6 +471,7 @@ git log -G"validate_.*input" --oneline
 | تتبع إعادة تسمية ملف | `git log --follow -- path/to/file` |
 | البحث عن إضافة أو حذف نص | `git log -S"text"` |
 | عرض تفاصيل Commit | `git show <commit>` |
+</TableCard>
 
 ---
 
@@ -521,6 +527,7 @@ build/
 
 ### II. Common Ignore Patterns
 
+<TableCard title="Common .gitignore Patterns" caption="أنماط شائعة لتجاهل ملفات أو مجلدات محددة.">
 | Pattern | Meaning |
 |---|---|
 | `*.log` | تجاهل الملفات اللي أسماؤها بتنتهي بـ `.log` |
@@ -529,6 +536,7 @@ build/
 | `config.local` | تجاهل المسارات المطابقة للاسم ده حسب مكان قاعدة التجاهل |
 | `!important.log` | استثناء ملف من قاعدة تجاهل سابقة، إذا سمحت القواعد بذلك |
 | `**/cache/` | تجاهل المجلدات المطابقة لـ `cache` عبر مستويات المجلدات |
+</TableCard>
 
 ### III. Understanding Pattern Scope
 
@@ -662,13 +670,13 @@ git commit -m "chore: preserve logs directory"
 
 ### III. `.gitkeep` vs `.gitignore`
 
-الفرق الأساسي:
-
+<TableCard title=".gitkeep vs .gitignore" caption="اتنين أسماء شائعة لكن وظائفهم مختلفة تمامًا.">
 | `.gitkeep` | `.gitignore` |
 |---|---|
 | ملف عادي يُستخدم اصطلاحيًا للحفاظ على مجلد فارغ داخل الـ Repository | ملف بيحدد أنماط المسارات اللي Git يتجاهلها |
 | مش Feature خاصة في Git | اسم معترف به من Git لقواعد التجاهل |
 | ممكن يكون فارغًا | لازم يحتوي على Patterns لو عايز قواعد تجاهل فعلية |
+</TableCard>
 
 ### IV. Keeping an Empty Directory While Ignoring Its Contents
 
@@ -855,6 +863,8 @@ git status
 ---
 
 ## Key Takeaways
+
+<InfoCard variant="summary" title="Commits & History in One Line" description="Commit = لقطة + رسالة. اكتب رسائل واضحة، استخدم log/show للمراجعة، وتجاهل الملفات غير الضرورية بـ .gitignore." icon="layers" tags={["Mental Model"]} />
 
 - الـ Commit Object بيحتوي على Root Tree وبيانات الـ Author والـ Committer ورسالة الـ Commit ومراجع الـ Parent.
 - رسائل الـ Commits الواضحة بتسهّل مراجعة تاريخ المشروع.

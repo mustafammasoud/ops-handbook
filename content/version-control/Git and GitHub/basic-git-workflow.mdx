@@ -38,6 +38,13 @@ language: ar
 
 خلينا نشوف دورة الشغل كاملة قبل ما نشرح كل أمر لوحده.
 
+<CardGrid columns={4} label="The Four Core Commands">
+<InfoCard variant="concept" title="git status" description="اعرف الملفات المعدّلة والمجهّزة والأخطاء." icon="pulse" tags={["Inspect"]} />
+<InfoCard variant="concept" title="git diff" description="راجع التغييرات قبل ما تجهّزها أو تسجلها." icon="layers" tags={["Review"]} />
+<InfoCard variant="concept" title="git add" description="جهّز التغييرات المحددة للـ next commit." icon="wrench" tags={["Stage"]} />
+<InfoCard variant="concept" title="git commit" description="سجّل Snapshot جديدة من الـ staged changes." icon="cube" tags={["Record"]} />
+</CardGrid>
+
 ```mermaid
 flowchart TD
     A["Modify Files<br/>تعديل الملفات"] --> B["git status<br/>Check File States"]
@@ -240,12 +247,14 @@ git diff -- src/app.py
 
 ### VI. Which Diff Should You Use?
 
+<TableCard title="Which git diff to Use" caption="كل diff بيقارن بين حالتين مختلفتين من الملفات.">
 | Command | What It Compares |
 |---|---|
 | `git diff` | Working Directory vs Staging Area |
 | `git diff --cached` | Staging Area vs Current Commit |
 | `git diff HEAD` | Working Directory and Index changes vs `HEAD` |
 | `git diff COMMIT_A COMMIT_B` | Two Commit snapshots |
+</TableCard>
 
 <InfoCard variant="insight" title="Review Both Sides" description="git diff بيراجع التغييرات غير المجهزة، وgit diff --cached بيراجع التغييرات المجهزة. لو هتعمل Commit، مراجعة الـ Staged Changes تحديدًا خطوة مهمة." icon="pulse" tags={["Diff", "Code Review"]} />
 
@@ -529,6 +538,8 @@ git show --stat HEAD
 ---
 
 ## Key Takeaways
+
+<InfoCard variant="summary" title="The Core Loop" description="status → diff → add → diff --cached → commit → log. افهم حالة الملفات قبل كل خطوة، وراجع الـ staged changes قبل التسجيل." icon="cycle" tags={["Mental Model"]} />
 
 - `git status` بيعرض حالة الـ Working Directory والـ Staging Area.
 - `git add` بيجهز التغييرات اللي عايز تسجلها.

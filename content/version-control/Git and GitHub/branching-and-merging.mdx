@@ -116,12 +116,12 @@ flowchart TD
 
 ### II. Why Use Branches?
 
-| Use case | Example |
-|---|---|
-| Feature development | `feature/user-auth` |
-| Bug fixes | `fix/login-error` |
-| Experiments | `experiment/cache-strategy` |
-| Release preparation | `release/1.2.0` |
+<CardGrid columns={2} label="Common Branch Purposes">
+<InfoCard variant="feature" title="Feature Development" description="بناء ميزة جديدة في عزل عن الفرع الأساسي." icon="flag" tags={["feature/*"]} />
+<InfoCard variant="feature" title="Bug Fixes" description="إصلاح خطأ محدد من غير تأثير باقي الشغل." icon="wrench" tags={["fix/*"]} />
+<InfoCard variant="feature" title="Experiments" description="تجربة استراتيجية أو إثبات فكرة قبل اعتمادها." icon="cycle" tags={["experiment/*"]} />
+<InfoCard variant="feature" title="Release Preparation" description="تجهيز وإصلاح إصدار مستقر قبل النشر." icon="tag" tags={["release/*"]} />
+</CardGrid>
 
 الفكرة إنك تقدر تفصل التغييرات حسب الهدف منها، وتراجعها وتختبرها قبل ما تدمجها في branch تاني.
 
@@ -221,28 +221,31 @@ git status
 
 خلينا نطبّق Workflow بسيط.
 
-افترض إن عندك مشروع على `main` وعايز تضيف ميزة Login.
+افتكر إن عندك مشروع على `main` وعايز تضيف ميزة Login.
 
-### I. Step 1: Check Your Current State
+<Steps>
+<li>
+
+<InfoCard title="Step 1 — Check Your Current State" description="اتأكد إنك على الـ branch المناسب وإن الـ working directory حالته واضحة." icon="pulse" tags={["Status"]} />
 
 ```bash
 git status
 git branch
 ```
 
-اتأكد إنك على الـ branch المناسب وإن الـ working directory حالته واضحة.
+</li>
+<li>
 
-### II. Step 2: Create and Switch to a Branch
+<InfoCard title="Step 2 — Create and Switch to a Branch" description="أنشئ feature branch جديد وانتقل إليه مباشرة." icon="branch" tags={["Branch"]} />
 
 ```bash
 git switch -c feature/login
 ```
 
-دلوقتي إنت على `feature/login`.
+</li>
+<li>
 
-### III. Step 3: Make Changes and Commit Them
-
-بعد تعديل ملفات الـ Login:
+<InfoCard title="Step 3 — Make Changes and Commit Them" description="عدّل ملفات الـ Login، جهّزها، وسجّلها." icon="wrench" tags={["Commit"]} />
 
 ```bash
 git status
@@ -252,21 +255,26 @@ git commit -m "feat(auth): add login flow"
 
 عدّل مسار `src/auth/` حسب بنية مشروعك الفعلية. لو التغييرات موزعة على ملفات مختلفة، اعمل stage للملفات المناسبة بدل ما تفترض إن المسار ده موجود.
 
-### IV. Step 4: Inspect the Branch History
+</li>
+<li>
+
+<InfoCard title="Step 4 — Inspect the Branch History" description="شوف الـ commits والـ branches وعلاقاتهم ببعض." icon="layers" tags={["History"]} />
 
 ```bash
 git log --oneline --graph --decorate --all
 ```
 
-الأمر ده بيساعدك تشوف الـ commits والـ branches وعلاقاتهم ببعض.
+</li>
+<li>
 
-### V. Step 5: Return to the Target Branch
+<InfoCard title="Step 5 — Return to the Target Branch" description="اتأكد إنك واقف على الـ branch اللي عايز تستقبل التغييرات قبل الدمج." icon="branch" tags={["Merge prep"]} />
 
 ```bash
 git switch main
 ```
 
-قبل الدمج، اتأكد إنك واقف على الـ branch اللي عايز تستقبل التغييرات، مش الـ branch اللي عملت عليه التعديلات.
+</li>
+</Steps>
 
 ## 4. What Is `git merge`?
 
@@ -429,6 +437,12 @@ flowchart TD
 
 ### III. Comparison
 
+<CardGrid columns={2} label="Merge Strategies">
+<InfoCard variant="comparison" title="Fast-Forward" description="بيحرّك الـ branch reference للأمام من غير merge commit — خطّي وبسيط." icon="cycle" tags={["Linear"]} />
+<InfoCard variant="comparison" title="Three-Way Merge" description="بيستخدم الـ common ancestor والنُسختين لإنتاج merge commit — بيسجّل التفرّع." icon="git-merge" tags={["Recorded"]} />
+</CardGrid>
+
+<TableCard title="Fast-Forward vs Three-Way Merge" caption="الفرق الأساسي في شكل التاريخ وإمكانية حدوث التعارض.">
 | Aspect | Fast-Forward | Three-Way Merge |
 |---|---|---|
 | Branch histories | امتداد مباشر لمسار واحد | فيه مساران تطوروا من نقطة مشتركة |
@@ -436,6 +450,7 @@ flowchart TD
 | History shape | خطّي | ممكن يظهر فيه تفرّع واندماج |
 | Conflict possibility | عادةً لا يوجد تعارض بسبب تغييرات متفرعة في الطرفين | ممكن تحصل conflicts |
 | Common use | دمج فرع لم يتقدم عليه الـ target | دمج فروع اتطورت بشكل مستقل |
+</TableCard>
 
 **مهم:** الـ Fast-Forward مش استراتيجية لدمج محتوى الملفات بالطريقة نفسها اللي بيستخدمها Three-Way Merge؛ هو تحريك للـ branch reference لأن تاريخ الـ commits يسمح بده. وفي المقابل، Three-Way Merge بيستخدم الـ common ancestor والنسختين الحاليتين لتحديد التغييرات المطلوب دمجها.
 
@@ -496,49 +511,34 @@ const message = "Welcome back";
 
 خلينا نمشي بخطوات واضحة بدل ما نختار نسخة بشكل عشوائي.
 
-### I. Step 1: Inspect the Merge State
+<Steps>
+<li>
+
+<InfoCard title="Step 1 — Inspect the Merge State" description="اعرف إيه الملفات اللي فيها conflicts وحالتها." icon="pulse" tags={["Inspect"]} />
 
 ```bash
 git status
+git diff --name-only --diff-filter=U
 ```
 
 الأمر هيعرض الملفات اللي فيها conflicts، وغالبًا هتظهر تحت `Unmerged paths`.
 
-تقدر كمان تستخدم:
+</li>
+<li>
 
-```bash
-git diff --name-only --diff-filter=U
-```
-
-ده بيعرض أسماء الملفات اللي لسه فيها تعارضات غير محلولة.
-
-### II. Step 2: Inspect the Conflicting Files
-
-افتح كل ملف متعارض واقرأ التغييرات في سياقها.
-
-متفترضش إن نسخة `HEAD` دايمًا صح أو إن نسخة الـ feature branch هي المطلوبة. ممكن كل نسخة تحتوي على جزء مهم من المنطق.
-
-أثناء الـ Merge، تقدر تعرض نسخة الـ current branch من ملف متعارض باستخدام:
+<InfoCard title="Step 2 — Inspect the Conflicting Files" description="افتح كل ملف متعارض واقرأ التغييرات في سياقها." icon="layers" tags={["Read"]} />
 
 ```bash
 git show :2:path/to/file
-```
-
-وتعرض النسخة القادمة من الـ source branch باستخدام:
-
-```bash
 git show :3:path/to/file
 ```
 
-استبدل `path/to/file` بالمسار الفعلي للملف.
+متفترضش إن نسخة `HEAD` دايمًا صح أو إن نسخة الـ feature branch هي المطلوبة. ممكن كل نسخة تحتوي على جزء مهم من المنطق. في الـ merge conflict العادي، الـ stage `2` بيمثل **ours** والـ stage `3` بيمثل **theirs**.
 
-في حالة الـ merge conflict العادي، الـ stage `2` بيمثل **ours** والـ stage `3` بيمثل **theirs**. ونسخة الـ common ancestor ممكن تكون متاحة في stage `1` لو موجودة.
+</li>
+<li>
 
-### III. Step 3: Edit the File
-
-افتح الملف واكتب النتيجة النهائية المقصودة.
-
-مثال، بدل ما تختار واحدة من النسختين تلقائيًا، ممكن تكون النتيجة الصحيحة:
+<InfoCard title="Step 3 — Edit the File" description="اكتب النتيجة النهائية المقصودة — متسيبش علامات التعارض." icon="wrench" tags={["Resolve"]} />
 
 ```javascript
 const message = "Welcome back";
@@ -546,19 +546,21 @@ const message = "Welcome back";
 
 المثال هنا للتوضيح فقط؛ الاختيار الحقيقي لازم يعتمد على متطلبات التطبيق.
 
-### IV. Step 4: Stage the Resolved File
+</li>
+<li>
 
-بعد ما تخلص من التعارض في الملف:
+<InfoCard title="Step 4 — Stage the Resolved File" description="علّن إن النسخة الحالية هي النسخة اللي عايز تدخلها في نتيجة الـ Merge." icon="layers" tags={["Stage"]} />
 
 ```bash
 git add path/to/file
 ```
 
-في Git، الـ staging هنا معناه إنك بتعلن إن النسخة الحالية من الملف هي النسخة اللي عايز تدخلها في نتيجة الـ Merge.
-
 لو فيه أكتر من ملف متعارض، كرر العملية لكل ملف.
 
-### V. Step 5: Verify All Conflicts Are Resolved
+</li>
+<li>
+
+<InfoCard title="Step 5 — Verify All Conflicts Are Resolved" description="اتأكد إن مفيش ملفات Unmerged وراجع التغييرات." icon="pulse" tags={["Verify"]} />
 
 ```bash
 git status
@@ -566,15 +568,12 @@ git diff --check
 git diff --cached
 ```
 
-- `git status`: يوضح هل فيه ملفات لسه Unmerged.
-- `git diff --check`: يساعد في اكتشاف whitespace errors.
-- `git diff --cached`: يراجع التغييرات اللي اتعمل لها stage.
+`git diff --check` بيساعد في اكتشاف whitespace errors لكنه مش بديل عن مراجعة الكود أو تشغيل الاختبارات.
 
-مهم: `git diff --check` مش بديل عن مراجعة الكود أو تشغيل الاختبارات.
+</li>
+<li>
 
-### VI. Step 6: Complete the Merge
-
-لو كل التعارضات اتحلت، كمّل عملية الدمج:
+<InfoCard title="Step 6 — Complete the Merge" description="كمّل عملية الدمج بعد حل كل التعارضات." icon="git-merge" tags={["Finish"]} />
 
 ```bash
 git merge --continue
@@ -582,16 +581,18 @@ git merge --continue
 
 لو الأمر طلب منك تحرير رسالة الـ merge commit، راجع الرسالة واحفظها.
 
-في بعض الحالات، Git بيكمل الدمج تلقائيًا بعد staging لكل الملفات المتعارضة. لو ده حصل، مش هتحتاج تنفّذ `git merge --continue` مرة تانية.
+</li>
+<li>
 
-### VII. Step 7: Run Tests and Inspect History
+<InfoCard title="Step 7 — Run Tests and Inspect History" description="شغّل الاختبارات وراجع النتيجة قبل ما تعتبر الـ merge مكتملًا." icon="shield" tags={["Quality"]} />
 
 ```bash
 git status
 git log --oneline --graph --decorate -10
 ```
 
-بعدها شغّل الاختبارات المناسبة للمشروع، وراجع النتيجة قبل ما تعتبر الـ merge مكتملًا من ناحية الجودة.
+</li>
+</Steps>
 
 <InfoCard variant="warning" title="Avoid Blind Conflict Resolution" description="Commands such as git checkout --ours or git checkout --theirs can replace a conflicted file with one side's version. Use them only when you understand the consequences, because they can discard valid changes from the other side." icon="shield" tags={["Conflicts", "Data Safety"]} />
 
@@ -613,6 +614,13 @@ git merge --abort
 
 أمثلة شائعة:
 
+<CardGrid columns={3} label="Branch Naming Prefixes">
+<InfoCard variant="feature" title="feature/" description="ميزة جديدة أو تطوير قيد التنفيذ." icon="flag" tags={["feature/user-auth"]} />
+<InfoCard variant="feature" title="fix/ + hotfix/" description="إصلاح bug عادي أو إصلاح عاجل في الإنتاج." icon="wrench" tags={["fix/login-error"]} />
+<InfoCard variant="feature" title="release/ + docs/" description="تجهيز إصدار أو تعديلات توثيق." icon="tag" tags={["release/1.2.0"]} />
+</CardGrid>
+
+<TableCard title="Branch Naming Conventions" caption="prefixes شائعة بتساعد الفريق يفهم هدف الفرع من الاسم.">
 | Prefix | Purpose | Example |
 |---|---|---|
 | `feature/` | ميزة جديدة | `feature/user-auth` |
@@ -622,6 +630,7 @@ git merge --abort
 | `refactor/` | إعادة تنظيم الكود | `refactor/auth-service` |
 | `release/` | تجهيز إصدار | `release/1.2.0` |
 | `experiment/` | تجربة أو إثبات فكرة | `experiment/cache-layer` |
+</TableCard>
 
 دي conventions شائعة، مش قواعد إلزامية من Git.
 
@@ -791,6 +800,8 @@ git branch -d feature/profile-page
 <InfoCard variant="tip" title="Review Before You Merge" description="Inspect the current branch, the diff, and the commit history before merging. Afterward, run the project's tests and review the resulting history." icon="layers" tags={["Best Practices"]} />
 
 ## 12. Key Takeaways
+
+<InfoCard variant="summary" title="Branch & Merge in One Line" description="branch = pointer لـ commit. switch للتنقل، merge للدمج. conflicts بتتحل بفهم النسختين مش باختيار عشوائي." icon="branch" tags={["Mental Model"]} />
 
 - الـ **Branch** هو reference متحرك بيشير إلى commit.
 - `git branch` بيعرض أو ينشئ branches، لكنه مش بينقلك للـ branch الجديد.

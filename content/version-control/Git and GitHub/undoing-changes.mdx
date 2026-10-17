@@ -32,12 +32,15 @@ Git بيوفر أكتر من طريقة للتراجع، لكن **مش كل ال
 
 في Git، فيه ثلاث مناطق أساسية مرتبطة بالتعديلات:
 
-- **Working Tree:** الملفات اللي بتشتغل عليها حاليًا.
-- **Index / Staging Area:** التغييرات اللي جهزتها للـ next commit.
-- **Repository History:** الـ commits اللي Git سجلها بالفعل.
+<CardGrid columns={3} label="Where the Change Lives">
+<InfoCard variant="concept" title="Working Tree" description="الملفات اللي بتشتغل عليها حاليًا — التعديلات غير المعمولة لها commit." icon="wrench" tags={["Uncommitted"]} />
+<InfoCard variant="concept" title="Index / Staging Area" description="التغييرات اللي جهزتها للـ next commit بعد git add." icon="layers" tags={["Staged"]} />
+<InfoCard variant="concept" title="Repository History" description="الـ commits اللي Git سجلها بالفعل — التاريخ النهائي." icon="branch" tags={["Committed"]} />
+</CardGrid>
 
 الأوامر المختلفة بتتعامل مع المناطق دي بطرق مختلفة.
 
+<TableCard title="Which Command for Which Situation" caption="اختار الأمر حسب مكان التغيير والهدف من التراجع.">
 | Situation | Typical command | What it changes |
 |---|---|---|
 | Discard unstaged file changes | `git restore <file>` | Working tree |
@@ -46,6 +49,7 @@ Git بيوفر أكتر من طريقة للتراجع، لكن **مش كل ال
 | Create a new commit that reverses a previous commit | `git revert <commit>` | Repository history |
 | Replace the latest commit | `git commit --amend` | Latest commit and branch history |
 | Find previous HEAD positions | `git reflog` | No changes by itself |
+</TableCard>
 
 ```mermaid
 flowchart TD
@@ -162,12 +166,14 @@ git commit -m "fix: restore previous app implementation"
 
 ### IV. Quick Reference
 
+<TableCard title="git restore Variants" caption="كل variant بيستهدف منطقة مختلفة — راجع التأثير قبل التنفيذ.">
 | Command | Effect |
 |---|---|
 | `git restore file.txt` | Discard unstaged changes to the file |
 | `git restore --staged file.txt` | Unstage the file while preserving working-tree changes |
 | `git restore --source=HEAD~1 -- file.txt` | Restore the file from an older commit into the working tree |
 | `git restore --staged --worktree file.txt` | Restore both the index and working tree from the default source |
+</TableCard>
 
 في الأمر الأخير، المصدر الافتراضي هو `HEAD`؛ بالتالي الأمر ممكن يتخلص من تغييرات staged وunstaged في الملف المحدد. استخدمه فقط لو ده فعلًا المطلوب.
 
@@ -249,11 +255,19 @@ git reset --hard HEAD~1
 
 ### V. Compare the Modes
 
+<CardGrid columns={3} label="Reset Modes">
+<InfoCard variant="comparison" title="--soft" description="بيحرّك الـ branch بس — التغييرات بتفضل staged وجاهزة للـ commit التالي." icon="layers" tags={["Safest"]} />
+<InfoCard variant="comparison" title="--mixed" description="بيحرّك الـ branch وبيرجّع التغييرات لحالة unstaged (الافتراضي)." icon="wrench" tags={["Default"]} />
+<InfoCard variant="comparison" title="--hard" description="بيحرّك الـ branch وبيمسح الـ index والـ working tree — destructive." icon="shield" tags={["Destructive"]} />
+</CardGrid>
+
+<TableCard title="git reset Modes Compared" caption="كل mode بيحدد إيه اللي بيتم ضبطه تلقائيًا بعد تحريك الـ branch.">
 | Mode | Moves branch | Resets index | Resets working tree | Typical use |
 |---|---|---|---|---|
 | `--soft` | Yes | No | No | Undo a commit but keep changes staged |
 | `--mixed` | Yes | Yes | No | Undo a commit and keep changes unstaged |
 | `--hard` | Yes | Yes | Yes | Discard local changes and reset tracked files |
+</TableCard>
 
 ### VI. Visualizing Reset
 
@@ -408,6 +422,7 @@ flowchart LR
 
 ### III. Reset vs Revert
 
+<TableCard title="git reset vs git revert" caption="الأول بيعيد كتابة التاريخ، والتاني بيضيف commit جديد يعكس التأثير.">
 | Aspect | `git reset` | `git revert` |
 |---|---|---|
 | Creates a new commit | No | Yes |
@@ -415,6 +430,7 @@ flowchart LR
 | Preserves original commit in branch history | May remove it from the current branch history | Yes |
 | Appropriate for shared history | Requires care; can rewrite branch history | Often safer |
 | Can cause conflicts | Depending on operation and later work | Yes |
+</TableCard>
 
 ### IV. Revert a Merge Commit
 
@@ -563,7 +579,7 @@ flowchart LR
 
 الـ commits `C` و`D` بقوا خارج التاريخ الحالي للـ branch، لكن ده مش معناه إنهم اتحذفوا فورًا من Git's object database.
 
-## 7. Recovering Lost Commits
+----
 
 <Callout type="lab" title="Hands-on: Recovery" />
 
@@ -588,7 +604,7 @@ git show --stat <commit>
 </li>
 <li>
 
-<InfoCard title="Step 3 — Create Recovery Branch" description="أنشئ branch جديد يشير للـ commit المسترجع." icon="cube" tags={["Branch"]} />
+<InfoCard title="Step 3 — Create Recovery Branch" description="أنشئ branch جديد يشير للـ commit المسترجع." icon="branch" tags={["Branch"]} />
 
 ```bash
 git branch recovery/profile-page <commit>
@@ -604,7 +620,7 @@ git branch recovery/profile-page <commit>
 
 ---
 
-### VI. Alternative: Restore a Commit Without Moving the Branch Backward
+### II. Alternative: Restore a Commit Without Moving the Branch Backward
 
 افترض إنك لقيت الـ commit `D`:
 
@@ -621,7 +637,7 @@ git show --no-patch --format=fuller d4e5f6a
 
 اتأكد إن ده فعلًا الـ commit اللي محتاج تسترجعه.
 
-### IV. Step 3: Create a Recovery Branch
+### III. Create a Recovery Branch
 
 الطريقة الأكثر حذرًا هي إنشاء branch جديد يشير إلى الـ commit المسترجع:
 
@@ -638,7 +654,7 @@ git log --oneline --decorate -10
 
 كده استرجعت إمكانية الوصول للـ commit من خلال branch reference جديد، من غير ما تغيّر `main` مباشرةً.
 
-### V. Step 4: Decide How to Restore the Work
+### IV. Decide How to Restore the Work
 
 بعد مراجعة الـ recovery branch، عندك اختيارات حسب المطلوب:
 
@@ -655,7 +671,7 @@ git reset --hard d4e5f6a
 
 **نفّذ الأمر ده فقط بعد التأكد من الـ target ومن إنك مش هتفقد تغييرات محلية مهمة.** إنشاء recovery branch أولًا بيديك reference ثابتًا تقدر ترجع له أثناء المراجعة.
 
-### VI. Alternative: Restore a Commit Without Moving the Branch Backward
+### V. Alternative: Restore a Commit Without Moving the Branch Backward
 
 لو هدفك استرجاع التغيير في branch الحالي من غير إعادة كتابة التاريخ، ممكن تستخدم `git cherry-pick` على الـ commit المطلوب:
 
@@ -665,7 +681,7 @@ git cherry-pick d4e5f6a
 
 الأمر بيحاول يطبّق التغيير الموجود في الـ commit كـ commit جديد فوق الـ current branch. ممكن يحصل conflict، ومش دايمًا تطبيق commit قديم فوق التاريخ الحالي هينجح من غير تدخل.
 
-### VII. What If Reflog Does Not Help?
+### VI. What If Reflog Does Not Help?
 
 لو مش لاقي الـ commit في الـ reflog، ممكن تبحث عن commits غير مرتبطة حاليًا بأي branch أو reference باستخدام:
 
@@ -691,8 +707,15 @@ git show <commit>
 
 مش كل عمليات التراجع ليها نفس مستوى الخطورة. التصنيف هنا بيعتمد على تأثير الأمر في التغييرات المحلية والتاريخ، مش على إن الأمر آمن في كل الظروف.
 
+<CardGrid columns={3} label="Safety Spectrum">
+<InfoCard variant="success" title="Safe" description="أوامر فحص وعرض مش بتغيّر الملفات أو التاريخ." icon="pulse" tags={["Read-only"]} />
+<InfoCard variant="warning" title="Needs Care" description="أوامر بتغيّر الملفات أو التاريخ — محتاجة فهم للسياق." icon="wrench" tags={["Review first"]} />
+<InfoCard variant="danger" title="Destructive" description="أوامر بتمسح تعديلات أو تاريخ بشكل ممكن ما يرجعش." icon="shield" tags={["Backup"]} />
+</CardGrid>
+
 ### I. Safer Operations
 
+<TableCard title="Safer Operations" caption="بتغيّر شكل العرض أو الملفات بشكل محدود وقابل للتراجع.">
 | Operation | Why it is generally safer |
 |---|---|
 | `git status` | فحص الحالة من غير تغيير الملفات |
@@ -701,11 +724,13 @@ git show <commit>
 | `git reflog` | استعراض تحركات المراجع |
 | `git restore --staged <file>` | إزالة الـ file changes من الـ staging مع الاحتفاظ بها في الـ working tree |
 | `git revert <commit>` | إنشاء commit جديد يعكس تغييرًا سابقًا بدل إزالة الـ commit من التاريخ الحالي |
+</TableCard>
 
 حتى الأوامر دي محتاجة فهم للسياق؛ مثلًا، `git revert` ممكن ينتج عنه conflicts، و`git restore --staged` مش معناه إن التغيير اتلغى من الملف.
 
 ### II. Operations That Need Extra Care
 
+<TableCard title="Operations That Need Extra Care" caption="بتغيّر الـ branch reference أو الـ index — راجع النتيجة بعد التنفيذ.">
 | Operation | Main risk |
 |---|---|
 | `git restore <file>` | التخلص من تعديلات غير معمولة لها commit في الملف |
@@ -713,15 +738,18 @@ git show <commit>
 | `git reset --mixed` | نقل branch reference وإرجاع التغييرات إلى حالة unstaged |
 | `git commit --amend` | استبدال آخر commit وتغيير الـ commit hash |
 | `git cherry-pick` | إنشاء commit جديد وقد ينتج عنه conflicts |
+</TableCard>
 
 ### III. Destructive Operations
 
+<TableCard title="Destructive Operations" caption="بيمسحوا تعديلات أو references — اعمل backup قبل التنفيذ.">
 | Operation | Main risk |
 |---|---|
 | `git reset --hard` | فقدان تعديلات محلية متتبعة عند استبدالها بمحتوى الـ target commit |
 | `git clean -fd` | حذف ملفات ومجلدات غير متتبعة |
 | `git clean -fdx` | حذف الملفات غير المتتبعة، بما فيها الملفات المتجاهلة بواسطة `.gitignore` |
 | `git branch -D <branch>` | حذف branch reference حتى لو كان يحتوي على commits غير مدمجة |
+</TableCard>
 
 قبل تنفيذ `git clean`، اعرض الملفات اللي هتتحذف باستخدام dry run:
 
@@ -741,12 +769,38 @@ git clean -ndx
 
 قبل أي عملية تراجع، امشِ بالترتيب ده:
 
-1. **Inspect:** استخدم `git status` وراجع الـ diff.
-2. **Identify:** حدد الـ file أو commit أو branch المقصود.
-3. **Preserve:** لو فيه شغل مهم، اعمل commit أو أنشئ backup branch أو نسخة منفصلة مناسبة.
-4. **Choose:** اختار الأمر اللي يحقق هدفك بأقل تغيير مطلوب.
-5. **Execute:** نفّذ الأمر على الهدف الصحيح.
-6. **Verify:** راجع `git status` والتاريخ والملفات بعد التنفيذ.
+<Steps>
+<li>
+
+<InfoCard title="Inspect" description="استخدم git status وراجع الـ diff قبل أي تغيير." icon="pulse" tags={["Check"]} />
+
+</li>
+<li>
+
+<InfoCard title="Identify" description="حدد الـ file أو commit أو branch المقصود بدقة." icon="branch" tags={["Target"]} />
+
+</li>
+<li>
+
+<InfoCard title="Preserve" description="لو فيه شغل مهم، اعمل commit أو أنشئ backup branch قبل المتابعة." icon="layers" tags={["Backup"]} />
+
+</li>
+<li>
+
+<InfoCard title="Choose" description="اختار الأمر اللي يحقق هدفك بأقل تغيير مطلوب." icon="wrench" tags={["Decide"]} />
+
+</li>
+<li>
+
+<InfoCard title="Execute" description="نفّذ الأمر على الهدف الصحيح." icon="terminal" tags={["Run"]} />
+
+</li>
+<li>
+
+<InfoCard title="Verify" description="راجع git status والتاريخ والملفات بعد التنفيذ." icon="pulse" tags={["Confirm"]} />
+
+</li>
+</Steps>
 
 <InfoCard variant="warning" title="A Recovery Tool Is Not a Backup Strategy" description="Reflog can help recover recent local history changes, but it is not permanent storage. Keep important work committed and use appropriate backups or remotes for critical repositories." icon="shield" tags={["Recovery", "Best Practices"]} />
 
@@ -815,6 +869,8 @@ git commit --amend -m "docs: clarify recovery workflow"
 استخدم ده بحذر لو الـ commit سبق نشره أو الاعتماد عليه من الآخرين.
 
 ## 10. Key Takeaways
+
+<InfoCard variant="summary" title="Undo Decision Tree" description="ملف معدّل؟ restore. Commit غلط؟ reset --soft لو محلي، revert لو اتشارك. آخر commit؟ --amend. ضيعت commit؟ reflog." icon="layers" tags={["Mental Model"]} />
 
 - `git restore` بيستعيد محتوى الملفات في الـ working tree أو الـ index.
 - `git restore --staged` بيشيل التغييرات من الـ staging area من غير ما يمسحها من الـ working tree.

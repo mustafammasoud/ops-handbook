@@ -23,13 +23,14 @@ Git مش مجرد أداة بتحتفظ بنسخ قديمة من ملفاتك؛ 
 
 في الصفحة دي هنفهم:
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
-  <InfoCard variant="concept" title="Working Directory" description="المكان اللي بتعدّل فيه الملفات." icon="layers" tags={["Overview"]} />
-  <InfoCard variant="concept" title="Staging Area" description="المرحلة اللي بتحدد فيها التغييرات المراد تسجيلها." icon="layers" tags={["Overview"]} />
-  <InfoCard variant="concept" title="Repository" description="بيحتفظ ببيانات المشروع وتاريخه." icon="cube" tags={["Overview"]} />
-  <InfoCard variant="concept" title="Objects" description="Blob وTree وCommit objects." icon="cube" tags={["Overview"]} />
-  <InfoCard variant="concept" title="Hashes" description="تحديد هوية البيانات." icon="wrench" tags={["Overview"]} />
-</div>
+<CardGrid columns={3} label="Core Concepts">
+<InfoCard variant="concept" title="Working Directory" description="المكان اللي بتعدّل فيه الملفات." icon="wrench" tags={["Overview"]} />
+<InfoCard variant="concept" title="Staging Area" description="المرحلة اللي بتحدد فيها التغييرات المراد تسجيلها." icon="layers" tags={["Overview"]} />
+<InfoCard variant="concept" title="Repository" description="بيحتفظ ببيانات المشروع وتاريخه." icon="database" tags={["Overview"]} />
+<InfoCard variant="concept" title="Objects" description="Blob وTree وCommit objects." icon="cube" tags={["Overview"]} />
+<InfoCard variant="concept" title="Hashes" description="تحديد هوية البيانات." icon="tag" tags={["Overview"]} />
+<InfoCard variant="concept" title="Snapshots" description="كل Commit بيشير إلى لقطة كاملة للمشروع." icon="cycle" tags={["Overview"]} />
+</CardGrid>
 
 <InfoCard variant="concept" title="The Core Idea" description="Git بيسجل حالات المشروع على هيئة Commits، وكل Commit بيشير إلى Snapshot محددة من ملفات المشروع، مع الاحتفاظ بمعلومات تربطها بتاريخ التغييرات السابقة." icon="layers" tags={["Repository", "Commit", "Snapshot"]} />
 
@@ -253,12 +254,14 @@ git add src/app.py
 
 أهم الأوامر المرتبطة بالتعامل مع الـ Remote:
 
+<TableCard title="Remote Commands" caption="أهم أوامر التعامل مع المستودعات البعيدة.">
 | Command | Purpose |
 |---|---|
 | `git remote -v` | عرض الـ Remote URLs المسجلة |
 | `git fetch` | جلب بيانات وتحديثات من الـ Remote من غير دمجها تلقائيًا في الـ Branch الحالي |
 | `git pull` | جلب التحديثات ودمجها أو إعادة تطبيقها حسب الإعدادات |
 | `git push` | إرسال الـ Commits المحلية إلى الـ Remote |
+</TableCard>
 
 ### III. How Local and Remote Repositories Work Together
 
@@ -586,6 +589,8 @@ git ls-tree HEAD
 ---
 
 ## 11. Key Takeaways
+
+<InfoCard variant="summary" title="Git in Three Areas" description="Working Directory (تعديل) → Staging Area (تجهيز) → Repository (تسجيل). كل Commit لقطة كاملة موقّعة بـ Hash فريد." icon="layers" tags={["Mental Model"]} />
 
 <CardGrid columns={2} label="Core Concepts to Remember">
   <InfoCard variant="summary" title="Working Directory" description="المكان اللي بتعدّل فيه ملفات المشروع مباشرة." icon="layers" />

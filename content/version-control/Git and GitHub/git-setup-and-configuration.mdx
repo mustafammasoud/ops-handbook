@@ -57,12 +57,14 @@ git version 2.x.x
 
 طريقة التثبيت بتختلف حسب الـ Distribution والـ Package Manager المستخدم.
 
+<TableCard title="Install Git on Linux" caption="أوامر التثبيت باستخدام Package Manager لكل توزيعة.">
 | Distribution | Command |
 |---|---|
 | Fedora | `sudo dnf install git` |
 | Ubuntu / Debian | `sudo apt install git` |
 | Arch Linux | `sudo pacman -S git` |
 | openSUSE | `sudo zypper install git` |
+</TableCard>
 
 الأوامر دي بتستخدم الـ Package Manager الرسمي لكل توزيعة، وممكن تحتاج تحديث الـ Package Index أو تأكيد التثبيت حسب النظام.
 
@@ -225,11 +227,19 @@ git config --local user.email "work@example.com"
 
 لو نفس الإعداد متعرف في أكتر من مستوى، فالأكثر تحديدًا بيكون له الأولوية عادةً.
 
+<CardGrid columns={3} label="Config Scopes">
+<InfoCard variant="comparison" title="System" description="إعدادات عامة بتُطبق على كل المستخدمين على الجهاز." icon="cube" tags={["--system"]} />
+<InfoCard variant="comparison" title="Global" description="الهوية والإعدادات الشخصية للمستخدم الحالي." icon="sliders" tags={["--global"]} />
+<InfoCard variant="comparison" title="Local" description="Overrides خاصة بمشروع معين — بتسبق الباقي." icon="branch" tags={["--local"]} />
+</CardGrid>
+
+<TableCard title="Configuration Scope Precedence" caption="الأكثر تحديدًا (Local) بيسبق الأقل (System).">
 | Scope | Applies To | Typical Use |
 |---|---|---|
 | System | كل المستخدمين على الجهاز | إعدادات عامة للجهاز |
 | Global | المستخدم الحالي | الهوية والإعدادات الشخصية |
 | Local | Repository واحد | Overrides خاصة بمشروع معين |
+</TableCard>
 
 **مثال عملي:**
 
@@ -448,12 +458,14 @@ flowchart TD
     class A,B,N result
 ```
 
+<TableCard title="When to Use init vs clone" caption="اختار الأوامر المناسب حسب وضع المشروع الحالي.">
 | Situation | Command |
 |---|---|
 | بدأت مشروع جديد على جهازك | `git init` |
 | عندك مجلد مشروع موجود بدون Git | `git init` |
 | عايز تنزل Repository موجود على GitHub | `git clone` |
 | عايز نسخة محلية من Repository عندك صلاحية الوصول إليه | `git clone` |
+</TableCard>
 
 ---
 
@@ -522,6 +534,8 @@ git config --global init.defaultBranch
 ---
 
 ## Key Takeaways
+
+<InfoCard variant="summary" title="Setup in One Line" description="ثبّت Git، حط الهوية (user.name + user.email)، واختر init أو clone حسب وضع المشروع." icon="wrench" tags={["Mental Model"]} />
 
 - `git --version` بيتأكد إن Git متثبت ومتاح من الـ Terminal.
 - `git config` بيدير إعدادات Git.
