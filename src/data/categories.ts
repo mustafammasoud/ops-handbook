@@ -13,7 +13,12 @@ export type CategoryIconName =
   | 'sliders'
   | 'pulse'
   | 'shield'
-  | 'wrench';
+  | 'wrench'
+  | 'database'
+  | 'git-merge'
+  | 'git-pull-request'
+  | 'flag'
+  | 'tag';
 
 /**
  * Optional manual status override for an area. When omitted, the status is
