@@ -61,51 +61,26 @@ flowchart TB
 
 التلاتة Kubernetes resources، لكن كل واحد له غرض مختلف.
 
+<TableCard title="Deployment vs ReplicaSet vs DaemonSet" caption="التلاتة بيديروا Pods، لكن طريقة العد والغرض مختلفين.">
 | Feature | Deployment | ReplicaSet | DaemonSet |
 |---|---|---|---|
 | Main purpose | إدارة تطبيقات الـ Pods والـ rollouts | الحفاظ على عدد محدد من الـ Pods | تشغيل Pod على كل Node مؤهلة |
 | Replica count | عدد محدد | عدد محدد | بيتحدد حسب عدد الـ Nodes المؤهلة |
 | New eligible Node | مش بيزود Pod تلقائيًا لمجرد إضافة Node | مش بيزود نسخة لمجرد إضافة Node | بيحاول يشغّل Pod عليها |
 | Typical use | Web applications, APIs | الحفاظ على عدد النسخ | Logging, monitoring, node agents |
+</TableCard>
 
 غالبًا هتستخدم Deployment لتطبيق زي Web API، وDaemonSet لتشغيل Agent محتاج يشتغل على مستوى كل Node.
 
 ## 4. Common Use Cases
 
-<box gap={3}>
-  <row align="start" gap={3}>
-    <box background="surface-secondary" radius="lg" size="44px" align="center" justify="center">
-      <icon name="activity" size="xl" />
-    </box>
-    <box flex="1" gap={1}>
-      **Monitoring Agents**
+<CardGrid columns={3} label="Typical DaemonSet Workloads">
+<InfoCard variant="feature" title="Monitoring Agents" description="تشغيل Node-level monitoring agents لجمع معلومات عن الـ CPU والـ Memory والـ Node health." icon="pulse" tags={["Metrics", "Node health"]} />
 
-      تشغيل Node-level monitoring agents لجمع معلومات عن الـ CPU والـ Memory والـ Node health.
-    </box>
-  </row>
-  <divider color="subtle" />
-  <row align="start" gap={3}>
-    <box background="surface-secondary" radius="lg" size="44px" align="center" justify="center">
-      <icon name="file-text" size="xl" />
-    </box>
-    <box flex="1" gap={1}>
-      **Log Collectors**
+<InfoCard variant="feature" title="Log Collectors" description="تشغيل Agents تجمع الـ Logs من الـ Nodes والـ Containers، مثل Fluent Bit أو Fluentd، حسب طريقة إعداد الـ Logging." icon="database" tags={["Logs", "Fluent Bit"]} />
 
-      تشغيل Agents تجمع الـ Logs من الـ Nodes والـ Containers، مثل Fluent Bit أو Fluentd، حسب طريقة إعداد الـ Logging.
-    </box>
-  </row>
-  <divider color="subtle" />
-  <row align="start" gap={3}>
-    <box background="surface-secondary" radius="lg" size="44px" align="center" justify="center">
-      <icon name="network" size="xl" />
-    </box>
-    <box flex="1" gap={1}>
-      **Networking Agents**
-
-      بعض حلول الـ Container Networking بتشغّل Node-level agents باستخدام DaemonSets.
-    </box>
-  </row>
-</box>
+<InfoCard variant="feature" title="Networking Agents" description="بعض حلول الـ Container Networking بتشغّل Node-level agents باستخدام DaemonSets." icon="network" tags={["CNI", "Node agents"]} />
+</CardGrid>
 
 ### I. What about kube-proxy?
 
@@ -276,7 +251,11 @@ kubectl get daemonset node-monitor
 
 ## 9. Key Takeaways
 
+<InfoCard variant="summary" title="The DaemonSet Mental Model" description="الـ Controller بيطابق عدد الـ Pods مع عدد الـ Nodes المؤهلة تلقائيًا — أي Node جديدة تدخل تاخد Agent، وأي Node تخرج يتشال الـ Pod بتاعها." icon="cycle" tags={["Mental Model"]} />
+
+<CardGrid columns={3} label="Key Takeaways">
 <InfoCard
+  variant="summary"
   title="One Pod per Eligible Node"
   description="DaemonSets maintain a Pod on each Node that matches the DaemonSet's scheduling requirements."
   icon="cube"
@@ -284,6 +263,7 @@ kubectl get daemonset node-monitor
 />
 
 <InfoCard
+  variant="summary"
   title="Automatic Reconciliation"
   description="When eligible Nodes are added or removed, Kubernetes adjusts the DaemonSet's Pods to match the desired state."
   icon="cycle"
@@ -291,11 +271,13 @@ kubectl get daemonset node-monitor
 />
 
 <InfoCard
+  variant="summary"
   title="Typical Use Cases"
   description="Node-level logging, monitoring, and networking agents are common DaemonSet workloads."
   icon="wrench"
   tags={["Logging", "Monitoring", "Networking"]}
 />
+</CardGrid>
 
 **الخلاصة:** استخدم `DaemonSet` لما تحتاج تشغّل نسخة من Pod على كل Node مؤهلة، زي الـ Logging Agents والـ Monitoring Agents. أما لو هدفك تشغيل عدد محدد من نسخ تطبيق، فالـ Deployment هو الاختيار المعتاد.
 

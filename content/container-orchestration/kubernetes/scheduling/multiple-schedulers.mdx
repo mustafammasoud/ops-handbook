@@ -258,7 +258,10 @@ flowchart TD
 
 لو الـ Pod فضلت `Pending`، ابدأ بالخطوات دي بالترتيب:
 
-### I. Step 1 — Check the Pod Configuration
+<Steps>
+<li>
+
+**Step 1 — Check the Pod Configuration**
 
 ```bash
 kubectl get pod nginx-custom-scheduler -o yaml
@@ -271,9 +274,12 @@ spec:
   schedulerName: my-scheduler
 ```
 
-اتأكد إن الاسم مطابق للاسم اللي الـ Scheduler بيستخدمه.
+تأكد إن الاسم مطابق للاسم اللي الـ Scheduler بيستخدمه.
 
-### II. Step 2 — Inspect Pod Events
+</li>
+<li>
+
+**Step 2 — Inspect Pod Events**
 
 ```bash
 kubectl describe pod nginx-custom-scheduler
@@ -281,7 +287,10 @@ kubectl describe pod nginx-custom-scheduler
 
 راجع آخر الأحداث، خصوصًا لو مفيش حدث `Scheduled` أو ظهر سبب متعلق بالـ Scheduling.
 
-### III. Step 3 — Check the Scheduler
+</li>
+<li>
+
+**Step 3 — Check the Scheduler**
 
 ```bash
 kubectl get pods -n kube-system
@@ -289,7 +298,10 @@ kubectl get pods -n kube-system
 
 لو الـ Scheduler معمول له Deployment، راجع الـ Deployment والـ Pods التابعة له.
 
-### IV. Step 4 — Check Logs and Permissions
+</li>
+<li>
+
+**Step 4 — Check Logs and Permissions**
 
 ```bash
 kubectl logs -n kube-system <scheduler-pod-name>
@@ -297,7 +309,10 @@ kubectl logs -n kube-system <scheduler-pod-name>
 
 لو الـ Scheduler مش قادر يتواصل مع الـ API Server أو معندوش RBAC permissions مناسبة، ممكن يفشل في مراقبة الـ Pods أو عمل Binding للـ Node.
 
-### V. Step 5 — Check Node Suitability
+</li>
+<li>
+
+**Step 5 — Check Node Suitability**
 
 حتى لو الـ Scheduler شغال، ممكن مفيش Node مناسبة بسبب نقص الـ Resources أو قيود الـ Placement.
 
@@ -307,6 +322,9 @@ kubectl logs -n kube-system <scheduler-pod-name>
 kubectl get nodes
 kubectl describe nodes
 ```
+
+</li>
+</Steps>
 
 ما تفترضش إن كل حالة `Pending` معناها إن الـ Scheduler نفسه فيه مشكلة؛ ممكن يكون السبب في الـ Resources أو الـ Constraints.
 
@@ -475,11 +493,12 @@ kubectl delete pod nginx-custom-scheduler
 
 ## 10. Key Takeaways
 
-- الـ Kubernetes بيدعم تشغيل أكثر من Scheduler.
-- كل Scheduler لازم يكون له اسم مميز.
-- الحقل `spec.schedulerName` بيحدد الـ Scheduler المطلوب للـ Pod.
-- الـ Default Scheduler هو `default-scheduler`.
-- الـ Custom Scheduler محتاج إعدادات صحيحة واتصال بالـ API Server وصلاحيات مناسبة.
-- الـ Events والـ Logs أدوات أساسية لتشخيص مشاكل الـ Scheduling.
-- `leaderElection` بيُستخدم لتنسيق نسخ الـ Scheduler في سيناريوهات High Availability.
+<InfoCard variant="summary" title="The Multiple Schedulers Mental Model" description="أكتر من `kube-scheduler` ممكن يشتغلوا بالتوازي؛ الـ Pod بتختار واحد فيهم بـ `schedulerName` — والاسم ده لازم يطابق اسم الـ Scheduler الفعلي عشان الـ Pod تتجدول." icon="wheel" tags={["Mental Model"]} />
+
+<CardGrid columns={2} label="Key Takeaways">
+<InfoCard variant="summary" title="schedulerName Binding" description="الـ `spec.schedulerName` بيحدد الـ Scheduler المطلوب للـ Pod، والـ Default هو `default-scheduler`." icon="branch" tags={["Selection"]} />
+<InfoCard variant="summary" title="Custom Scheduler Setup" description="الـ Custom Scheduler محتاج إعدادات صحيحة واتصال بالـ API Server وصلاحيات RBAC مناسبة." icon="sliders" tags={["Config", "RBAC"]} />
+<InfoCard variant="summary" title="Leader Election" description="`leaderElection` بيُستخدم لتنسيق نسخ الـ Scheduler في سيناريوهات High Availability." icon="git-merge" tags={["HA"]} />
+<InfoCard variant="summary" title="Pending Pod Debugging" description="الـ Events والـ Logs والأدوات اللي شفناها في خطوات التشخيص هي أساس حل مشاكل الـ Scheduling." icon="pulse" tags={["Debugging"]} />
+</CardGrid>
 

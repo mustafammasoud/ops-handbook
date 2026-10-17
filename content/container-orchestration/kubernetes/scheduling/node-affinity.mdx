@@ -99,6 +99,7 @@ spec:
 
 الـ Operator هو اللي بيحدد طريقة مطابقة الـ Label مع الشرط المطلوب.
 
+<TableCard title="Node Affinity Operators" caption="كل Operator بيحدد طريقة مطابقة الـ Label مع الشرط.">
 | Operator | المعنى |
 |---|---|
 | `In` | قيمة الـ Label تكون واحدة من القيم المحددة. |
@@ -107,6 +108,7 @@ spec:
 | `DoesNotExist` | الـ Label Key غير موجودة. |
 | `Gt` | قيمة الـ Label الرقمية أكبر من القيمة المحددة. |
 | `Lt` | قيمة الـ Label الرقمية أصغر من القيمة المحددة. |
+</TableCard>
 
 بالنسبة إلى `Gt` و`Lt`، لازم قيمة الـ Label والقيمة المقارنة تكونا أعدادًا صحيحة بصيغة نصية صالحة للمقارنة الرقمية.
 
@@ -199,9 +201,11 @@ affinity:
 
 فيه نوعان أساسيان بنستخدمهم لتحديد طريقة تعامل الـ Scheduler مع شروط الـ Node Affinity.
 
-<InfoCard title="Required" description="شرط إلزامي وقت الجدولة. لو مفيش Node تحقق الشروط وباقي قيود الجدولة، الـ Pod مش هتتجدول." icon="shield" tags={["Hard Requirement"]} />
+<CardGrid columns={2} label="Affinity Types">
+<InfoCard variant="concept" title="Required" description="شرط إلزامي وقت الجدولة. لو مفيش Node تحقق الشروط وباقي قيود الجدولة، الـ Pod مش هتتجدول." icon="shield" tags={["Hard Requirement"]} />
 
-<InfoCard title="Preferred" description="تفضيل للـ Scheduler. يحاول اختيار Node مطابقة، لكن ممكن يختار Node أخرى لو التفضيل مش قابل للتحقيق." icon="sliders" tags={["Soft Preference"]} />
+<InfoCard variant="concept" title="Preferred" description="تفضيل للـ Scheduler. يحاول اختيار Node مطابقة، لكن ممكن يختار Node أخرى لو التفضيل مش قابل للتحقيق." icon="sliders" tags={["Soft Preference"]} />
+</CardGrid>
 
 ### I. Required During Scheduling, Ignored During Execution
 
@@ -432,17 +436,19 @@ kubectl get nodes --show-labels
 
 الاتنين بيتعلقوا بالـ Scheduling، لكن كل واحد بيحل مشكلة مختلفة.
 
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <InfoCard title="Node Affinity" description="تحدد الـ Nodes التي تطابق شروط الـ Pod أو تفضيلاتها." icon="wrench" tags={["Placement"]} />
-  <InfoCard title="Taints & Tolerations" description="تمنع Pods غير المتحملة من استخدام Node، أو تسمح لها بتجاوز Taint مطابقة." icon="shield" tags={["Repelling"]} />
-</div>
+<CardGrid columns={2} label="Two Scheduling Mechanisms">
+  <InfoCard variant="comparison" title="Node Affinity" description="تحدد الـ Nodes التي تطابق شروط الـ Pod أو تفضيلاتها." icon="network" tags={["Placement"]} />
+  <InfoCard variant="comparison" title="Taints & Tolerations" description="تمنع Pods غير المتحملة من استخدام Node، أو تسمح لها بتجاوز Taint مطابقة." icon="shield" tags={["Repelling"]} />
+</CardGrid>
 
+<TableCard title="Node Affinity vs Taints & Tolerations" caption="مين بيعمل إيه في قرارات الجدولة.">
 | Feature | Node Affinity | Taints & Tolerations |
 |---|---|---|
 | مكان الإعداد | Pod specification | Taints على Node وTolerations على Pod |
 | الهدف | اختيار Nodes حسب Labels | إبعاد Pods غير المتحملة |
 | هل يفرض الاختيار؟ | الـ Required يفرض مطابقة الشروط وقت الجدولة | الـ Toleration وحدها لا تفرض اختيار Node |
 | الاستخدام معًا | ممكن | ممكن |
+</TableCard>
 
 في بيئة حقيقية، ممكن تحتاج الاتنين معًا: الـ Affinity عشان توجّه الـ Pod إلى مجموعة Nodes معينة، والـ Taints عشان تمنع الـ Workloads غير المناسبة من استخدامها.
 
@@ -458,6 +464,13 @@ kubectl get nodes --show-labels
 - نسيان فحص الـ Taints والـ Resources عند استهداف Control Plane Node.
 
 ## 12. Key Takeaways
+
+<InfoCard variant="summary" title="The Node Affinity Mental Model" description="قواعد على الـ Pod بتوجّهه لـ Nodes حسب Labels: `Required` وقت الجدولة، `Preferred` تفضيل، و`IgnoredDuringExecution` يعني تغيير الـ Label بعد التشغيل مش بيطرد الـ Pod لوحده." icon="network" tags={["Mental Model"]} />
+
+<CardGrid columns={2} label="Key Takeaways">
+<InfoCard variant="summary" title="Operators" description="`In` و`NotIn` لمطابقة أو استبعاد القيم، و`Exists` و`DoesNotExist` للتعامل مع وجود الـ Label Key." icon="tag" tags={["Matching"]} />
+<InfoCard variant="summary" title="Required vs Preferred" description="`requiredDuringScheduling...` شرط إلزامي، و`preferredDuringScheduling...` تفضيل بيتجنّبه الـ Scheduler لو مش متحقق." icon="sliders" tags={["Hard", "Soft"]} />
+</CardGrid>
 
 - الـ Node Affinity بتستخدم Node Labels لاختيار الـ Nodes.
 - `In` و`NotIn` بيسمحوا بمطابقة القيم أو استبعادها.

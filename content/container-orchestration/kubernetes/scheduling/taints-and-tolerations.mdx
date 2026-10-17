@@ -126,11 +126,13 @@ flowchart TD
 
 الـ Taint بيتضاف على الـ **Node**، وبيتكوّن من ثلاثة أجزاء:
 
+<TableCard title="Taint Components" caption="أجزاء الـ Taint الثلاثة على الـ Node.">
 | Component | Meaning |
 |---|---|
 | `key` | اسم العلامة |
 | `value` | قيمة العلامة |
 | `effect` | تأثير العلامة |
+</TableCard>
 
 مثال:
 
@@ -220,12 +222,14 @@ spec:
 
 ### I. Understanding the Fields
 
+<TableCard title="Toleration Fields" caption="حقول الـ Toleration على الـ Pod وتطابقها مع الـ Taint.">
 | Field | Explanation |
 |---|---|
 | `key: "app"` | نفس الـ Key الموجود في الـ Taint |
 | `operator: "Equal"` | يشترط تطابق الـ Value |
 | `value: "blue"` | نفس قيمة الـ Taint |
 | `effect: "NoSchedule"` | الـ Effect المطلوب تحمّله |
+</TableCard>
 
 لازم شروط المطابقة تكون متحققة علشان الـ Toleration تتحمل الـ Taint المقصود.
 
@@ -280,7 +284,7 @@ tolerations:
 
 الـ Effect بيحدد طريقة تعامل Kubernetes مع الـ Pod اللي مش بتتحمل الـ Taint.
 
-<div class="grid gap-4 sm:grid-cols-3">
+<CardGrid columns={3} label="Taint Effects">
   <InfoCard
     variant="comparison"
     title="NoSchedule"
@@ -302,7 +306,7 @@ tolerations:
     icon="cycle"
     tags={["Evicts existing pods"]}
   />
-</div>
+</CardGrid>
 
 ### I. NoSchedule
 
@@ -346,11 +350,13 @@ kubectl taint nodes node1 app=blue:NoExecute
 
 ### IV. Comparing the Effects
 
+<TableCard title="Comparing Taint Effects" caption="مصير الـ Pods الجديدة والموجودة حسب الـ Effect.">
 | Effect | New Pods Without Matching Toleration | Existing Pods Without Matching Toleration |
 |---|---|---|
 | `NoSchedule` | لا تتم جدولتها على الـ Node | تظل موجودة بسبب هذا الـ Taint وحده |
 | `PreferNoSchedule` | يحاول الـ Scheduler تجنّب الـ Node | تظل موجودة بسبب هذا الـ Taint وحده |
 | `NoExecute` | لا تتم جدولتها على الـ Node | يتم طردها من الـ Node |
+</TableCard>
 
 ### V. Understanding NoExecute in More Detail
 
@@ -408,9 +414,23 @@ tolerations:
 
 Kubernetes بتتعامل مع الـ Taints كقيود متعددة:
 
-1. تفحص الـ Taints الموجودة على الـ Node.
-2. تتجاهل كل Taint تمتلك الـ Pod له Toleration مطابقًا.
-3. تطبّق تأثيرات الـ Taints المتبقية.
+<Steps>
+<li>
+
+تفحص الـ Taints الموجودة على الـ Node.
+
+</li>
+<li>
+
+تتجاهل كل Taint تمتلك الـ Pod له Toleration مطابقًا.
+
+</li>
+<li>
+
+تطبّق تأثيرات الـ Taints المتبقية.
+
+</li>
+</Steps>
 
 مثال: عندنا Node عليها الـ Taints التالية:
 
@@ -628,14 +648,11 @@ kubectl describe pod <pod-name>
 
 ## Key Takeaways
 
-- الـ **Taint** بيتضاف على الـ Node.
-- الـ **Toleration** بتتضاف على الـ Pod.
-- الـ Taint بتقيّد جدولة الـ Pods اللي لا تتحملها.
-- الـ Toleration بتسمح للـ Pod بتحمّل Taint مطابق، لكنها لا تضمن اختيار Node معينة.
-- `NoSchedule` يمنع الجدولة الجديدة غير المتحمّلة.
-- `PreferNoSchedule` بيحاول تجنّب الـ Node بدل المنع المطلق.
-- `NoExecute` ممكن يمنع الجدولة الجديدة ويطرد الـ Pods الموجودة التي لا تتحمل الـ Taint.
-- `tolerationSeconds` بيحدد مدة التحمل مع `NoExecute`.
-- إزالة Taint ممكن تخلّي Pod كانت `Pending` قابلة للجدولة من غير إعادة إنشائها.
-- الـ Control Plane غالبًا عليها Taint افتراضي لتجنب تشغيل الـ application workloads عليها.
-- استخدم `nodeSelector` أو `nodeAffinity` لو هدفك توجيه Pod إلى Nodes معينة.
+<InfoCard variant="summary" title="The Taints Mental Model" description="Taint على الـ Node (key=value:effect) + Toleration على الـ Pod = بوابة الجدولة: NoSchedule يمنع الجديد، PreferNoSchedule يفضّل التجنّب، وNoExecute بيطرد الموجود كمان." icon="shield" tags={["Mental Model"]} />
+
+<CardGrid columns={2} label="Key Takeaways">
+<InfoCard variant="summary" title="Where They Live" description="الـ **Taint** بيتضاف على الـ Node، والـ **Toleration** بتتضاف على الـ Pod — والтолيريشن بتسمح لا تجبر." icon="tag" tags={["Node", "Pod"]} />
+<InfoCard variant="summary" title="Effects at a Glance" description="`NoSchedule` يمنع الجدولة الجديدة، `PreferNoSchedule` يحاول التجنّب، و`NoExecute` ممكن يطرد الـ Pods الموجودة غير المتحمّلة." icon="pulse" tags={["NoSchedule", "NoExecute"]} />
+<InfoCard variant="summary" title="tolerationSeconds" description="`tolerationSeconds` بيحدد مدة التحمل مع `NoExecute` قبل الطرد، وإزالة Taint ممكن تحل Pod كانت Pending." icon="cycle" tags={["Eviction"]} />
+<InfoCard variant="summary" title="Control Plane + Direction" description="الـ Control Plane غالبًا عليه Taint افتراضي؛ ولو هدفك توجيه Pod لـ Nodes معينة استخدم `nodeSelector` أو `nodeAffinity` مش التolerations وحدها." icon="wheel" tags={["Control Plane", "Direction"]} />
+</CardGrid>

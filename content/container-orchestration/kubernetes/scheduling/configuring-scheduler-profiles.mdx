@@ -81,12 +81,14 @@ spec:
 
 ### I. Scheduler Profiles vs. Multiple Schedulers
 
+<TableCard title="Profiles vs Multiple Schedulers" caption="تخصيص داخل نفس الـ Process مقابل عمليات منفصلة.">
 | Feature | Scheduler Profiles | Multiple Schedulers |
 |---|---|---|
 | التشغيل | عدة Profiles داخل Scheduler process واحدة | ممكن تشغّل عمليات Scheduler منفصلة |
 | منطق الجدولة | يختلف حسب الـ Profile والـ plugins | ممكن يكون لكل Scheduler إعدادات أو منطق مختلف |
 | اختيار الـ Pod | باستخدام `schedulerName` المطابق للـ Profile | باستخدام `schedulerName` المطابق للـ Scheduler |
 | الاستخدام | تخصيص سلوك الجدولة داخل نفس الـ Scheduler | تشغيل Scheduler إضافي مستقل عند الحاجة |
+</TableCard>
 
 الفرق الأساسي إن الـ **Profile مش بالضرورة Scheduler process جديدة**؛ دي مجموعة إعدادات داخل الـ Scheduler نفسه.
 
@@ -178,13 +180,17 @@ kubectl get events -A --sort-by=.metadata.creationTimestamp
 kubectl get pod <pod-name> -o jsonpath='{.spec.schedulerName}{"\n"}{.spec.nodeName}{"\n"}'
 ```
 
-<InfoCard title="Scheduler Selection" description="الـ `spec.schedulerName` يحدد اسم الـ Scheduler المطلوب للـ Pod." icon="wrench" tags={["Selection"]} />
+<CardGrid columns={3} label="Command Reference Cards">
+<InfoCard title="Scheduler Selection" description="الـ `spec.schedulerName` يحدد اسم الـ Scheduler المطلوب للـ Pod." icon="sliders" tags={["Selection"]} />
 
 <InfoCard title="Profiles vs Multiple" description="Multiple Schedulers = عمليات منفصلة؛ Profiles = إعدادات داخل نفس الـ Process." icon="branch" tags={["Comparison"]} />
 
 <InfoCard title="Scheduling Flow" description="Filter ثم Score ثم Bind مع قيود Taints/Affinity وRequests." icon="layers" tags={["Flow"]} />
+</CardGrid>
 
 ## 8. Key Takeaways
+
+<InfoCard variant="summary" title="The Scheduler Profiles Mental Model" description="الـ Scheduler الواحد بيشتغل بمراحل Filter → Score → Bind؛ الـ Profiles بتخصّص الـ plugins داخل المراحل، وMultiple Schedulers بيضيف عمليات مستقلة تختار بـ `schedulerName`." icon="wheel" tags={["Mental Model"]} />
 
 - الـ Scheduler مسؤول عن اختيار الـ Node المناسبة للـ Pod.
 - الـ Scheduling constraints بتحدد الـ Nodes المقبولة، والـ scoring بيرتّب الاختيارات.

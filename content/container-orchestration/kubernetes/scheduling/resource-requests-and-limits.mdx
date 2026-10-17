@@ -19,19 +19,23 @@ language: ar
 
 وكل Pod بتستهلك جزء من الموارد دي. علشان Kubernetes توزّع الـ Pods بشكل صحيح وتحافظ على استقرار الـ cluster، بنستخدم `Requests` و`Limits`.
 
+<CardGrid columns={2} label="Core Concepts">
 <InfoCard
+  variant="concept"
   title="Resource Requests"
   description="The resources a container requests for scheduling and resource allocation decisions."
-  icon="layers"
+  icon="sliders"
   tags={["Scheduling", "Minimum requested resources"]}
 />
 
 <InfoCard
+  variant="concept"
   title="Resource Limits"
   description="The maximum CPU or memory a container is allowed to consume under its configured resource constraints."
   icon="shield"
   tags={["CPU", "Memory"]}
 />
+</CardGrid>
 
 ## 2. How the Scheduler Uses Resources
 
@@ -102,6 +106,7 @@ spec:
 
 في Kubernetes، وحدة CPU واحدة بتعادل وحدة CPU منطقية واحدة كما يراها النظام، وده غالبًا بيكون Core أو Hardware Thread حسب البيئة.
 
+<TableCard title="CPU Units" caption="قيم الـ CPU الشائعة ومعانيها في Kubernetes.">
 | CPU value | Meaning |
 |---|---|
 | `1` | One CPU unit |
@@ -109,6 +114,7 @@ spec:
 | `250m` | A quarter of a CPU unit |
 | `100m` | One tenth of a CPU unit |
 | `1m` | One thousandth of a CPU unit |
+</TableCard>
 
 الحرف `m` معناه **milliCPU**.
 
@@ -122,12 +128,14 @@ spec:
 
 Kubernetes بتدعم وحدات مختلفة للذاكرة، وأهم فرق لازم تعرفه هو الفرق بين الوحدات العشرية والثنائية.
 
+<TableCard title="Memory Units" caption="الفرق بين الـ decimal (M/G) والـ binary (Mi/Gi).">
 | Unit | Meaning |
 |---|---|
 | `256M` | 256,000,000 bytes |
 | `256Mi` | 268,435,456 bytes |
 | `1G` | 1,000,000,000 bytes |
 | `1Gi` | 1,073,741,824 bytes |
+</TableCard>
 
 - `M` و`G` وحدات عشرية.
 - `Mi` و`Gi` وحدات ثنائية.
@@ -172,40 +180,36 @@ spec:
 
 الـ CPU والـ Memory بيتعاملوا بشكل مختلف.
 
-<box gap={3}>
-  <row align="start" gap={3}>
-    <box background="surface-secondary" radius="lg" size="44px" align="center" justify="center">
-      <icon name="cpu" size="xl" />
-    </box>
-    <box flex="1" gap={1}>
-      **CPU Limit**
+<CardGrid columns={2} label="Exceeding Limits">
+<InfoCard
+  variant="warning"
+  title="CPU Limit"
+  description="الـ CPU مورد قابل للـ throttling. لو الـ Container حاولت تستخدم CPU أكتر من الـ Limit، ممكن Kubernetes تقيّد وقت المعالجة المسموح لها بيه. ده ممكن يبطّأ التطبيق، لكنه مش معناه إن الـ Container هتتقتل لمجرد إنها وصلت للـ CPU Limit."
+  icon="pulse"
+  tags={["Throttling"]}
+/>
 
-      الـ CPU مورد قابل للـ throttling. لو الـ Container حاولت تستخدم CPU أكتر من الـ Limit، ممكن Kubernetes تقيّد وقت المعالجة المسموح لها بيه. ده ممكن يبطّأ التطبيق، لكنه مش معناه إن الـ Container هتتقتل لمجرد إنها وصلت للـ CPU Limit.
-    </box>
-  </row>
-  <divider color="subtle" />
-  <row align="start" gap={3}>
-    <box background="surface-secondary" radius="lg" size="44px" align="center" justify="center">
-      <icon name="memory-stick" size="xl" />
-    </box>
-    <box flex="1" gap={1}>
-      **Memory Limit**
-
-      الـ Memory مش بتتعامل مع الـ Limit عن طريق throttling زي الـ CPU. لو الـ Container تجاوزت حد الذاكرة، ممكن يحصل لها إنهاء بواسطة النظام بسبب نفاد الذاكرة، وتظهر حالة `OOMKilled`.
-    </box>
-  </row>
-</box>
+<InfoCard
+  variant="warning"
+  title="Memory Limit"
+  description="الـ Memory مش بتتعامل مع الـ Limit عن طريق throttling زي الـ CPU. لو الـ Container تجاوزت حد الذاكرة، ممكن يحصل لها إنهاء بواسطة النظام بسبب نفاد الذاكرة، وتظهر حالة `OOMKilled`."
+  icon="database"
+  tags={["OOMKilled"]}
+/>
+</CardGrid>
 
 > `OOMKilled` معناها إن الـ Container اتقتلت بسبب مشكلة نفاد الذاكرة. لو ظهر الخطأ ده، راجع الـ Memory Limit واستهلاك التطبيق والـ Events قبل ما تقرر تزود القيمة.
 
 ## 5. Requests vs Limits
 
+<TableCard title="Requests vs Limits" caption="Requests للجدولة، Limits للحد الأقصى للاستهلاك.">
 | Property | Requests | Limits |
 |---|---|---|
 | Purpose | Scheduling decisions and resource allocation | Restrict maximum resource usage |
 | CPU | Used to determine scheduling fit | CPU can be throttled |
 | Memory | Used to determine scheduling fit | Exceeding the limit can trigger an OOM kill |
 | Must be equal? | No | No |
+</TableCard>
 
 ### I. A practical example
 
@@ -297,26 +301,33 @@ kubectl top pods
 
 ## 9. Key Takeaways
 
+<InfoCard variant="summary" title="The Requests vs Limits Mental Model" description="Requests هي حجز الـ Scheduler للـ Node، والLimits سقف الاستهلاك: CPU بيتأجّح (Throttle) والذاكرة لو فاقت تتنفّض بـ OOMKilled — عشان كده Limits مفتوح أحيانًا عن Requests." icon="sliders" tags={["Mental Model"]} />
+
+<CardGrid columns={3} label="Key Takeaways">
 <InfoCard
+  variant="summary"
   title="Requests"
   description="Help the Scheduler determine whether a Node can accommodate a Pod."
-  icon="wrench"
+  icon="sliders"
   tags={["Scheduling"]}
 />
 
 <InfoCard
+  variant="summary"
   title="Limits"
   description="Constrain container resource consumption. CPU is throttled; exceeding a memory limit can cause an OOM kill."
-  icon="shield"
+  icon="database"
   tags={["CPU", "Memory"]}
 />
 
 <InfoCard
+  variant="summary"
   title="Troubleshooting"
   description="Use kubectl describe, Pod YAML, and Events to investigate scheduling failures and OOMKilled containers."
   icon="pulse"
   tags={["Debugging"]}
 />
+</CardGrid>
 
 **الخلاصة:** الـ Requests بتساعد Kubernetes تختار Node مناسبة، والـ Limits بتحط حدود لاستهلاك الـ Container. فهم الفرق بينهم ضروري علشان تتجنب مشاكل الـ Pending Pods والـ CPU throttling والـ OOMKilled.
 

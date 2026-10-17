@@ -160,8 +160,18 @@ spec:
 
 علشان نحقق الشرطين مع بعض، بنستخدم كل مفهوم في دوره الصحيح:
 
-1. **Taints and Tolerations:** تمنع الـ Pods غير المسموح لها من الـ scheduling على الـ Nodes المخصصة.
-2. **Node Affinity:** تضمن إن الـ Pods بتاعتنا تتوجّه للـ Nodes اللي عليها الـ Labels المطلوبة.
+<Steps>
+<li>
+
+**Taints and Tolerations:** تمنع الـ Pods غير المسموح لها من الـ scheduling على الـ Nodes المخصصة.
+
+</li>
+<li>
+
+**Node Affinity:** تضمن إن الـ Pods بتاعتنا تتوجّه للـ Nodes اللي عليها الـ Labels المطلوبة.
+
+</li>
+</Steps>
 
 ### I. The scheduling flow
 
@@ -199,17 +209,20 @@ flowchart TD
 
 هنطبّق الفكرة على 3 Nodes:
 
+<TableCard title="Lab Node Setup" caption="الألوان والتسميات والـ Taints المستخدمة في المثال.">
 | Node | Label | Taint |
 |---|---|---|
 | `blue-node` | `color=blue` | `color=blue:NoSchedule` |
 | `red-node` | `color=red` | `color=red:NoSchedule` |
 | `green-node` | `color=green` | `color=green:NoSchedule` |
+</TableCard>
 
 > **قبل ما تبدأ:** المثال بيفترض إن عندك 3 Nodes مناسبة للتجربة. استخدم أسماء الـ Nodes الحقيقية عندك، ومتطبّقش Taints على Nodes بتاعة بيئة مشتركة أو Production من غير ما تفهم تأثيرها على الـ workloads الموجودة.
 
-### I. Step 1: Label the Nodes
+<Steps>
+<li>
 
-<InfoCard title="Label Nodes" description="أضف `color=blue/red/green` لكل Node المطابقة." icon="wrench" tags={["Label"]} />
+<InfoCard title="Step 1 — Label the Nodes" description="أضف `color=blue/red/green` لكل Node المطابقة." icon="tag" tags={["Label"]} />
 
 ```bash
 kubectl label nodes blue-node color=blue
@@ -223,9 +236,10 @@ kubectl label nodes green-node color=green
 kubectl get nodes --show-labels
 ```
 
-### II. Step 2: Apply Taints
+</li>
+<li>
 
-<InfoCard title="Taint Nodes" description="أضف `NoSchedule` Taint لكل Node باستخدام `kubectl taint`." icon="shield" tags={["Taint"]} />
+<InfoCard title="Step 2 — Apply Taints" description="أضف `NoSchedule` Taint لكل Node باستخدام `kubectl taint`." icon="shield" tags={["Taint"]} />
 
 ```bash
 kubectl taint nodes blue-node color=blue:NoSchedule
@@ -243,9 +257,10 @@ kubectl describe node green-node
 
 ابحث عن `Taints` في الـ output.
 
-### III. Step 3: Create the Blue Pod
+</li>
+<li>
 
-<InfoCard title="Create Pod" description="أنشئ `blue-pod.yaml` مع Toleration و Required Affinity." icon="cube" tags={["Pod", "YAML"]} />
+<InfoCard title="Step 3 — Create the Blue Pod" description="أنشئ `blue-pod.yaml` مع Toleration و Required Affinity." icon="cube" tags={["Pod", "YAML"]} />
 
 أنشئ ملف `blue-pod.yaml`:
 
@@ -285,9 +300,10 @@ spec:
 kubectl apply -f blue-pod.yaml
 ```
 
-### IV. Step 4: Verify the Placement
+</li>
+<li>
 
-<InfoCard title="Verify Placement" description="راجع مكان الـ Pod باستخدام `kubectl get pods -o wide` و `describe`." icon="layers" tags={["Verify"]} />
+<InfoCard title="Step 4 — Verify the Placement" description="راجع مكان الـ Pod باستخدام `kubectl get pods -o wide` و `describe`." icon="pulse" tags={["Verify"]} />
 
 ```bash
 kubectl get pod blue-pod -o wide
@@ -303,9 +319,10 @@ kubectl describe pod blue-pod
 
 كرر نفس الفكرة مع الـ Red وGreen Pods، مع تعديل الـ `name` والـ `value` والـ Label المطلوبة لتناسب كل لون.
 
-### V. Step 5: Test the Restrictions
+</li>
+<li>
 
-<InfoCard title="Test Restrictions" description="جرّب Pods بدون Toleration أو بـ Affinity مختلفة وراجع `Events`." icon="branch" tags={["Test"]} />
+<InfoCard title="Step 5 — Test the Restrictions" description="جرّب Pods بدون Toleration أو بـ Affinity مختلفة وراجع `Events`." icon="branch" tags={["Test"]} />
 
 جرّب إنشاء Pod بدون Toleration على الـ Nodes المخصصة. بسبب الـ `NoSchedule` Taints، الـ Nodes دي مش هتقبل الـ Pod دي للـ scheduling.
 
@@ -320,8 +337,12 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 الـ Events هتساعدك تفهم ليه الـ Scheduler مش قادر يلاقي Node مناسبة.
 
+</li>
+</Steps>
+
 ## 7. Comparison Table
 
+<TableCard title="Taints vs Node Affinity" caption="مين بيعمل إيه — ولما تستخدم الاتنين معًا.">
 | Feature | Taints and Tolerations | Node Affinity |
 |---|---|---|
 | Main purpose | منع Pods غير المتوافقة من الـ scheduling على Node | تحديد الـ Nodes المناسبة للـ Pod |
@@ -329,6 +350,7 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 | Prevents unwanted Pods? | نعم، حسب الـ Taint والـ Effect والـ Tolerations | لا |
 | Directs Pods to specific Nodes? | لا، مش لوحدها | نعم |
 | Can be combined? | نعم | نعم |
+</TableCard>
 
 ## 8. Common Mistakes
 
@@ -346,7 +368,11 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 ## 9. Key Takeaways
 
+<InfoCard variant="summary" title="The Combined Scheduling Mental Model" description="Taints تطرد غير المرحب بهم من الـ Node، وAffinity تسحب الـ Pod للـ Nodes الصحيحة — سياسة العزل بالتوازي، مش بديلًا عن RBAC وNetwork Policies." icon="shield" tags={["Mental Model"]} />
+
+<CardGrid columns={3} label="Key Takeaways">
 <InfoCard
+  variant="summary"
   title="Taints and Tolerations"
   description="Control which Pods are allowed onto tainted Nodes."
   icon="shield"
@@ -354,18 +380,21 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 />
 
 <InfoCard
+  variant="summary"
   title="Node Affinity"
   description="Control which Nodes a Pod must or prefers to run on."
-  icon="wrench"
+  icon="network"
   tags={["Attract", "Require"]}
 />
 
 <InfoCard
+  variant="summary"
   title="Use Both Together"
   description="Combine Taints and Tolerations with Node Affinity when you want dedicated scheduling placement for specific workloads."
   icon="branch"
   tags={["Placement", "Isolation policy"]}
 />
+</CardGrid>
 
 **الخلاصة:** لو عايز الـ Pod بتاعتك تروح للـ Node المناسبة، استخدم Node Affinity. ولو عايز تمنع الـ Pods غير المناسبة من الدخول للـ Node، استخدم Taints and Tolerations. ولما تحتاج الاتنين، اجمع بينهم.
 

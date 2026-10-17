@@ -55,6 +55,7 @@ flowchart TD
 
 أما الـ Static Pods، فمصدر تعريفها الأساسي هو ملف موجود على الـ Node نفسه.
 
+<TableCard title="Static Pods vs Regular Pods" caption="مصدر التعريف ومين بيدير كل نوع.">
 | Feature | Static Pod | Regular Pod |
 |---|---|---|
 | Source of definition | Local manifest file | Kubernetes API |
@@ -63,6 +64,7 @@ flowchart TD
 | Managed by Deployment or ReplicaSet? | No | Possibly |
 | Can kube-scheduler schedule it? | No | Usually, yes |
 | Can `kubectl delete pod` permanently remove it? | No, as long as its manifest remains | Depends on its owner/controller |
+</TableCard>
 
 **مهم:** الـ Regular Pod مش شرط يكون تابعًا لـ Deployment؛ ممكن يكون Pod اتعمل مباشرةً باستخدام `kubectl run` أو Manifest.
 
@@ -118,11 +120,33 @@ systemctl cat kubelet
 
 الـ `kubelet` بيتعامل مع الـ Static Pod بشكل مباشر:
 
-1. يقرأ الـ Manifest من الـ Directory المحدد.
-2. يتحقق من تعريف الـ Pod.
-3. يطلب من الـ Container Runtime تشغيل الـ Containers.
-4. يتابع حالة الـ Pod ويحاول استعادتها لو حصل Crash، طالما الـ Manifest ما زال موجودًا.
-5. يلاحظ تغييرات الملفات ويطبّق الحالة المطلوبة.
+<Steps>
+<li>
+
+يقرأ الـ Manifest من الـ Directory المحدد.
+
+</li>
+<li>
+
+يتحقق من تعريف الـ Pod.
+
+</li>
+<li>
+
+يطلب من الـ Container Runtime تشغيل الـ Containers.
+
+</li>
+<li>
+
+يتابع حالة الـ Pod ويحاول استعادتها لو حصل Crash، طالما الـ Manifest ما زال موجودًا.
+
+</li>
+<li>
+
+يلاحظ تغييرات الملفات ويطبّق الحالة المطلوبة.
+
+</li>
+</Steps>
 
 لكن خليك فاكر إن ده مش معناه إن الـ Pod هيكون `Running` دائمًا؛ ممكن يفشل بسبب Image غير موجودة، أو نقص Resources، أو مشكلة في الـ Configuration.
 
@@ -223,10 +247,15 @@ metadata:
 
 في إعدادات `kubeadm` المعتادة، ممكن تلاقي الملفات التالية:
 
-- `kube-apiserver`
-- `kube-controller-manager`
-- `kube-scheduler`
-- `etcd`
+<CardGrid columns={2} label="kubeadm Control Plane Manifests">
+<InfoCard variant="feature" title="kube-apiserver" description="بوابة الـ API في الـ Cluster — ممكن يكون Static Pod نفسه، عشان يفك مشكلة الاعتماد الدائري." icon="network" tags={["API", "Control Plane"]} />
+
+<InfoCard variant="feature" title="kube-controller-manager" description="بيدير حلقات التحكم (Controllers) اللي بتحافظ على الحالة المرجعية للـ Workloads." icon="cycle" tags={["Controllers"]} />
+
+<InfoCard variant="feature" title="kube-scheduler" description="نفس الـ Scheduler اللي بندرسه — بيختار الـ Nodes المناسبة للـ Pods العادية." icon="wheel" tags={["Scheduling"]} />
+
+<InfoCard variant="feature" title="etcd" description="مفتاح الحالة (Key-Value Store) للـ Cluster — عشان كده أيقونة الـ database هنا." icon="database" tags={["Store", "State"]} />
+</CardGrid>
 
 وجود الـ Manifests محليًا بيسمح للـ `kubelet` بتشغيل المكونات دي حتى قبل ما الـ API Server يكون متاحًا.
 
@@ -262,6 +291,7 @@ flowchart TD
 
 الاتنين ممكن ينتج عنهم Pods على الـ Nodes المختلفة، لكن طريقة إدارتهم مختلفة تمامًا.
 
+<TableCard title="Static Pods vs DaemonSets" caption="الاتنين بيديروا Pods على الـ Nodes، لكن مصدر التعريف والإدارة مختلفين.">
 | Feature | Static Pod | DaemonSet |
 |---|---|---|
 | Created by | kubelet | DaemonSet controller |
@@ -269,6 +299,7 @@ flowchart TD
 | Needs Kubernetes API to define the workload? | No | Yes |
 | Typical use case | Control Plane components | Logging and monitoring agents |
 | Rescheduling | kubelet reconciles the local manifest on its Node | Controller manages Pods across eligible Nodes |
+</TableCard>
 
 مثال على استخدام `DaemonSet`: تشغيل Agent لجمع Logs على كل Node مناسب.
 
@@ -288,10 +319,12 @@ flowchart TD
 
 ## 9. Key Takeaways
 
-- الـ Static Pod بيتنشأ وبيتدار مباشرةً بواسطة الـ `kubelet`.
-- الـ `staticPodPath` بيحدد مكان ملفات الـ Manifest.
-- تغيير أو حذف الـ Manifest بيؤثر على الـ Pod اللي الـ `kubelet` بيديره.
-- في الـ Cluster، الـ Mirror Pod بيسمح بعرض معلومات الـ Static Pod من خلال `kubectl`.
-- الـ Static Pods بتُستخدم عادةً لتشغيل مكونات الـ Control Plane في Clusters اللي أُنشئت باستخدام `kubeadm`.
-- الـ DaemonSets والـ Static Pods مش نفس الحاجة؛ طريقة الإنشاء والإدارة مختلفة.
+<InfoCard variant="summary" title="The Static Pods Mental Model" description="الـ Manifest على القرص هو مصدر الحقيقة: الـ `kubelet` بيقرأه وبيدير الـ Pod محليًا، والمirror Pod بتظهر في `kubectl` للعرض فقط — الحذف من الـ API مش بيأثر غير لما تشيل الملف نفسه." icon="cube" tags={["Mental Model"]} />
+
+<CardGrid columns={2} label="Key Takeaways">
+<InfoCard variant="summary" title="kubelet-Managed" description="الـ Static Pod بيتنشأ وبيتدار مباشرةً بواسطة الـ `kubelet`، من غير الـ Scheduler." icon="cube" tags={["kubelet"]} />
+<InfoCard variant="summary" title="staticPodPath" description="الـ `staticPodPath` بيحدد مكان ملفات الـ Manifest، ومساره ممكن يختلف عن `/etc/kubernetes/manifests`." icon="database" tags={["Manifests"]} />
+<InfoCard variant="summary" title="Mirror Pods" description="في الـ Cluster، الـ Mirror Pod بيسمح بعرض معلومات الـ Static Pod من خلال `kubectl`." icon="network" tags={["kubectl"]} />
+<InfoCard variant="summary" title="Control Plane Use" description="الـ Static Pods بتُستخدم عادةً لتشغيل مكونات الـ Control Plane في Clusters اللي أُنشئت باستخدام `kubeadm`." icon="flag" tags={["kubeadm"]} />
+</CardGrid>
 
