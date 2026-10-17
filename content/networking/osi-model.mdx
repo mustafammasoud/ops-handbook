@@ -243,18 +243,19 @@ flowchart TB
 
     A1 --> LINK --> B1
 
-    classDef upper fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.2px
-    classDef middle fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.3px
-    classDef lower fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.4px
-    classDef medium fill:#EFE6D8,stroke:#B9A68A,color:#44392D,stroke-width:1.5px
+    classDef upper fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.2px,rx:8,ry:8
+    classDef middle fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.3px,rx:8,ry:8
+    classDef lower fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.4px,rx:8,ry:8
+    classDef medium fill:#EFE6D8,stroke:#B9A68A,color:#44392D,stroke-width:1.5px,rx:8,ry:8
 
     class A7,A6,A5,B5,B6,B7 upper
     class A4,A3,B3,B4 middle
     class A1,A2,B1,B2 lower
     class LINK medium
 
-    style Sender fill:#FAF7F1,stroke:#B9A68A,color:#44392D
-    style Receiver fill:#F1F5F0,stroke:#829A87,color:#33483A
+    style Sender fill:#FAF7F1,stroke:#B9A68A,color:#44392D,rx:8,ry:8
+    style Receiver fill:#F1F5F0,stroke:#829A87,color:#33483A,rx:8,ry:8
+    linkStyle default stroke-width:1.7px
 ```
 
 **Important:** الرسم ده بيوضح الفكرة النظرية للـ OSI. في الـ TCP/IP stack المستخدم فعليًا، وظائف Session وPresentation غالبًا بتكون مدمجة ضمن Application Layer، ومش كل طبقة في الرسم بتتحول إلى بروتوكول مستقل.
@@ -263,6 +264,7 @@ flowchart TB
 
 الـ **PDU (Protocol Data Unit)** هو الاسم اللي بنستخدمه لوصف وحدة البيانات في طبقة معينة.
 
+<TableCard title="PDU by OSI Layer" caption="اسم وحدة البيانات في كل طبقة — أهم جدول ترجع له.">
 | OSI Layer | Common PDU Term | Example |
 | --- | --- | --- |
 | Layer 7 — Application | Data | HTTP Request |
@@ -272,6 +274,7 @@ flowchart TB
 | Layer 3 — Network | Packet | IP Packet |
 | Layer 2 — Data Link | Frame | Ethernet Frame |
 | Layer 1 — Physical | Bits | Bits transmitted as signals |
+</TableCard>
 
 التسميات في بعض المراجع بتختلف، خصوصًا في الطبقات العليا؛ لذلك أهم حاجة تحفظها بثقة هي:
 
@@ -286,17 +289,19 @@ flowchart TB
     L3 --> L2
     L2 --> L1
 
-    classDef transport fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef network fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
-    classDef datalink fill:#E8E0ED,stroke:#A394B3,color:#44374F,stroke-width:2px
-    classDef physical fill:#F0E2D7,stroke:#BE987C,color:#533C2E,stroke-width:2px
+    classDef transport fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
+    classDef network fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px,rx:8,ry:8
+    classDef datalink fill:#E8E0ED,stroke:#A394B3,color:#44374F,stroke-width:2px,rx:8,ry:8
+    classDef physical fill:#F0E2D7,stroke:#BE987C,color:#533C2E,stroke-width:2px,rx:8,ry:8
 
     class L4 transport
     class L3 network
     class L2 datalink
     class L1 physical
 
-    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px
+    linkStyle default stroke-width:1.7px
+    linkStyle 0,1,2 stroke-width:2px
+
 ```
 
 ## 5. OSI vs TCP/IP Model
@@ -308,6 +313,7 @@ flowchart TB
   <InfoCard variant="concept" title="TCP/IP Model" description="نموذج عملي لفهم بنية الإنترنت والبروتوكولات المستخدمة في الشبكات الحديثة." icon="network" tags={["4-Layer Model", "Internet Protocols"]} />
 </CardGrid>
 
+<TableCard title="OSI vs 4-Layer TCP/IP" caption="إزاي السبع طبقات بتنطبق على نموذج TCP/IP الشائع.">
 | OSI Model | Common 4-Layer TCP/IP Model |
 | --- | --- |
 | Application (L7) | Application |
@@ -317,6 +323,7 @@ flowchart TB
 | Network (L3) | Internet |
 | Data Link (L2) | Network Access / Link |
 | Physical (L1) | Network Access / Link |
+</TableCard>
 
 ملحوظة: فيه مراجع بتعرض TCP/IP في خمس طبقات، وبتفصل Physical عن Data Link. ده اختلاف في طريقة العرض، مش تناقض في طريقة عمل الإنترنت.
 
@@ -328,13 +335,35 @@ flowchart TB
 
 ### I. Example: A Website Is Not Reachable
 
-<CardGrid columns={2} label="Troubleshooting Checklist">
-  <InfoCard variant="concept" title="L1 — Physical" description="افحص الكابل، الـ Link، أو حالة الاتصال اللاسلكي." icon="network" tags={["Link"]} />
-  <InfoCard variant="concept" title="L2 — Data Link" description="راجع الاتصال المحلي والـ VLAN والـ Switch Port عند الحاجة." icon="network" tags={["Local Network"]} />
-  <InfoCard variant="concept" title="L3 — Network" description="افحص IP Address وRoutes وDefault Gateway." icon="branch" tags={["IP", "Routing"]} />
-  <InfoCard variant="concept" title="L4 — Transport" description="تأكد من إمكانية الوصول إلى الـ TCP Port المطلوب، وافحص Firewall rules." icon="terminal" tags={["TCP", "Ports"]} />
-  <InfoCard variant="concept" title="L7 — Application" description="افحص DNS وHTTP responses وسجلات التطبيق وإعدادات الخدمة." icon="cloud" tags={["DNS", "HTTP"]} />
-</CardGrid>
+ابدأ من الطبقة الدنيا وصعد — كل خطوة بتضيّق نطاق المشكلة.
+
+<Steps>
+<li>
+
+<InfoCard title="L1 — Physical" description="افحص الكابل، الـ Link، أو حالة الاتصال اللاسلكي." icon="network" tags={["Link"]} />
+
+</li>
+<li>
+
+<InfoCard title="L2 — Data Link" description="راجع الاتصال المحلي والـ VLAN والـ Switch Port عند الحاجة." icon="layers" tags={["Local Network"]} />
+
+</li>
+<li>
+
+<InfoCard title="L3 — Network" description="افحص IP Address وRoutes وDefault Gateway." icon="branch" tags={["IP", "Routing"]} />
+
+</li>
+<li>
+
+<InfoCard title="L4 — Transport" description="تأكد من إمكانية الوصول إلى الـ TCP Port المطلوب، وافحص Firewall rules." icon="terminal" tags={["TCP", "Ports"]} />
+
+</li>
+<li>
+
+<InfoCard title="L7 — Application" description="افحص DNS وHTTP responses وسجلات التطبيق وإعدادات الخدمة." icon="cloud" tags={["DNS", "HTTP"]} />
+
+</li>
+</Steps>
 
 ### II. Useful Linux Commands
 
@@ -365,11 +394,13 @@ curl -I https://example.com
 
 ## 7. Common Misconceptions
 
+<CardGrid columns={3} label="OSI Misconceptions">
 <InfoCard variant="insight" title="OSI Is a Conceptual Model" description="مش كل بروتوكول أو جهاز في العالم الحقيقي بيتطابق بشكل مثالي مع Layer واحدة. النموذج وسيلة للفهم والتحليل، والأنظمة الحديثة ممكن تنفذ وظائف من طبقات مختلفة في نفس المكوّن." icon="layers" />
 
 <InfoCard variant="insight" title="Routers and Switches" description="الـ Router التقليدي بيشتغل أساسًا على Layer 3، والـ Ethernet Switch التقليدي على Layer 2. لكن فيه أجهزة بتجمع وظائف من أكتر من طبقة." icon="network" />
 
 <InfoCard variant="insight" title="Ports vs IP Addresses" description="الـ IP Address بيساعد في تحديد وجهة الشبكة أو الواجهة، بينما الـ Port Number بيساعد في تحديد الخدمة أو العملية داخل الجهاز. الاتنين بيكملوا بعض." icon="terminal" />
+</CardGrid>
 
 ## 8. Key Takeaways
 

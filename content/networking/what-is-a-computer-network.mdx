@@ -15,12 +15,14 @@ language: ar
 
 ## Learning Objectives
 
-- فهم مفهوم الـ Computer Network وأهميتها.
-- التمييز بين الـ Wired وWireless Networks.
-- فهم الأدوار الأساسية للـ Client والـ Server والـ Switch والـ Router.
-- فهم الفرق بين الـ Network والـ Internet.
-- تفسير ليه اتصال الأجهزة ببعض مش معناه بالضرورة إنها تقدر تتواصل بنجاح.
-- ربط المفاهيم دي بمشاكل الشبكات اللي بتواجه مهندس DevOps.
+<CardGrid columns={3} label="What You'll Learn">
+<InfoCard variant="concept" title="Network Basics" description="فهم مفهوم الـ Computer Network وأهميتها." icon="layers" tags={["Definition"]} />
+<InfoCard variant="concept" title="Wired vs Wireless" description="التمييز بين الـ Wired وWireless Networks." icon="network" tags={["Medium"]} />
+<InfoCard variant="concept" title="Core Components" description="فهم أدوار الـ Client والـ Server والـ Switch والـ Router." icon="cube" tags={["Devices"]} />
+<InfoCard variant="concept" title="Network vs Internet" description="فهم الفرق بين الـ Network والـ Internet." icon="cloud" tags={["Scope"]} />
+<InfoCard variant="concept" title="Connectivity ≠ Communication" description="اتصال الأجهزة مش معناه بالضرورة قدرتها على التواصل بنجاح." icon="pulse" tags={["Troubleshooting"]} />
+<InfoCard variant="concept" title="DevOps Link" description="ربط المفاهيم بمشاكل الشبكات اللي بتواجه مهندس DevOps." icon="wrench" tags={["Practice"]} />
+</CardGrid>
 
 ---
 
@@ -59,13 +61,14 @@ flowchart TB
     R <--> P
     R <--> S
 
-    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px
-    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px
+    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px,rx:8,ry:8
 
     class R router
     class L,P,S device
 
-    linkStyle default stroke:#B89B76,stroke-width:1.5px
+    linkStyle default stroke-width:1.7px
+
 ```
 
 الرسم بيوضح فكرة الاتصال داخل شبكة منزلية. لكن وجود الأجهزة على نفس الشبكة مش ضمان لوحده لنجاح كل أنواع التواصل؛ لأن ده بيعتمد على إعدادات الشبكة والخدمات وقواعد الأمان.
@@ -102,17 +105,19 @@ flowchart TB
 
 ### III. Wired vs Wireless
 
-<InfoCard title="Wired Network" description="Physical connectivity through cables." icon="wrench" tags={["Ethernet", "Cabled"]}>
+<CardGrid columns={2} label="Connection Mediums">
+<InfoCard variant="comparison" title="Wired Network" description="Physical connectivity through cables." icon="layers" tags={["Ethernet", "Cabled"]}>
 - اتصال مادي باستخدام الكابلات.
 - مناسب لأجهزة كتير بتحتاج اتصالًا ثابتًا.
 - جودة الاتصال بتعتمد على الكابلات والمعدات وإعداداتها.
 </InfoCard>
 
-<InfoCard title="Wireless Network" description="Connectivity using wireless communication." icon="network" tags={["Wi-Fi", "Wireless"]}>
+<InfoCard variant="comparison" title="Wireless Network" description="Connectivity using wireless communication." icon="network" tags={["Wi-Fi", "Wireless"]}>
 - اتصال لاسلكي من غير كابل مخصص لكل جهاز.
 - مناسب للموبايلات واللابتوبات والأجهزة المتحركة.
 - جودة الاتصال بتتأثر بالتغطية والتداخل والعوائق.
 </InfoCard>
+</CardGrid>
 
 ---
 
@@ -139,15 +144,16 @@ flowchart LR
     S -->|"Response"| N
     N --> C
 
-    classDef client fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px
-    classDef network fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px
-    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px
+    classDef client fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px,rx:8,ry:8
+    classDef network fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px,rx:8,ry:8
 
     class U,C client
     class N network
     class S server
 
-    linkStyle default stroke:#B89B76,stroke-width:1.5px
+    linkStyle default stroke-width:1.7px
+
 ```
 
 **مهم:** الـ Client والـ Server أدوار في الاتصال، مش شرط يكونوا نوعين مختلفين من الأجهزة. نفس الجهاز ممكن يطلب خدمة من سيرفر، وفي نفس الوقت يقدم خدمة لجهاز آخر.
@@ -168,14 +174,15 @@ flowchart TB
     D <--> SW
     S <--> SW
 
-    classDef switch fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px
-    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px
+    classDef switch fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px,rx:8,ry:8
 
     class SW switch
     class L,D device
     class S device
 
-    linkStyle default stroke:#B89B76,stroke-width:1.5px
+    linkStyle default stroke-width:1.7px
+
 ```
 
 ### III. Router
@@ -200,16 +207,17 @@ flowchart LR
 
     R1 <--> R2
 
-    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px
-    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px
-    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px
+    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px,rx:8,ry:8
 
     class L device
     class R1,R2 router
     class S server
 
-    style A fill:#F7EFE2,stroke:#B89B76,color:#382719
-    style B fill:#F3E8D5,stroke:#B89B76,color:#382719
+    style A fill:#F7EFE2,stroke:#B89B76,color:#382719,rx:8,ry:8
+    style B fill:#F3E8D5,stroke:#B89B76,color:#382719,rx:8,ry:8
+    linkStyle default stroke-width:1.7px
 ```
 
 ### IV. Access Point
@@ -234,6 +242,7 @@ flowchart LR
 
 أمثلة مهمة هنشرحها بالتفصيل في الدروس الجاية:
 
+<TableCard title="Core Network Protocols" caption="أهم البروتوكولات اللي هنرجع لها في دروس TCP/IP وOSI.">
 | Protocol | Purpose |
 |---|---|
 | IP | عنونة الحزم وتوجيهها بين الشبكات |
@@ -242,6 +251,7 @@ flowchart LR
 | DNS | المساعدة في تحويل أسماء النطاقات إلى عناوين IP |
 | HTTP | التواصل بين عملاء الويب والسيرفرات |
 | HTTPS | استخدام HTTP مع حماية الاتصال بواسطة TLS |
+</TableCard>
 
 ### I. Example: Opening a Website
 
@@ -261,6 +271,7 @@ sequenceDiagram
     B->>S: Send HTTPS request
     S-->>B: Return HTTP response
     B-->>U: Display page
+
 ```
 
 ده تسلسل مبسط. التفاصيل الفعلية بتختلف حسب الـ DNS Cache، وطريقة إنشاء الاتصال، والبروتوكول المستخدم، وإمكانية إعادة استخدام اتصال سابق.
@@ -271,13 +282,15 @@ sequenceDiagram
 
 كلمة **Network** معناها شبكة من الأجهزة المتصلة، أما **Internet** فهو نظام عالمي من الشبكات المترابطة اللي بتتواصل باستخدام بروتوكولات مشتركة.
 
-<InfoCard title="Network" description="A connected group of devices that can communicate according to its configuration." icon="network">
+<CardGrid columns={2} label="Network vs Internet">
+<InfoCard variant="comparison" title="Network" description="A connected group of devices that can communicate according to its configuration." icon="network">
 ممكن تكون شبكة منزلية أو شبكة شركة أو شبكة خاصة داخل بيئة Cloud.
 </InfoCard>
 
-<InfoCard title="Internet" description="A global system of interconnected networks." icon="cloud">
+<InfoCard variant="comparison" title="Internet" description="A global system of interconnected networks." icon="cloud">
 الإنترنت بيربط عددًا ضخمًا من الشبكات ببعض، وبيسمح بالوصول إلى خدمات موجودة في أماكن مختلفة حول العالم.
 </InfoCard>
+</CardGrid>
 
 ### I. How They Relate
 
@@ -300,18 +313,19 @@ flowchart TB
     R <--> I
     I <--> S
 
-    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px
-    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px
-    classDef internet fill:#DCC8AA,stroke:#8D6746,color:#382719,stroke-width:2px
-    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px
+    classDef device fill:#F8F1E5,stroke:#B89B76,color:#382719,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#EAD8B5,stroke:#9B7447,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef internet fill:#DCC8AA,stroke:#8D6746,color:#382719,stroke-width:2px,rx:8,ry:8
+    classDef server fill:#E5D8C8,stroke:#92765A,color:#382719,stroke-width:2px,rx:8,ry:8
 
     class L,P device
     class R router
     class I internet
     class S server
 
-    style HOME fill:#F7EFE2,stroke:#B89B76,color:#382719
-    style REMOTE fill:#F3E8D5,stroke:#B89B76,color:#382719
+    style HOME fill:#F7EFE2,stroke:#B89B76,color:#382719,rx:8,ry:8
+    style REMOTE fill:#F3E8D5,stroke:#B89B76,color:#382719,rx:8,ry:8
+    linkStyle default stroke-width:1.7px
 ```
 
 **معلومة مهمة:** انقطاع الإنترنت مش معناه بالضرورة إن الشبكة المحلية توقفت. ممكن الأجهزة تفضل تتواصل محليًا طالما الشبكة والخدمات المطلوبة شغالة وإعداداتها بتسمح بالاتصال.
@@ -346,37 +360,43 @@ flowchart TB
 
 ### I. Real-World Scenarios
 
-<InfoCard title="Docker Networking" description="Containers need appropriate network connectivity to communicate with each other and external clients." icon="cube">
+<CardGrid columns={3} label="Where Networking Bites in DevOps">
+<InfoCard variant="feature" title="Docker Networking" description="Containers need appropriate network connectivity to communicate with each other and external clients." icon="cube">
 تشغيل الـ Container مش ضمان إن التطبيق متاح للمستخدم. لازم تفهم الشبكة وعناوين الاستماع والـ Port Mapping.
 </InfoCard>
 
-<InfoCard title="Kubernetes Networking" description="Pods and Services depend on networking configuration to provide connectivity." icon="network">
+<InfoCard variant="feature" title="Kubernetes Networking" description="Pods and Services depend on networking configuration to provide connectivity." icon="network">
 مشاكل الوصول إلى الـ Services أو الـ Pods ممكن تكون مرتبطة بإعدادات الشبكة أو سياسات الاتصال أو اكتشاف الخدمات.
 </InfoCard>
 
-<InfoCard title="Cloud Networking" description="Cloud applications depend on routing, network boundaries, and security rules." icon="cloud">
+<InfoCard variant="feature" title="Cloud Networking" description="Cloud applications depend on routing, network boundaries, and security rules." icon="cloud">
 في بيئات Cloud، لازم تفهم إزاي الشبكات والـ Subnets والـ Routing وقواعد الأمان بتتحكم في الوصول إلى الخدمات.
 </InfoCard>
+</CardGrid>
 
 ---
 
 ## 8. Key Takeaways
 
-<InfoCard title="Computer Network" description="Devices connected to communicate and share resources." icon="network">
+<InfoCard variant="summary" title="The Networking Mental Model" description="شبكة = أجهزة متصلة ببروتوكولات. Switch يربط داخل الشبكة، Router يوجّه بينها — والوصول للإنترنت مش شرط للاتصال المحلي." icon="network" tags={["Mental Model"]} />
+
+<CardGrid columns={2} label="Key Takeaways">
+<InfoCard variant="summary" title="Computer Network" description="Devices connected to communicate and share resources." icon="network">
 الشبكة بتسمح للأجهزة بتبادل البيانات باستخدام بروتوكولات وإعدادات مناسبة.
 </InfoCard>
 
-<InfoCard title="Switch vs Router" description="Connecting devices vs routing between networks." icon="branch">
+<InfoCard variant="summary" title="Switch vs Router" description="Connecting devices vs routing between networks." icon="branch">
 الـ Switch بيربط الأجهزة داخل الشبكة المحلية، والـ Router بيوجّه البيانات بين الشبكات.
 </InfoCard>
 
-<InfoCard title="Network vs Internet" description="A network can exist without Internet access." icon="network">
+<InfoCard variant="summary" title="Network vs Internet" description="A network can exist without Internet access." icon="cloud">
 ممكن شبكة محلية تشتغل وتسمح بالتواصل بين الأجهزة حتى لو اتصال الإنترنت فاصل.
 </InfoCard>
 
-<InfoCard title="DevOps Connection" description="Deployment success does not automatically guarantee network accessibility." icon="terminal">
+<InfoCard variant="summary" title="DevOps Connection" description="Deployment success does not automatically guarantee network accessibility." icon="terminal">
 فهم الشبكات ضروري لتشخيص مشاكل الوصول إلى التطبيقات في Docker وKubernetes وCloud.
 </InfoCard>
+</CardGrid>
 
 ---
 

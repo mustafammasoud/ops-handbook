@@ -20,9 +20,11 @@ language: ar
 
 فيه نوعان أساسيان لازم تفرق بينهم:
 
+<CardGrid columns={2} label="Two Topology Views">
 <InfoCard variant="concept" title="Physical Topology" description="الشكل الفعلي لتوصيل الأجهزة والكابلات ومعدات الشبكة." icon="network" tags={["Physical Layout"]} />
 
 <InfoCard variant="concept" title="Logical Topology" description="الطريقة اللي البيانات بتتحرك أو بتتبادل بيها داخل الشبكة، بغض النظر عن شكل الكابلات بالضرورة." icon="branch" tags={["Data Flow"]} />
+</CardGrid>
 
 مثال: ممكن أجهزة تكون متوصلة فعليًا على Switch في شكل Star، لكن طريقة انتقال البيانات منطقيًا بتعتمد على تقنية الشبكة والبروتوكولات المستخدمة.
 
@@ -52,13 +54,14 @@ flowchart LR
     Backbone --- PC4
     Backbone --- T2
 
-    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px
-    classDef cable fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:2px
-    classDef endcap fill:#EFE6D8,stroke:#B9A68A,color:#44392D
+    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px,rx:8,ry:8
+    classDef cable fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:2px,rx:8,ry:8
+    classDef endcap fill:#EFE6D8,stroke:#B9A68A,color:#44392D,rx:8,ry:8
 
     class PC1,PC2,PC3,PC4 device
     class Backbone cable
     class T1,T2 endcap
+    linkStyle default stroke-width:1.7px
 ```
 
 ### II. Advantages
@@ -104,11 +107,12 @@ flowchart TB
     Switch --- Printer
     Switch --- AP
 
-    classDef central fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px
-    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px
+    classDef central fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px,rx:8,ry:8
+    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px,rx:8,ry:8
 
     class Switch central
     class Laptop,PC,Server,Printer,AP device
+    linkStyle default stroke-width:1.7px
 ```
 
 ### II. Advantages
@@ -154,8 +158,9 @@ flowchart TB
     C --- D
     D --- A
 
-    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.4px
+    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.4px,rx:8,ry:8
     class A,B,C,D device
+    linkStyle default stroke-width:1.7px
 ```
 
 ### II. Advantages
@@ -199,8 +204,9 @@ flowchart TB
     B --- D
     C --- D
 
-    classDef node fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px
+    classDef node fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px,rx:8,ry:8
     class A,B,C,D node
+    linkStyle default stroke-width:1.7px
 ```
 
 ### III. Advantages
@@ -263,15 +269,16 @@ flowchart TB
     B1 --- PC3
     B2 --- PC4
 
-    classDef core fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px
-    classDef distribution fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.5px
-    classDef access fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px
-    classDef endpoint fill:#F5F0E7,stroke:#B9A68A,color:#44392D
+    classDef core fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px,rx:8,ry:8
+    classDef distribution fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.5px,rx:8,ry:8
+    classDef access fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.3px,rx:8,ry:8
+    classDef endpoint fill:#F5F0E7,stroke:#B9A68A,color:#44392D,rx:8,ry:8
 
     class Core core
     class D1,D2 distribution
     class A1,A2,B1,B2 access
     class PC1,PC2,PC3,PC4 endpoint
+    linkStyle default stroke-width:1.7px
 ```
 
 ### II. Advantages
@@ -328,16 +335,17 @@ flowchart TB
     Core --- A
     Core --- B
 
-    classDef core fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px
-    classDef access fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.5px
-    classDef endpoint fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.2px
+    classDef core fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px,rx:8,ry:8
+    classDef access fill:#E8E1D5,stroke:#9C8567,color:#44392D,stroke-width:1.5px,rx:8,ry:8
+    classDef endpoint fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.2px,rx:8,ry:8
 
     class Core core
     class A,B access
     class A1,A2,B1,B2 endpoint
 
-    style FloorA fill:#F5F0E7,stroke:#B9A68A,color:#44392D
-    style FloorB fill:#F5F0E7,stroke:#B9A68A,color:#44392D
+    style FloorA fill:#F5F0E7,stroke:#B9A68A,color:#44392D,rx:8,ry:8
+    style FloorB fill:#F5F0E7,stroke:#B9A68A,color:#44392D,rx:8,ry:8
+    linkStyle default stroke-width:1.7px
 ```
 
 ### II. Advantages
@@ -354,6 +362,7 @@ flowchart TB
 
 ## 7. Comparison Table
 
+<TableCard title="Topology Comparison" caption="الهيكل والميزة وحد كل توبولوجي.">
 | Topology | Main Structure | Main Advantage | Main Limitation |
 | --- | --- | --- | --- |
 | Bus | خط رئيسي مشترك | بساطة التصميم الأساسي | الاعتماد على الـ Backbone |
@@ -362,14 +371,17 @@ flowchart TB
 | Mesh | مسارات متعددة | Redundancy | التكلفة والتعقيد |
 | Tree | طبقات هرمية | قابلية التوسع والتنظيم | الأعطال في الطبقات العليا قد تؤثر على فروع |
 | Hybrid | مزيج من أشكال مختلفة | المرونة | تعقيد التصميم والإدارة |
+</TableCard>
 
 ## 8. Key Takeaways
+
+<InfoCard variant="summary" title="The Topology Mental Model" description="اختار التوبولوجي حسب الحجم والتكلفة ومستوى الاعتمادية: Bus بسيطة ورخيصة، Star هي الأنسب للـ LAN، Mesh للموثوقية العالية — وأغلب الشبكات الكبيرة Hybrid." icon="layers" tags={["Mental Model"]} />
 
 <CardGrid columns={2} label="Topology Summary">
   <InfoCard variant="summary" title="Bus" description="الأجهزة بتشارك خط اتصال رئيسي واحد." icon="branch" tags={["Shared Backbone"]} />
   <InfoCard variant="summary" title="Star" description="كل جهاز بيتصل بنقطة مركزية زي الـ Switch." icon="network" tags={["Central Point"]} />
   <InfoCard variant="summary" title="Ring" description="الاتصالات بتكوّن مسارًا دائريًا بين العقد." icon="cycle" tags={["Circular"]} />
-  <InfoCard variant="summary" title="Mesh" description="روابط ومسارات متعددة بتساعد على توفير بدائل." icon="network" tags={["Redundancy"]} />
-  <InfoCard variant="summary" title="Tree" description="ترتيب هرمي يسهل تنظيم الشبكات الكبيرة." icon="branch" tags={["Hierarchical"]} />
+  <InfoCard variant="summary" title="Mesh" description="روابط ومسارات متعددة بتساعد على توفير بدائل." icon="shield" tags={["Redundancy"]} />
+  <InfoCard variant="summary" title="Tree" description="ترتيب هرمي يسهل تنظيم الشبكات الكبيرة." icon="layers" tags={["Hierarchical"]} />
   <InfoCard variant="summary" title="Hybrid" description="دمج أكثر من شكل حسب احتياجات الشبكة." icon="modules" tags={["Combined"]} />
 </CardGrid>

@@ -35,15 +35,16 @@ flowchart TD
     AP -. "Wi-Fi" .-> Laptop[" Laptop"]
     AP -. "Wi-Fi" .-> Mobile[" Mobile"]
 
-    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class Internet internet
     class Router,AP router
     class Switch switch
     class Server,PC,Laptop,Mobile endpoint
+    linkStyle default stroke-width:1.7px
 ```
 
 ده رسم توضيحي مبسّط، مش تصميم إلزامي لكل شبكة. في الواقع، جهاز الـ Router المنزلي ممكن يكون مدمجًا مع الـ Switch والـ Wireless Access Point والـ Firewall في جهاز واحد.
@@ -77,11 +78,12 @@ flowchart TD
 
     S -. "Frame for PC B" .-> PC2
 
-    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class S switch
     class PC1,PC2,Server device
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم بيوضح الفكرة المنطقية للتوجيه داخل الـ LAN، مش كل تفاصيل انتقال الـ Frames أو آلية تعلّم عناوين الـ MAC.
@@ -116,13 +118,14 @@ flowchart LR
     D --> E[" Internet"]
     E --> F[" Web Server"]
 
-    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
-    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
+    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
 
     class A,F device
     class C router
     class B,D,E network
+    linkStyle default stroke-width:1.7px
 ```
 
 خلي بالك: الـ Router مش لازم يعرف الطريق الكامل لحد السيرفر. غالبًا بيحدد الـ Next Hop، وبعدها Routers أخرى بتكمل التوجيه.
@@ -165,13 +168,14 @@ flowchart TD
         S --> S3["Port 3"]
     end
 
-    classDef hub fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef port fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef hub fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef port fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class H hub
     class S switch
     class H1,H2,H3,S1,S2,S3 port
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم توضيحي للفرق في السلوك، مش مخطط لانتقال Packet محددة.
@@ -205,15 +209,16 @@ flowchart TD
     AP -. "Wi-Fi" .-> M[" Mobile"]
     S <--> Server[" Server"]
 
-    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef switch fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class Internet internet
     class R,AP router
     class S switch
     class L,M,Server device
+    linkStyle default stroke-width:1.7px
 ```
 
 ## 6. Modem
@@ -235,12 +240,14 @@ flowchart TD
 
 ### I. Modem vs Router
 
+<TableCard title="Modem vs Router vs Gateway" caption="مين بيعمل إيه في شبكة المنزل أو المكتب.">
 | Device | Main responsibility |
 |---|---|
 | Modem | الاتصال بخدمة الإنترنت باستخدام تقنية الوصول المناسبة |
 | ONT | إنهاء وصلة الألياف الضوئية وتوفير واجهة للشبكة |
 | Router | توجيه IP Packets بين الشبكات |
 | Home Gateway | ممكن يجمع Modem أو ONT وRouter وSwitch وWi-Fi في جهاز واحد |
+</TableCard>
 
 ## 7. Firewall
 
@@ -266,6 +273,7 @@ flowchart TD
 
 ## 8. Compare the Network Devices
 
+<TableCard title="Network Devices at a Glance" caption="وظيفة كل جهاز والطبقة اللي بيشتغل عليها.">
 | Device | Main job | Typical OSI layer |
 |---|---|---|
 | Hub | تكرار الإشارات إلى باقي المنافذ | Layer 1 — Physical |
@@ -274,6 +282,7 @@ flowchart TD
 | Access Point | توفير اتصال Wi-Fi وربط الأجهزة اللاسلكية بالـ LAN | غالبًا Layer 2 في الوضع التقليدي |
 | Modem | توفير الاتصال باستخدام تقنية الوصول إلى ISP | بيعتمد على التقنية؛ مش طبقة واحدة ثابتة |
 | Firewall | تطبيق سياسات فلترة حركة الشبكة | ممكن يشتغل على طبقات متعددة |
+</TableCard>
 
 التقسيم ده بيوضح الوظيفة الأساسية لكل جهاز. الأجهزة الحديثة ممكن تجمع أكتر من وظيفة، وبعضها بيشتغل على أكتر من Layer.
 
@@ -281,12 +290,38 @@ flowchart TD
 
 خلينا نربط كل حاجة بمثال: جهازك بيحاول يوصل إلى Web Server على الإنترنت.
 
-1. الـ Laptop بيجهّز البيانات ويرسلها عبر Wi-Fi إلى الـ Access Point، أو عبر Ethernet إلى الـ Switch.
-2. لو الشبكة محتاجة الوصول إلى شبكة خارجية، البيانات بتوصل إلى الـ Default Gateway.
-3. الـ Router بيختار المسار المناسب للـ IP Packet.
-4. الـ Firewall، لو موجود في المسار، بيطبّق قواعد السماح والمنع.
-5. الـ Modem أو الـ ONT بيوفر واجهة الاتصال بخدمة الـ ISP حسب التقنية المستخدمة.
-6. البيانات بتكمل عبر الشبكات المختلفة لحد ما توصل إلى السيرفر، والرد بيرجع عبر المسار المناسب.
+<Steps>
+<li>
+
+الـ Laptop بيجهّز البيانات ويرسلها عبر Wi-Fi إلى الـ Access Point، أو عبر Ethernet إلى الـ Switch.
+
+</li>
+<li>
+
+لو الشبكة محتاجة الوصول إلى شبكة خارجية، البيانات بتوصل إلى الـ Default Gateway.
+
+</li>
+<li>
+
+الـ Router بيختار المسار المناسب للـ IP Packet.
+
+</li>
+<li>
+
+الـ Firewall، لو موجود في المسار، بيطبّق قواعد السماح والمنع.
+
+</li>
+<li>
+
+الـ Modem أو الـ ONT بيوفر واجهة الاتصال بخدمة الـ ISP حسب التقنية المستخدمة.
+
+</li>
+<li>
+
+البيانات بتكمل عبر الشبكات المختلفة لحد ما توصل إلى السيرفر، والرد بيرجع عبر المسار المناسب.
+
+</li>
+</Steps>
 
 مش لازم كل شبكة تحتوي على كل الأجهزة دي كأجهزة منفصلة؛ التصميم بيتغيّر حسب حجم الشبكة واحتياجاتها.
 
@@ -316,6 +351,8 @@ flowchart TD
 ---
 
 ## 11. Summary
+
+<InfoCard variant="summary" title="The Devices Mental Model" description="Hub يكرّر (L1)، Switch يوجّه الإطارات (L2)، Router يوجّه الحزم (L3)، AP يضيف Wi-Fi، Modem يوصّل بالـ ISP، والـ Firewall يطبّق السياسات — وأغلب أجهزة البيت تجمع الستة." icon="network" tags={["Mental Model"]} />
 
 - **Switch:** بيربط الأجهزة داخل LAN وبيوجّه الـ Frames باستخدام MAC Addresses.
 - **Router:** بيربط شبكات IP مختلفة وبيوجّه الـ Packets.

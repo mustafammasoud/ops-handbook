@@ -44,11 +44,33 @@ language: ar
 
 بشكل مبسّط، عملية التواصل بتشمل:
 
-1. الـ Application يجهّز البيانات اللي عايز يبعتها.
-2. بروتوكولات الشبكة بتضيف المعلومات المطلوبة، زي TCP أو IP Headers حسب نوع الاتصال.
-3. طبقة الوصول للشبكة بتجهّز الـ Frame المناسب للتقنية المستخدمة.
-4. الـ NIC بيشارك في إرسال البيانات عبر Ethernet أو Wi-Fi.
-5. عند الاستقبال، الـ NIC يستقبل البيانات ويسلّمها لنظام التشغيل عشان يعالجها من خلال الـ Network Stack.
+<Steps>
+<li>
+
+الـ Application يجهّز البيانات اللي عايز يبعتها.
+
+</li>
+<li>
+
+بروتوكولات الشبكة بتضيف المعلومات المطلوبة، زي TCP أو IP Headers حسب نوع الاتصال.
+
+</li>
+<li>
+
+طبقة الوصول للشبكة بتجهّز الـ Frame المناسب للتقنية المستخدمة.
+
+</li>
+<li>
+
+الـ NIC بيشارك في إرسال البيانات عبر Ethernet أو Wi-Fi.
+
+</li>
+<li>
+
+عند الاستقبال، الـ NIC يستقبل البيانات ويسلّمها لنظام التشغيل عشان يعالجها من خلال الـ Network Stack.
+
+</li>
+</Steps>
 
 ```mermaid id="n4k8pz"
 flowchart TD
@@ -58,15 +80,16 @@ flowchart TD
     D --> E["Switch or Access Point"]
     E --> F[" Destination Network"]
 
-    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px
-    classDef os fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef nic fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
+    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px,rx:8,ry:8
+    classDef os fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef nic fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
 
     class A app
     class B os
     class C nic
     class D,E,F network
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم توضيحي للمسار العام. التفاصيل الفعلية بتختلف حسب نظام التشغيل وتقنية الاتصال، والـ Switch أو الـ Access Point ممكن يكونوا مدمجين في أجهزة أخرى.
@@ -100,11 +123,13 @@ flowchart TD
 
 في الاستخدام اليومي، المصطلحين ممكن يُستخدموا بمعنى قريب، لكن في Linux الفرق ده مهم.
 
+<TableCard title="NIC vs Network Interface" caption="الفرق التقني المهم في Linux.">
 | Term | Meaning | Example |
 |---|---|---|
 | NIC | Network hardware أو الـ Adapter | Ethernet Adapter |
 | Network Interface | واجهة شبكة يقدر النظام يستخدمها | `enp3s0` |
 | Virtual Interface | واجهة منطقية أو افتراضية | `lo`, `docker0`, `veth...` |
+</TableCard>
 
 مش كل Network Interface لازم يكون وراه NIC مستقل؛ مثلًا، واجهة `lo` هي Loopback Interface، ودي بتسمح للجهاز يتواصل مع نفسه.
 
@@ -125,11 +150,13 @@ flowchart TD
 
 ### I. MAC Address vs IP Address
 
+<TableCard title="MAC Address vs IP Address" caption="عنوان على مستوى الـ Link Layer مقابل عنوان منطقي للتوجيه.">
 | MAC Address | IP Address |
 |---|---|
 | مرتبط بالتواصل على مستوى الـ Link Layer. | يُستخدم في العنونة المنطقية والتواصل بين شبكات IP. |
 | الـ Switch بيتعلم عناوين MAC لتوجيه الـ Frames. | الـ Router بيستخدم عناوين IP لاتخاذ قرارات التوجيه. |
 | عنوان MAC بيكون عادةً مرتبطًا بواجهة الشبكة. | عنوان IP ممكن يتغير حسب إعدادات الشبكة، وممكن يكون عند الواجهة أكثر من عنوان. |
+</TableCard>
 
 خلي بالك: عنوان MAC مش ضمان لهوية الجهاز أو وسيلة أمان لوحده، لأنه ممكن يتغير أو يتعمل له Spoofing في بعض الأنظمة.
 
@@ -166,15 +193,16 @@ flowchart TD
     V --> D["docker0<br/>Docker Bridge"]
     V --> E["veth Pair<br/>Virtual Ethernet"]
 
-    classDef host fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px
-    classDef physical fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef virtual fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef iface fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
+    classDef host fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px,rx:8,ry:8
+    classDef physical fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef virtual fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef iface fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
 
     class H host
     class P physical
     class V virtual
     class L,D,E iface
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم بيوضح أنواع واجهات ممكن تظهر على Linux Host؛ مش شرط كل جهاز يكون عنده كل الواجهات دي.
@@ -239,20 +267,22 @@ sudo ethtool enp3s0
 
 بدل ما تفترض إن المشكلة في الـ Router أو الـ Application، ابدأ بفحص واجهة الشبكة.
 
+<CardGrid columns={3} label="Troubleshooting Cases">
 <InfoCard title="Case 1: Interface is DOWN" icon="terminal" variant="warning">
 
 لو الواجهة الفيزيائية حالتها `DOWN`، ممكن تكون الواجهة متوقفة إداريًا أو فيه مشكلة في الاتصال أو الـ Driver. افحص الحالة والاتصال قبل ما تحدد السبب.
 </InfoCard>
 
-<InfoCard title="Case 2: Interface is UP, but no connectivity" icon="network" variant="warning">
+<InfoCard title="Case 2: Interface is UP, but no connectivity" icon="pulse" variant="warning">
 
 حالة `UP` لا تثبت إن فيه اتصال كامل. افحص عنوان IP، والـ Routing، والـ Link Status، وبعد كده اختبر الوصول للوجهة المطلوبة.
 </InfoCard>
 
-<InfoCard title="Case 3: Wrong interface or route" icon="layers" variant="warning">
+<InfoCard title="Case 3: Wrong interface or route" icon="branch" variant="warning">
 
 ممكن يكون الجهاز عنده أكتر من Network Interface، والنظام بيستخدم واجهة أو Route غير المناسبة للوصول إلى الوجهة.
 </InfoCard>
+</CardGrid>
 
 مجموعة أوامر مفيدة كبداية:
 
@@ -278,6 +308,8 @@ ip route
 ---
 
 ## 10. Summary
+
+<InfoCard variant="summary" title="The NIC Mental Model" description="الـ NIC بيوفر الوصلة الفيزيائية، واجهة الشبكة هي اللي نظام التشغيل يشوفها (`ip link`)، و`UP` مش معناها متصل — راجع IP والـ Routes دائمًا." icon="network" tags={["Mental Model"]} />
 
 - **NIC:** مكوّن بيوفر اتصال الجهاز بالشبكة، وغالبًا بيكون Hardware.
 - **Network Interface:** واجهة اتصال بيقدر نظام التشغيل يتعامل معاها، وممكن تكون Physical أو Virtual.

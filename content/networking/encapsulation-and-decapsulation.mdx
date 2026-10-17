@@ -38,17 +38,18 @@ flowchart TD
     G --> H["Process TCP Information"]
     H --> I["Application Receives HTTP Data"]
 
-    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px
-    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px,rx:8,ry:8
+    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class A,I app
     class B,H transport
     class C,G internet
     class D,F access
     class E endpoint
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم بيوضح الفكرة العامة، لكن خد بالك إن كل طبقة بتعالج الجزء الخاص بيها؛ مش كل طبقة بتقرأ محتوى الـ Application نفسه.
@@ -118,15 +119,16 @@ flowchart TD
     C --> D["Ethernet Header + IP Packet + Ethernet Trailer"]
     D --> E["Ready to transmit"]
 
-    classDef data fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
-    classDef tcp fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef ip fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef frame fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
+    classDef data fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
+    classDef tcp fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef ip fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef frame fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
 
     class A,E data
     class B tcp
     class C ip
     class D frame
+    linkStyle default stroke-width:1.7px
 ```
 
 الرسم ده مبسّط، وبيوضح الترتيب المنطقي. في الواقع، حجم الـ Headers والحقول الموجودة فيها بيختلف حسب البروتوكول والإعدادات.
@@ -137,6 +139,7 @@ flowchart TD
 
 كل Layer ليها اسم شائع لوحدة البيانات اللي بتتعامل معاها، وده بيساعدنا نفهم الكلام التقني ونحل مشاكل الشبكات.
 
+<TableCard title="PDU by Layer" caption="اسم وحدة البيانات في كل طبقة.">
 | Layer | Common PDU name | Example |
 |---|---|---|
 | Application | Data | HTTP Request |
@@ -145,6 +148,7 @@ flowchart TD
 | Internet | Packet | IP Header + Payload |
 | Network Access | Frame | Ethernet Header + Payload + FCS |
 | Physical | Bits | Electrical, optical, or radio signals representing bits |
+</TableCard>
 
 ملاحظات مهمة:
 
@@ -161,10 +165,28 @@ flowchart TD
 
 ### I. The Receiving Process
 
-1. **Network Access:** الجهاز يستقبل الـ Frame ويتحقق من معلوماته، بما فيها فحص سلامة الـ Frame حسب التقنية المستخدمة.
-2. **Internet:** يتم التعامل مع الـ IP Packet وتحديد ما إذا كانت موجهة للجهاز أو الواجهة المناسبة.
-3. **Transport:** يتم التعامل مع TCP أو UDP، وتوجيه البيانات إلى الـ Socket المناسب باستخدام معلومات زي الـ Ports.
-4. **Application:** تصل بيانات التطبيق إلى الخدمة المناسبة، مثل Web Server اللي بيعالج HTTP Request.
+<Steps>
+<li>
+
+**Network Access:** الجهاز يستقبل الـ Frame ويتحقق من معلوماته، بما فيها فحص سلامة الـ Frame حسب التقنية المستخدمة.
+
+</li>
+<li>
+
+**Internet:** يتم التعامل مع الـ IP Packet وتحديد ما إذا كانت موجهة للجهاز أو الواجهة المناسبة.
+
+</li>
+<li>
+
+**Transport:** يتم التعامل مع TCP أو UDP، وتوجيه البيانات إلى الـ Socket المناسب باستخدام معلومات زي الـ Ports.
+
+</li>
+<li>
+
+**Application:** تصل بيانات التطبيق إلى الخدمة المناسبة، مثل Web Server اللي بيعالج HTTP Request.
+
+</li>
+</Steps>
 
 ```mermaid
 flowchart TD
@@ -174,27 +196,30 @@ flowchart TD
     D --> E["Application Layer<br/>HTTP Data"]
     E --> F["Web Server Processes Request"]
 
-    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px
+    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px,rx:8,ry:8
 
     class A,B access
     class C internet
     class D transport
     class E,F app
+    linkStyle default stroke-width:1.7px
 ```
 
 الطبقات بتعالج المعلومات الخاصة ببروتوكولاتها، وبتتعامل مع البيانات المتبقية باعتبارها Payload للطبقة الحالية.
 
 ## 7. Encapsulation vs Decapsulation
 
+<TableCard title="Encapsulation vs Decapsulation" caption="العمليتين المتعاكستين في انتقال البيانات.">
 | Encapsulation | Decapsulation |
 |---|---|
 | بتحصل عند إرسال البيانات. | بتحصل عند استقبال البيانات. |
 | البيانات بتتحرك منطقيًا من الطبقات العليا للسفلى. | البيانات بتتحرك منطقيًا من الطبقات السفلى للعليا. |
 | بتُضاف Headers، وممكن Trailers. | بتُعالَج معلومات البروتوكولات وتُفصل عن المحتوى عند الحاجة. |
 | بتجهّز البيانات للإرسال. | بتجهّز البيانات للطبقة الأعلى لحد ما توصل للتطبيق. |
+</TableCard>
 
 ## 8. What Happens at a Router?
 
@@ -212,15 +237,16 @@ flowchart LR
     D --> E[" Next Network"]
     E --> F[" Destination Server"]
 
-    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
-    classDef frame fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef router fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
+    classDef device fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
+    classDef frame fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef router fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef network fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
 
     class A,F device
     class B,D frame
     class C router
     class E network
+    linkStyle default stroke-width:1.7px
 ```
 
 خلي بالك من ثلاث نقاط:
@@ -235,6 +261,7 @@ flowchart LR
 
 فهم المفهوم ده بيساعدك تفرّق بين مشاكل بتحصل في مستويات مختلفة.
 
+<CardGrid columns={2} label="Why It Matters in DevOps">
 <InfoCard title="Docker networking" icon="cloud" variant="insight">
 
 لما Container يحاول يتواصل مع Container تاني أو مع خدمة خارجية، البيانات بتعدّي عبر طبقات وبروتوكولات مختلفة. معرفة دور كل طبقة بتساعدك تفهم مشاكل الاتصال بدل ما تفترض إن المشكلة في التطبيق وحده.
@@ -244,6 +271,7 @@ flowchart LR
 
 أدوات زي `tcpdump` وWireshark بتساعدك تشوف أجزاء من الـ Packets والـ Headers، وده مفيد في تحليل Source/Destination IPs والـ Ports وبعض تفاصيل البروتوكولات.
 </InfoCard>
+</CardGrid>
 
 مثلًا، الأمر ده بيعرض حركة الشبكة على واجهة محددة:
 
@@ -258,6 +286,7 @@ sudo tcpdump -i any -nn
 
 ## 10. Common Misconceptions
 
+<CardGrid columns={3} label="Encapsulation Misconceptions">
 <InfoCard title="Every layer does not add both a header and a trailer" icon="layers" variant="tip">
 
 كل بروتوكول بيضيف المعلومات اللي محتاجها حسب تصميمه. بعض البروتوكولات عندها Header فقط، وبعضها عنده Header وTrailer.
@@ -272,10 +301,13 @@ sudo tcpdump -i any -nn
 
 الـ Headers الخاصة بالطبقات الأدنى بتُعالج أثناء الاستقبال، لكن الـ Payload بيستمر إلى الطبقة الأعلى لحد ما يوصل للتطبيق المناسب.
 </InfoCard>
+</CardGrid>
 
 ---
 
 ## 11. Summary
+
+<InfoCard variant="summary" title="The Encapsulation Mental Model" description="الإرسال: Data ← Segment ← Packet ← Frame ← Bits، والاستقبال بالعكس — والـ Router بيعيد تغليف الـ Packet في Frame جديد لكل وصلة." icon="layers" tags={["Mental Model"]} />
 
 - **Encapsulation:** إضافة معلومات البروتوكولات أثناء انتقال البيانات لأسفل الطبقات.
 - **Decapsulation:** معالجة معلومات البروتوكولات أثناء استقبال البيانات وانتقالها لأعلى الطبقات.

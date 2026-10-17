@@ -74,12 +74,14 @@ language: ar
 
 ### I. Important Protocols
 
+<TableCard title="Important Application-Layer Protocols" caption="أهم البروتوكولات اللي بتشتغل على طبقة الـ Application.">
 | Protocol | Purpose |
 |---|---|
 | HTTP / HTTPS | تبادل بيانات الويب |
 | DNS | تحويل أسماء النطاقات إلى IP Addresses عند الحاجة |
 | SSH | الاتصال الآمن وإدارة الأجهزة عن بُعد |
 | SMTP | إرسال البريد الإلكتروني |
+</TableCard>
 
 **Example:**
 
@@ -121,12 +123,14 @@ UDP بيبعت البيانات من غير ما يوفّر بنفسه ضمان�
 
 أمثلة شائعة:
 
+<TableCard title="Common Default Ports" caption="الخدمات بتشتغل على أرقام Ports شائعة.">
 | Port | Common use |
 |---:|---|
 | 22 | SSH |
 | 53 | DNS |
 | 80 | HTTP |
 | 443 | HTTPS |
+</TableCard>
 
 الأرقام دي هي الـ Default Ports الشائعة، لكن الخدمات ممكن تتظبط على أرقام مختلفة.
 
@@ -181,6 +185,7 @@ UDP بيبعت البيانات من غير ما يوفّر بنفسه ضمان�
 
 الموديلين بيشرحوا التواصل الشبكي، لكن بدرجات مختلفة من التقسيم والتفصيل.
 
+<TableCard title="OSI vs TCP/IP Layers" caption="المقابلة الشائعة بين السبع طبقات ونموذج TCP/IP.">
 | OSI Model | TCP/IP Model |
 |---|---|
 | Application (L7) | Application |
@@ -190,6 +195,7 @@ UDP بيبعت البيانات من غير ما يوفّر بنفسه ضمان�
 | Network (L3) | Internet |
 | Data Link (L2) | Network Access |
 | Physical (L1) | Network Access |
+</TableCard>
 
 الجدول ده بيوضّح المقابلة الشائعة بين الموديلين. مش معناه إن كل بروتوكول لازم ينتمي لطبقة واحدة بشكل صارم في كل طريقة تصنيف.
 
@@ -223,17 +229,18 @@ flowchart TD
     D --> E[" Network"]
     E --> F[" Destination Server"]
 
-    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px
-    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px
-    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px
-    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px
-    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px
+    classDef app fill:#F4E8D2,stroke:#A67C52,color:#493524,stroke-width:1.5px,rx:8,ry:8
+    classDef transport fill:#E8EBD9,stroke:#8C9A68,color:#34412C,stroke-width:1.5px,rx:8,ry:8
+    classDef internet fill:#E5E9E1,stroke:#8B9A86,color:#344238,stroke-width:1.5px,rx:8,ry:8
+    classDef access fill:#F0E2D8,stroke:#B58A70,color:#523B2D,stroke-width:1.5px,rx:8,ry:8
+    classDef endpoint fill:#F7F2E8,stroke:#A89B85,color:#493F32,stroke-width:1.5px,rx:8,ry:8
 
     class A app
     class B transport
     class C internet
     class D access
     class E,F endpoint
+    linkStyle default stroke-width:1.7px
 ```
 
 الـ Server بيستقبل البيانات، وبعد كده الطبقات بتتعامل معاها بالعكس لحد ما توصل للتطبيق المناسب. العملية دي مرتبطة بمفهومين:
@@ -249,25 +256,41 @@ flowchart TD
 
 ممكن تفكر باستخدام TCP/IP Model بالشكل ده:
 
+<Steps>
+<li>
+
 <InfoCard title="Application Layer" icon="layers" variant="concept">
 
 هل اسم النطاق بيتحلّ بنجاح؟ وهل خدمة الويب بترد بشكل صحيح؟ ممكن تختبر DNS أو تستخدم `curl` لفحص استجابة HTTP.
 </InfoCard>
+
+</li>
+<li>
 
 <InfoCard title="Transport Layer" icon="branch" variant="concept">
 
 هل الاتصال بالخدمة على الـ Port المطلوب ممكن؟ هل فيه خدمة بتستمع على المنفذ، أو هل الـ Firewall بيمنع الاتصال؟
 </InfoCard>
 
+</li>
+<li>
+
 <InfoCard title="Internet Layer" icon="network" variant="concept">
 
 هل الجهاز عنده IP Address وإعدادات Routing مناسبة؟ وهل يقدر يوصل إلى الشبكة المطلوبة؟
 </InfoCard>
 
+</li>
+
+<li>
+
 <InfoCard title="Network Access Layer" icon="cloud" variant="concept">
 
 هل واجهة الشبكة شغالة؟ وهل الجهاز متصل بالـ Ethernet أو Wi-Fi؟
 </InfoCard>
+
+</li>
+</Steps>
 
 ممكن تستخدم أوامر Linux دي كبداية للتشخيص:
 
@@ -295,6 +318,7 @@ curl -I https://example.com
 
 ## 10. Common Misconceptions
 
+<CardGrid columns={3} label="TCP/IP Misconceptions">
 <InfoCard title="TCP/IP is not just TCP and IP" icon="layers" variant="tip">
 
 اسم الموديل جاي من بروتوكولين مشهورين، لكن مجموعة البروتوكولات أوسع من كده، وبتشمل HTTP وDNS وUDP وICMP وغيرهم.
@@ -309,10 +333,13 @@ IP مسؤول عن العنونة والتوصيل بين الشبكات، لك�
 
 ممكن التطبيق يكون شغال، لكن الوصول ليه يفشل بسبب Port أو Firewall أو Routing أو DNS. لازم تفحص المسار بالكامل بدل ما تفترض إن المشكلة من التطبيق وحده.
 </InfoCard>
+</CardGrid>
 
 ---
 
 ## 11. Summary
+
+<InfoCard variant="summary" title="The TCP/IP Mental Model" description="أربع طبقات: Application تتعامل مع البروتوكولات، Transport تربط المنافذ، Internet توجّه الحزم، Network Access تنقل الإطار — والبنية دي شغالة فعليًا على الإنترنت." icon="network" tags={["Mental Model"]} />
 
 - TCP/IP Model بيوضّح إزاي بروتوكولات الشبكة بتشتغل مع بعض.
 - التقسيم الشائع بيتكوّن من أربع Layers: Application, Transport, Internet, Network Access.
