@@ -1,7 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { docPath, docTool, isPlaceholderText } from '../utils/docs';
-import { toolLabel, levelLabel } from '../data/categories';
+import { docCategory, docPath, docTool, isPlaceholderText } from '../utils/docs';
+import { toolLabel } from '../utils/tools';
+import { levelLabel } from '../data/categories';
 
 type Doc = CollectionEntry<'docs'>;
 
@@ -44,7 +45,7 @@ const { docs, showOrder = true, showTool = false } = Astro.props;
                 class="rounded border border-border bg-surface px-2 py-0.5 text-xs text-muted"
                 lang="en"
               >
-                {toolLabel(docTool(doc)!)}
+                {toolLabel(docTool(doc)!, docCategory(doc))}
               </span>
             )}
             <span

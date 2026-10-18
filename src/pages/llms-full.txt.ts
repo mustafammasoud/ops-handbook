@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import { categoryLabel, levelLabel, toolLabel } from '../data/categories';
+import { categoryLabel, levelLabel } from '../data/categories';
+import { toolLabel } from '../utils/tools';
 import { docCategory, docTool } from '../utils/docs';
 import { docUrl, mdText, publishedDocs } from '../utils/llms';
 
@@ -51,7 +52,7 @@ function articleBlock(doc: Doc, site: URL): string {
     `Title: ${doc.data.title}`,
     `URL: ${docUrl(doc, site)}`,
     `Area: ${categoryLabel(docCategory(doc))}`,
-    ...(tool ? [`Tool: ${toolLabel(tool)}`] : []),
+    ...(tool ? [`Tool: ${toolLabel(tool, docCategory(doc))}`] : []),
     `Level: ${levelLabel(doc.data.level)}`,
     ...(doc.data.tags.length ? [`Tags: ${doc.data.tags.join(', ')}`] : []),
   ];

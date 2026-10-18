@@ -10,9 +10,9 @@ import {
   getCategory,
   categoryLabel,
   canonicalCategoryId,
-  toolLabel,
   levelLabel,
 } from '../../data/categories';
+import { toolLabel } from '../../utils/tools';
 import { docCategory, docTool, sortedDocs, topicCount } from '../../utils/docs';
 
 export async function getStaticPaths() {
@@ -69,7 +69,7 @@ for (const doc of docs) {
 }
 const toolGroups = [...byTool.entries()].map(([toolId, entries]) => ({
   id: toolId,
-  label: toolLabel(toolId),
+  label: toolLabel(toolId, categoryId),
   href: `/docs/${categoryId}/${toolId}`,
   count: entries.length,
   entries,

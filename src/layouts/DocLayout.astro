@@ -12,7 +12,8 @@ import PlannedState from '../components/PlannedState.astro';
 import CategoryIcon from '../components/CategoryIcon.astro';
 import ArticleActions from '../components/ArticleActions.astro';
 import ArticleFeedback from '../components/ArticleFeedback.astro';
-import { categoryLabel, getCategory, toolLabel, levelLabel } from '../data/categories';
+import { categoryLabel, getCategory, levelLabel } from '../data/categories';
+import { toolLabel } from '../utils/tools';
 import { docCategory, docPath, docTool, sortedDocs, hasPublishedContent } from '../utils/docs';
 import { githubEditUrl, githubFeedbackIssueUrl } from '../utils/github';
 import { readingMinutes, lastModified } from '../utils/metadata';
@@ -58,7 +59,7 @@ const nextDoc =
 // Learning-path display label and per-group progress scope. The group key
 // is namespaced by area so identically named tools in different areas
 // (hypothetically) stay independent.
-const groupLabel = groupTool ? toolLabel(groupTool) : categoryLabel(category);
+const groupLabel = groupTool ? toolLabel(groupTool, category) : categoryLabel(category);
 const groupKey = groupTool ? `${category}/${groupTool}` : category;
 const progressKey = `ops-handbook:progress:${groupKey}`;
 const pathRoutes = groupDocs.map((doc) => docPath(doc.id));
@@ -210,7 +211,7 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
               <>
                 <li aria-hidden="true">/</li>
                 <li class="text-muted" lang="en">
-                  {toolLabel(tool)}
+                  {toolLabel(tool, category)}
                 </li>
               </>
             )
@@ -224,7 +225,7 @@ const issueUrl = githubFeedbackIssueUrl(title, canonicalUrl);
         <p class="mb-2 text-sm text-muted">
           <span lang="en">
             {categoryLabel(category)}
-            {tool ? ` · ${toolLabel(tool)}` : ''}
+            {tool ? ` · ${toolLabel(tool, category)}` : ''}
           </span>
           <span aria-hidden="true"> · </span>
           <span>{levelLabel(level)}</span>

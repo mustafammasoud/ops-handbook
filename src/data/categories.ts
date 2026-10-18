@@ -201,54 +201,6 @@ export function categoryLabel(id: string): string {
   return category ? category.label : id;
 }
 
-/** Known technology / tool display names. */
-export const KNOWN_TOOLS: Record<string, string> = {
-  docker: 'Docker',
-  containerd: 'Containerd',
-  podman: 'Podman',
-  kubernetes: 'Kubernetes',
-  helm: 'Helm',
-  linux: 'Linux',
-  git: 'Git',
-  github: 'GitHub',
-  gitlab: 'GitLab',
-  bitbucket: 'Bitbucket',
-  bash: 'Bash',
-  python: 'Python',
-  go: 'Go',
-  'github-actions': 'GitHub Actions',
-  'gitlab-ci': 'GitLab CI/CD',
-  jenkins: 'Jenkins',
-  'azure-devops': 'Azure DevOps',
-  aws: 'AWS',
-  azure: 'Azure',
-  'google-cloud': 'Google Cloud',
-  terraform: 'Terraform',
-  opentofu: 'OpenTofu',
-  ansible: 'Ansible',
-  puppet: 'Puppet',
-  chef: 'Chef',
-  saltstack: 'SaltStack',
-  prometheus: 'Prometheus',
-  grafana: 'Grafana',
-  'elk-stack': 'ELK Stack',
-  loki: 'Loki',
-  opentelemetry: 'OpenTelemetry',
-  jaeger: 'Jaeger',
-  vault: 'Vault',
-  trivy: 'Trivy',
-  snyk: 'Snyk',
-};
-
-/** Formats a technology/tool ID into a human-readable display label. */
-export function toolLabel(toolId: string): string {
-  if (KNOWN_TOOLS[toolId]) return KNOWN_TOOLS[toolId];
-  return toolId
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
 const LEVEL_LABELS: Record<string, string> = {
   beginner: 'Beginner',
   intermediate: 'Intermediate',

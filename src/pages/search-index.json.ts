@@ -2,8 +2,8 @@ import type { APIRoute } from 'astro';
 import { getCollection, render } from 'astro:content';
 import {
   categoryLabel,
-  toolLabel,
 } from '../data/categories';
+import { toolLabel } from '../utils/tools';
 import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
 
 /**
@@ -42,7 +42,7 @@ export const GET: APIRoute = async () => {
       const cat = docCategory(entry);
       const tool = docTool(entry);
       const cl = tool
-        ? `${categoryLabel(cat)} · ${toolLabel(tool)}`
+        ? `${categoryLabel(cat)} · ${toolLabel(tool, cat)}`
         : categoryLabel(cat);
 
       return {

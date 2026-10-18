@@ -1,6 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import { categoryLabel, toolLabel } from '../data/categories';
+import { categoryLabel } from '../data/categories';
+import { toolLabel } from './tools';
 import {
   docCategory,
   docPath,
@@ -50,7 +51,7 @@ export function groupByArea(docs: Doc[]): DocGroup[] {
     }
 
     const tool = docTool(doc);
-    const key = tool ? toolLabel(tool) : '';
+    const key = tool ? toolLabel(tool, areaId) : '';
     const bucket = group.tools.get(key);
     if (bucket) bucket.push(doc);
     else group.tools.set(key, [doc]);

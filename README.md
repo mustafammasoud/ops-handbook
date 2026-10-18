@@ -18,6 +18,7 @@
   <a href="#features">Features</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#writing-content">Writing content</a> ·
+  <a href="#adding-a-new-tool-folder">New tool folder</a> ·
   <a href="#architecture-decisions">Architecture</a> ·
   <a href="#deployment">Deployment</a>
 </p>
@@ -185,6 +186,40 @@ The full authoring documentation (frontmatter reference, components, images,
 PDFs, direction rules) lives in [`content/README.md`](content/README.md). A
 visual QA page for every component is available at `/components-preview`
 (not linked in navigation).
+
+## Adding a new tool folder
+
+Tools are **discovered from the folder layout** — there is no registry to
+edit. Create `content/<area>/<tool-name>/`, add one article (start from
+`content/_template/article.mdx`), and the tool appears automatically: sidebar
+entry, `/docs/<area>/<tool-name>` landing page, breadcrumbs, search index and
+prev/next links. The folder name is the URL segment, so pick it once and keep
+it stable.
+
+Optional per-tool metadata lives in a `_meta.json` file next to the articles:
+
+```json
+{
+  "label": "IP Addressing & Subnetting",
+  "order": 20
+}
+```
+
+- `label` — display name in the sidebar, area page and search results.
+  Without it, the label is generated from the folder name: a name that
+  already contains spaces or `&` is used as-is, while a kebab/snake-case
+  name becomes Title Case with common acronyms kept uppercase
+  (`ip-addressing` → `IP Addressing`).
+- `order` — position among the tools of an area. Tools with an `order` come
+  first (ascending), then unordered tools alphabetically by label. Use
+  spaced values (10, 20, 30 …) so a new tool can be inserted between
+  existing ones.
+- The file must be **valid JSON** — a syntax error fails the build on
+  purpose, where the mistake was made. Both fields are optional; a missing
+  `_meta.json` is a normal state, not an error.
+
+No code changes, registration step or URL changes are needed for a new tool
+folder, and adding or removing `_meta.json` never affects URLs either.
 
 ## Content architecture principles
 

@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { categoryOrder, canonicalCategoryId } from '../data/categories';
+import { compareTools } from './tools';
 
 type Doc = CollectionEntry<'docs'>;
 
@@ -33,7 +34,7 @@ export function docTool(entry: Doc): string | undefined {
 /**
  * Canonical documentation order:
  * 1. Category (documentation area) canonical order
- * 2. Technology / tool
+ * 2. Technology / tool — `_meta.json` order, then alphabetical by label
  * 3. Frontmatter `order`
  * 4. Title
  *
@@ -42,13 +43,13 @@ export function docTool(entry: Doc): string | undefined {
 export function compareDocs(a: Doc, b: Doc): number {
   const catA = docCategory(a);
   const catB = docCategory(b);
-  const toolA = docTool(a) ?? '';
-  const toolB = docTool(b) ?? '';
+  const toolA = docTool(a);
+  const toolB = docTool(b);
 
   return (
     categoryOrder(catA) - categoryOrder(catB) ||
     catA.localeCompare(catB) ||
-    toolA.localeCompare(toolB) ||
+    compareTools(catA, toolA, toolB) ||
     a.data.order - b.data.order ||
     a.data.title.localeCompare(b.data.title)
   );

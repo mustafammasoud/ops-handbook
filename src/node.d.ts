@@ -1,7 +1,7 @@
 /**
  * Minimal ambient typings for the Node.js built-ins used by
- * `src/utils/metadata.ts`. The project intentionally has no `@types/node`
- * dependency, so only the exact APIs in use are declared here.
+ * `src/utils/metadata.ts` and `src/utils/tools.ts`. The project intentionally
+ * has no `@types/node` dependency, so only the exact APIs in use are declared here.
  */
 declare module 'node:child_process' {
   export function execFileSync(
@@ -15,5 +15,16 @@ declare module 'node:child_process' {
 }
 
 declare module 'node:fs' {
+  /** A directory entry returned by `readdirSync(path, { withFileTypes: true })`. */
+  export interface Dirent {
+    name: string;
+    isDirectory(): boolean;
+  }
+
   export function statSync(path: string | URL): { mtime: Date };
+
+  export function readdirSync(
+    path: string | URL,
+    options: { withFileTypes: true },
+  ): Dirent[];
 }

@@ -3,8 +3,8 @@ import { getCollection } from 'astro:content';
 import {
   categories,
   categoryLabel,
-  toolLabel,
 } from '../data/categories';
+import { toolLabel } from '../utils/tools';
 import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
 
 interface Props {
@@ -51,7 +51,7 @@ const groups = orderedIds
 
     const toolGroups = [...byTool.entries()].map(([toolId, entries]) => ({
       id: toolId,
-      label: toolLabel(toolId),
+      label: toolLabel(toolId, id),
       entries,
     }));
 

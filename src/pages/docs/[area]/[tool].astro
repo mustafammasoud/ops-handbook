@@ -7,8 +7,8 @@ import PlannedState from '../../../components/PlannedState.astro';
 import {
   categoryLabel,
   canonicalCategoryId,
-  toolLabel,
 } from '../../../data/categories';
+import { toolLabel } from '../../../utils/tools';
 import { docCategory, docTool, sortedDocs, topicCount } from '../../../utils/docs';
 
 /**
@@ -48,7 +48,7 @@ const { docs } = Astro.props;
 
 const areaId = canonicalCategoryId(area!);
 const areaName = categoryLabel(areaId);
-const toolName = toolLabel(tool!);
+const toolName = toolLabel(tool!, areaId);
 const count = topicCount(docs.length);
 const planned = docs.length === 0;
 
