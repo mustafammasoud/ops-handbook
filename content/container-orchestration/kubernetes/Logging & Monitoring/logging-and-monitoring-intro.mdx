@@ -1,0 +1,53 @@
+---
+title: Logging & Monitoring — Introduction
+description: Understand the fundamentals of monitoring Kubernetes clusters and applications, and managing logs for troubleshooting.
+order: 34
+category: container-orchestration
+level: beginner
+draft: false
+tags: [kubernetes, logging, monitoring]
+language: ar
+---
+
+## Overview
+<InfoCard variant="concept" title="Monitoring Foundation" description="جمع البيانات من العقد والتطبيقات لفهم حالة الكلستر." icon="cube" tags={["Monitoring", "Logs"]} />
+
+يُعتبر **Logging & Monitoring** من الجوانب الأساسية في إدارة وتشغيل Kubernetes Clusters، لأنهم بيساعدونا نفهم حالة الـ Cluster والـ Applications اللي شغالة عليه، ونكتشف المشاكل ونتتبع أسبابها.
+
+في الموديول ده هنتعلم إزاي نراقب أداء الـ Kubernetes Cluster والـ Applications، وإزاي نعرض ونتعامل مع الـ Logs الخاصة بيهم.
+
+## 1. What You'll Learn
+
+- **Cluster Monitoring:** متابعة حالة الـ Nodes والـ Kubernetes Components ومراقبة استهلاك الـ CPU والـ Memory.
+- **Application Monitoring:** مراقبة الـ Applications والـ Workloads اللي شغالة داخل الـ Cluster.
+- **Logging:** عرض وتحليل الـ Logs الخاصة بالـ Applications والـ Cluster Components لفهم الأخطاء وتشخيص المشاكل.
+- **Troubleshooting:** تطبيق المفاهيم من خلال تمارين عملية وسيناريوهات واقعية.
+
+## 2. Logging vs. Monitoring
+
+```mermaid
+flowchart TD
+    A(["Kubernetes Cluster"]) --> B["Monitoring"]
+    A --> C["Logging"]
+
+    B --> D["Metrics"]
+    D --> E["CPU, Memory, Node Health"]
+
+    C --> F["Log Records"]
+    F --> G["Errors, Events, Application Output"]
+
+    E --> H(["Understand System Health"])
+    G --> I(["Investigate Problems"])
+
+    classDef root fill:#F4E8D8,stroke:#B38B5B,color:#493722,rx:8,ry:8
+    classDef process fill:#E9E3DA,stroke:#A99A87,color:#493F35,rx:8,ry:8
+    classDef result fill:#E5EFE7,stroke:#8BAA91,color:#2D4A35,rx:8,ry:8
+
+    class A root
+    class B,C,D,E,F,G process
+    class H,I result
+```
+
+بشكل مبسط، الـ **Monitoring** بيساعدنا نعرف حالة النظام وأداءه من خلال الـ Metrics، بينما الـ **Logging** بيساعدنا نفهم الأحداث والأخطاء اللي حصلت من خلال الـ Log Records.
+
+الاتنين بيكملوا بعض، وبيساعدونا في اكتشاف المشاكل وتحليلها داخل الـ Kubernetes Cluster.
