@@ -25,11 +25,17 @@ import CardGrid from "../../../src/components/CardGrid.astro";
 
 من هنا بيظهر عندنا نوعان مهمان من عناوين IPv4: **Private IP** و**Public IP**.
 
+<CardGrid columns={3} label="What This Lesson Covers">
+  <InfoCard title="Private addressing" description="عناوين مخصصة للشبكات الداخلية." icon="network" variant="concept" />
+  <InfoCard title="Public routing" description="عناوين تُستخدم للتواصل عبر الإنترنت العام." icon="cloud" variant="concept" />
+  <InfoCard title="NAT and access" description="كيف تتصل الأجهزة الخاصة بالإنترنت والخدمات الداخلية." icon="cycle" variant="concept" />
+</CardGrid>
+
 ## 1. The Core Difference
 
 الفرق الأساسي مش إن واحد سريع والتاني بطيء، ولا إن واحد آمن والتاني غير آمن. الفرق هو **نطاق استخدام العنوان وإمكانية توجيهه عبر الإنترنت العام**.
 
-<CardGrid columns={2}>
+<CardGrid columns={2} label="Private and Public at a Glance">
 
 <InfoCard title="Private IP" icon="network" variant="concept">
 
@@ -59,7 +65,7 @@ import CardGrid from "../../../src/components/CardGrid.astro";
 
 مش أي عنوان بنستخدمه داخل البيت يبقى Private IP بالمعنى التقني. فيه ثلاثة Ranges محددة رسميًا لعناوين IPv4 الخاصة، وهي اللي بنحتاج نعرفها ونقدر نميّزها.
 
-<CardGrid columns={1}>
+<CardGrid columns={3} label="RFC 1918 Private Ranges">
 
 <InfoCard title="10.0.0.0/8" icon="network" variant="feature">
 
@@ -105,7 +111,7 @@ Example: `192.168.1.20`
 flowchart TD
     A([" Laptop<br/>Private: 192.168.1.20"])
     B([" Phone<br/>Private: 192.168.1.21"])
-    C[" Home Router<br/>NAT"]
+    C([" Home Router<br/>NAT"])
     D([" Public IP<br/>203.0.113.10"])
     E([" Internet<br/>Web Server"])
 
@@ -150,9 +156,11 @@ flowchart TD
 
 لكن ده مش معناه إن الجهاز غير قابل للوصول في كل الظروف. فيه طرق مختلفة للوصول لخدمات داخل شبكة خاصة، مثل:
 
-- **Port Forwarding:** إعداد الـ Router لتمرير اتصالات واردة على Port محدد إلى جهاز داخلي، مع مراعاة مخاطر الأمان.
-- **VPN:** إنشاء اتصال يسمح لجهاز بعيد بالوصول إلى الشبكة الخاصة وفقًا للصلاحيات.
-- **Reverse Proxy أو Tunnel:** إتاحة خدمة داخلية من خلال وسيط أو اتصال مُعد مسبقًا.
+<CardGrid columns={3} label="Ways to Reach Private Services">
+  <InfoCard title="Port Forwarding" description="إعداد الـ Router لتمرير اتصالات واردة على Port محدد إلى جهاز داخلي، مع مراعاة مخاطر الأمان." icon="git-pull-request" variant="warning" />
+  <InfoCard title="VPN" description="إنشاء اتصال يسمح لجهاز بعيد بالوصول إلى الشبكة الخاصة وفقًا للصلاحيات." icon="shield" variant="concept" />
+  <InfoCard title="Reverse Proxy or Tunnel" description="إتاحة خدمة داخلية من خلال وسيط أو اتصال مُعد مسبقًا." icon="cycle" variant="concept" />
+</CardGrid>
 
 في المقابل، امتلاك Public IP لا يعني تلقائيًا إن أي شخص يقدر يدخل على الجهاز. الـ Firewall، والـ Routing، والخدمات اللي بتستمع للاتصالات، وإعدادات الوصول كلها عوامل مؤثرة.
 
@@ -193,11 +201,16 @@ default via 192.168.1.1 dev wlp2s0
 
 أما عنوان الـ Public IP، فالأمر `ip addr` مش بالضرورة يعرضه؛ لأن الجهاز ممكن يكون خلف Router أو NAT. كمان لو الشبكة تستخدم **CGNAT** عند الـ ISP، فالـ Router نفسه ممكن ما يكونش عنده Public IPv4 مخصص مباشرة.
 
+<CardGrid columns={2} label="Linux Network Checks">
+  <InfoCard title="ip -4 addr" description="يعرض عناوين IPv4 الموجودة على الـ Interfaces." icon="terminal" variant="command" />
+  <InfoCard title="ip route" description="يعرض الـ Default Gateway والـ Routes." icon="network" variant="command" />
+</CardGrid>
+
 ## 7. Why This Matters in DevOps & Cloud
 
 فهم الفرق بين النوعين مهم جدًا لما تبدأ تشتغل على Infrastructure حقيقية.
 
-<CardGrid columns={2}>
+<CardGrid columns={2} label="DevOps and Cloud Design">
 
 <InfoCard title="Private Networks" icon="network" variant="feature">
 
@@ -241,7 +254,8 @@ flowchart TD
 
 حاول تجاوب قبل ما تبص على الإجابات.
 
-<InfoCard title="Question 1" icon="insight" variant="concept">
+<CardGrid columns={3} label="Check Your Understanding">
+<InfoCard title="Question 1" icon="network" variant="concept">
 
 هل العنوان `172.20.5.10` يعتبر Private IP؟
 
@@ -249,7 +263,7 @@ flowchart TD
 
 </InfoCard>
 
-<InfoCard title="Question 2" icon="insight" variant="concept">
+<InfoCard title="Question 2" icon="cycle" variant="concept">
 
 لو اللابتوب والموبايل عندهم Private IPs مختلفة، هل لازم يكون عندهم Public IPs مختلفة؟
 
@@ -257,18 +271,21 @@ flowchart TD
 
 </InfoCard>
 
-<InfoCard title="Question 3" icon="insight" variant="concept">
+<InfoCard title="Question 3" icon="shield" variant="concept">
 
 هل وجود Public IP معناه إن الجهاز مفتوح لأي شخص على الإنترنت؟
 
 **الإجابة:** لأ. قابلية الوصول بتعتمد على الـ Routing والـ Firewall والخدمات وإعدادات الأمان.
 
 </InfoCard>
+</CardGrid>
 
 ## Key Takeaways
 
-- **Private IP:** عنوان للاستخدام داخل الشبكات الخاصة، ومش بيُوجَّه مباشرة عبر الإنترنت العام.
-- **Public IP:** عنوان قابل للتوجيه عبر الإنترنت العام، وفقًا لإعدادات الشبكة.
-- النطاقات الخاصة في IPv4 هي `10.0.0.0/8` و`172.16.0.0/12` و`192.168.0.0/16`.
-- **NAT/PAT** بيسمح في السيناريو الشائع لأجهزة متعددة بمشاركة Public IPv4 واحد.
-- Public IP مش معناه إن الجهاز آمن أو مكشوف تلقائيًا؛ إعدادات الوصول والأمان هي اللي بتحدد ده.
+<CardGrid columns={2} label="Public vs Private IP Recap">
+  <InfoCard title="Private IP" description="عنوان للاستخدام داخل الشبكات الخاصة، ومش بيُوجَّه مباشرة عبر الإنترنت العام." icon="network" variant="summary" />
+  <InfoCard title="Public IP" description="عنوان قابل للتوجيه عبر الإنترنت العام، وفقًا لإعدادات الشبكة." icon="cloud" variant="summary" />
+  <InfoCard title="Private ranges" description="النطاقات الخاصة في IPv4 هي `10.0.0.0/8` و`172.16.0.0/12` و`192.168.0.0/16`." icon="layers" variant="summary" />
+  <InfoCard title="NAT/PAT" description="بيسمح في السيناريو الشائع لأجهزة متعددة بمشاركة Public IPv4 واحد." icon="cycle" variant="summary" />
+  <InfoCard title="Access and security" description="Public IP مش معناه إن الجهاز آمن أو مكشوف تلقائيًا؛ إعدادات الوصول والأمان هي اللي بتحدد ده." icon="shield" variant="summary" />
+</CardGrid>
