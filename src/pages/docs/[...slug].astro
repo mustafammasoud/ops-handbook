@@ -9,6 +9,7 @@ import CardGrid from '../../components/CardGrid.astro';
 import PdfCard from '../../components/PdfCard.astro';
 import PdfEmbed from '../../components/PdfEmbed.astro';
 import TableCard from '../../components/TableCard.astro';
+import ChecklistCard from '../../components/ChecklistCard.astro';
 import { docSlug } from '../../utils/docs';
 
 /**
@@ -25,6 +26,7 @@ const mdxComponents = {
   PdfCard,
   PdfEmbed,
   TableCard,
+  ChecklistCard,
 };
 
 export async function getStaticPaths() {
