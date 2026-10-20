@@ -14,9 +14,6 @@ tags:
 language: ar
 ---
 
-import InfoCard from "../../../src/components/InfoCard.astro";
-import CardGrid from "../../../src/components/CardGrid.astro";
-
 ## Introduction
 
 الـ **IP Address** هو عنوان منطقي بيُستخدم لتحديد واجهة شبكة والمساعدة في توصيل البيانات إلى وجهتها عبر شبكات الـ IP.
@@ -115,7 +112,7 @@ flowchart TD
 
 `8 + 2 = 10`
 
-وبالتالي تمثيله في 8 bits هو:
+وبيمثّله في 8 bits هو:
 
 `00001010`
 
@@ -129,12 +126,14 @@ flowchart TD
 
 بالثنائي:
 
+<TableCard title="192.168.1.10 in Binary">
 | Decimal Octet | Binary Octet |
 |---:|---|
 | 192 | `11000000` |
 | 168 | `10101000` |
 | 1 | `00000001` |
 | 10 | `00001010` |
+</TableCard>
 
 إذًا العنوان الكامل في Binary هو:
 
@@ -193,11 +192,13 @@ flowchart TD
 
 أمثلة:
 
+<TableCard title="Prefix Length Examples">
 | IPv4 Address with Prefix | Network Bits | Remaining Host Bits |
 |---|---:|---:|
 | `192.168.1.10/24` | 24 | 8 |
 | `10.20.30.40/16` | 16 | 16 |
 | `172.16.5.20/8` | 8 | 24 |
+</TableCard>
 
 الأمثلة دي بتوضّح التقسيم المنطقي حسب الـ Prefix المكتوب، مش قواعد ثابتة مرتبطة بشكل العنوان.
 
@@ -230,11 +231,13 @@ flowchart TD
 
 فيه ثلاث مجموعات رئيسية مخصصة لعناوين IPv4 الخاصة:
 
+<TableCard title="RFC 1918 Private Ranges">
 | Private Range | CIDR | Example |
 |---|---|---|
 | `10.0.0.0` – `10.255.255.255` | `10.0.0.0/8` | `10.10.1.5` |
 | `172.16.0.0` – `172.31.255.255` | `172.16.0.0/12` | `172.20.1.10` |
 | `192.168.0.0` – `192.168.255.255` | `192.168.0.0/16` | `192.168.1.10` |
+</TableCard>
 
 دي نطاقات الـ Private IPv4 المعروفة في RFC 1918.
 

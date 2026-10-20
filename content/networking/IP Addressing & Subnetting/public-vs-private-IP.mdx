@@ -14,9 +14,6 @@ tags:
 language: ar
 ---
 
-import InfoCard from "../../../src/components/InfoCard.astro";
-import CardGrid from "../../../src/components/CardGrid.astro";
-
 ## Introduction
 
 في الدرس السابق، اتعلمنا إن كل جهاز متصل بشبكة بيحتاج **IP Address** عشان نقدر نميّزه ونوصل له داخل الشبكة أو عبر شبكات تانية.
@@ -131,14 +128,36 @@ flowchart TD
     class E internet
 ```
 
-> **ملاحظة:** العنوان `203.0.113.10` في الرسم مخصص للأمثلة والتوثيق، مش عنوان Public IP حقيقي بنستخدمه في اتصال فعلي.
+<Callout type="note" title="ملاحظة">
+
+العنوان `203.0.113.10` في الرسم مخصص للأمثلة والتوثيق، مش عنوان Public IP حقيقي بنستخدمه في اتصال فعلي.
+
+</Callout>
 
 خلّينا نفهم الخطوات بالترتيب:
 
-1. اللابتوب يرسل Request من عنوانه الخاص، مثل `192.168.1.20`.
-2. الـ Router يستقبل الـ Traffic ويُجري NAT، وغالبًا يستخدم **PAT (Port Address Translation)** عشان يميّز اتصالات الأجهزة المختلفة.
-3. الـ Request يخرج إلى الإنترنت باستخدام عنوان المصدر العام الخاص باتصال الـ Router.
-4. لما الـ Response يرجع، الـ Router يستخدم معلومات الاتصال المسجلة عنده عشان يوجّه البيانات للجهاز الصحيح.
+<Steps>
+<li>
+
+<InfoCard title="Laptop Sends" description="اللابتوب يرسل Request من عنوانه الخاص، مثل `192.168.1.20`." icon="code" />
+
+</li>
+<li>
+
+<InfoCard title="Router Applies NAT" description="الـ Router يستقبل الـ Traffic ويُجري NAT، وغالبًا يستخدم **PAT (Port Address Translation)** عشان يميّز اتصالات الأجهزة المختلفة." icon="cycle" />
+
+</li>
+<li>
+
+<InfoCard title="Request Goes Public" description="الـ Request يخرج إلى الإنترنت باستخدام عنوان المصدر العام الخاص باتصال الـ Router." icon="cloud" />
+
+</li>
+<li>
+
+<InfoCard title="Response Returns" description="لما الـ Response يرجع، الـ Router يستخدم معلومات الاتصال المسجلة عنده عشان يوجّه البيانات للجهاز الصحيح." icon="wheel" />
+
+</li>
+</Steps>
 
 بالتالي، الأجهزة بتشارك الـ Public IP في الاتصالات الصادرة، لكن كل جهاز بيحتفظ بعنوانه الخاص داخل الشبكة.
 
@@ -166,14 +185,16 @@ flowchart TD
 
 ## 5. Public vs Private IP — Quick Comparison
 
+<TableCard title="Public vs Private Comparison">
 | Property | Private IP | Public IP |
 |---|---|---|
 | Primary use | داخل الشبكات الخاصة | التواصل عبر الإنترنت العام |
-| Internet routing | لا يُوجَّه مباشرة عبر الإنترنت العام | قابل للتوجيه عبر الإنترنت العام |
+| Internet routing | لا يُوجَّه مباشرة عبر الإنترنت العام | قابل للتوجيه عبر الإنترنت العام |
 | Uniqueness | ممكن يتكرر في شبكات منفصلة | لازم يكون قابلًا للتمييز ضمن نطاق التوجيه العام |
 | Common example | `192.168.1.20` | `8.8.8.8` |
 | Typical assignment | Router داخلي أو DHCP Server | ISP أو Cloud Provider أو جهة مختصة |
 | Security | مش آمن تلقائيًا | مش مكشوف تلقائيًا؛ الوصول يعتمد على الإعدادات |
+</TableCard>
 
 ## 6. How to Check Your IP Addresses on Linux
 
@@ -283,7 +304,7 @@ flowchart TD
 ## Key Takeaways
 
 <CardGrid columns={2} label="Public vs Private IP Recap">
-  <InfoCard title="Private IP" description="عنوان للاستخدام داخل الشبكات الخاصة، ومش بيُوجَّه مباشرة عبر الإنترنت العام." icon="network" variant="summary" />
+  <InfoCard title="Private IP" description="عنوان للاستخدام داخل الشبكات الخاصة، ومش بيُوجَّه مباشرة عبر الإنترنت العام." icon="network" variant="summary" />
   <InfoCard title="Public IP" description="عنوان قابل للتوجيه عبر الإنترنت العام، وفقًا لإعدادات الشبكة." icon="cloud" variant="summary" />
   <InfoCard title="Private ranges" description="النطاقات الخاصة في IPv4 هي `10.0.0.0/8` و`172.16.0.0/12` و`192.168.0.0/16`." icon="layers" variant="summary" />
   <InfoCard title="NAT/PAT" description="بيسمح في السيناريو الشائع لأجهزة متعددة بمشاركة Public IPv4 واحد." icon="cycle" variant="summary" />
