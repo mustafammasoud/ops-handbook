@@ -54,7 +54,7 @@ export interface Category {
 }
 
 /**
- * 14 Canonical Documentation Areas matching the knowledge organization model.
+ * 15 Canonical Documentation Areas matching the knowledge organization model.
  * Each area groups technologies, tools, and technical concepts.
  */
 export const categories: Category[] = [
@@ -155,6 +155,13 @@ export const categories: Category[] = [
     descriptionEn: 'Production debugging, log analysis, performance issues, network diagnostics, and incident postmortems.',
     icon: 'wrench',
     order: 14,
+  },
+  {
+    id: 'cheat-sheets',
+    label: 'Cheat Sheets',
+    descriptionEn: 'Quick command references organized by purpose: Kubernetes, Git, Linux — copy-ready with short examples.',
+    icon: 'tag',
+    order: 15,
   },
 ];
 
