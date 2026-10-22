@@ -172,7 +172,7 @@ command: ["sh", "-c", "slepp 20"]
 
 النتيجة المتوقعة إن الأمر يفشل، والـ Init Container مش هيكمل initialization بنجاح. بالتالي، الـ Application Container مش هيبدأ، وهيفضل الـ Pod في مرحلة initialization لحد ما المشكلة تتحل.
 
-في بعض الصور، لو الأمر غير موجود، ممكن يظهر exit code `127`، زي المثال اللي اتشرح في اللاب.
+في بعض الصور، لو الأمر غير موجود، ممكن يظهر exit code `127` .
 
 ### II. Troubleshooting Init Containers
 
@@ -395,8 +395,6 @@ flowchart LR
 </li>
 </Steps>
 
-في اللاب، كان فيه Application Container بيكتب الـ logs في ملف، وتمت إضافة Sidecar باستخدام صورة Filebeat مُجهّزة للتمرين. الـ Sidecar والتطبيق استخدموا نفس الـ Volume، لكن كل واحد عمل له mount في المسار المناسب داخل الـ Container.
-
 <InfoCard variant="callout" title="Pre-Configured Lab Image" description="الصورة المستخدمة في اللاب كانت مُجهّزة خصيصًا لإرسال الـ logs إلى Elasticsearch؛ مجرد تشغيل Filebeat عادي مش معناه إنه هيشتغل بنفس الإعدادات تلقائيًا." icon="cube" />
 
 ### II. Shared Volume Example
@@ -558,11 +556,8 @@ kubectl exec -it sidecar-demo -c app -- sh
 
 ## 6. Updating Existing Pods
 
-في اللابات، احتجنا نضيف Init Container إلى Pod موجود، وفي مثال تاني أضفنا Sidecar.
+ مش كل تغييرات الـ Pod spec مسموح بيها على Pod موجود؛ إضافة أو إزالة Containers غالبًا بتحتاج إعادة إنشاء الـ Pod بدل تعديل ال Pod نفسه مباشرة.
 
-لكن مش كل تغييرات الـ Pod spec مسموح بيها على Pod موجود؛ إضافة أو إزالة Containers غالبًا بتحتاج إعادة إنشاء الـ Pod بدل تعديل الـ Pod نفسه مباشرة.
-
-في اللاب، استُخدم أسلوب:
 
 ```bash
 kubectl replace --force -f pod.yaml
@@ -586,8 +581,6 @@ kubectl replace --force -f pod.yaml
 </TableCard>
 
 ## Summary
-
-راجع النقاط دي قبل ما تنتقل للجزء التالي:
 
 <CardGrid columns={2} label="Key Takeaways">
   <InfoCard variant="summary" title="Init Container" icon="flag">
