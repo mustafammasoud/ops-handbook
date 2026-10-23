@@ -46,15 +46,17 @@ language: ar
 
 ```mermaid id="k4r8mv"
 flowchart LR
-    LOCAL["Local Repository"] -->|"git push"| REMOTE["Remote Repository"]
+    LOCAL(["Local Repository"]) -->|"git push"| REMOTE(["Remote Repository"])
     REMOTE -->|"git fetch"| LOCAL
     REMOTE -->|"git pull: fetch + integrate"| LOCAL
 
-    classDef repo fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px,rx:8,ry:8
-    classDef action fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px,rx:8,ry:8
+    classDef repo fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef action fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class LOCAL,REMOTE repo
     class action action
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ remote مش لازم يكون GitHub؛ ممكن يكون GitLab أو Bitbucket أو سيرفر Git خاص بالشركة.
@@ -70,7 +72,6 @@ flowchart LR
 <InfoCard variant="feature" title="Team Collaboration" description="اتعاون باستخدام branches وPull Requests." icon="cycle" tags={["Workflow"]} />
 </CardGrid>
 
----
 
 ## 2. The `git remote` Command
 
@@ -151,7 +152,6 @@ git remote remove github
 
 حذف الـ remote definition مش معناه حذف المستودع المستضاف على GitHub. هو بس بيزيل الاتصال المسجل في المستودع المحلي.
 
----
 
 ## 3. Local Branches vs Remote-Tracking Branches
 
@@ -179,7 +179,15 @@ origin/feature/login
 
 Git بيحدّث الـ references دي أثناء عمليات زي `git fetch`.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** `origin/main` مش هو الـ branch المحلي `main`، ومش اتصال مباشر بيتغير لحظيًا مع GitHub. هو مرجع محلي بيمثل آخر حالة جلبتها من الـ remote.
+
+</InfoCard>
+
+</InfoCard>
 
 لو حد عمل commit جديد على GitHub، `origin/main` عندك مش هيعرف بالتغيير ده إلا بعد عملية جلب ناجحة، أو عملية أخرى بتحدّث معلومات الـ remote.
 
@@ -187,23 +195,25 @@ Git بيحدّث الـ references دي أثناء عمليات زي `git fetch`
 
 ```mermaid id="s7x2kc"
 flowchart TD
-    LOCAL["Local Repository"]
-    REMOTE["Hosted Repository"]
+    LOCAL(["Local Repository"])
+    REMOTE(["Hosted Repository"])
 
-    LOCAL --> MAIN["main"]
-    LOCAL --> TRACK["origin/main"]
-    REMOTE --> RMAIN["Remote main"]
+    LOCAL --> MAIN(["main"])
+    LOCAL --> TRACK(["origin/main"])
+    REMOTE --> RMAIN(["Remote main"])
 
     MAIN -. "local work" .-> LOCAL
     RMAIN -. "updated through fetch" .-> TRACK
 
-    classDef local fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px,rx:8,ry:8
-    classDef tracking fill:#e7e4f2,stroke:#8980ad,color:#39334f,stroke-width:1.5px,rx:8,ry:8
-    classDef hosted fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px,rx:8,ry:8
+    classDef local fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef tracking fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef hosted fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class MAIN local
     class TRACK tracking
     class REMOTE,RMAIN hosted
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ diagram بيوضح الفكرة العامة: الـ local branch والـ remote-tracking branch references موجودين عندك محليًا، بينما الـ remote branch الحقيقي موجود في المستودع المستضاف.
@@ -227,7 +237,6 @@ git branch -a
 git branch -vv
 ```
 
----
 
 ## 4. `git fetch`
 
@@ -274,7 +283,6 @@ git diff main..origin/main
 
 <InfoCard variant="tip" title="Fetch First, Inspect, Then Integrate" description="Fetching lets you update your knowledge of the remote history without immediately changing your current branch or working files." icon="branch" tags={["git fetch", "Workflow"]} />
 
----
 
 ## 5. `git pull`
 
@@ -337,7 +345,6 @@ git log --oneline --graph --decorate --all -15
 
 لو الـ working tree فيه تغييرات ممكن تتعارض مع الملفات اللي هتتغير، Git ممكن يرفض إكمال العملية حفاظًا على شغلك. وقتها عالج التغييرات المحلية بشكل مناسب قبل إعادة المحاولة.
 
----
 
 ## 6. `git push`
 
@@ -371,7 +378,6 @@ git push
 
 لو الـ remote اتقدم بتغييرات مش موجودة عندك، Git ممكن يرفض الـ push. وقتها محتاج تجلب التغييرات وتتكامل معاها قبل إعادة المحاولة.
 
----
 
 ## 7. Tracking and Upstream Branches
 
@@ -455,7 +461,6 @@ git status -sb
 
 لكن خلي بالك: المعلومات دي مبنية على آخر حالة معروفة عندك. نفّذ `git fetch` لو عايز تحدّث الـ remote-tracking references قبل اتخاذ قرار.
 
----
 
 ## 8. `origin` vs `upstream`
 
@@ -517,22 +522,31 @@ git merge upstream/main
 
 ```mermaid id="r1k7nd"
 flowchart TD
-    ORIGINAL["Original Repository"] -->|"fork"| FORK["Your Fork"]
-    FORK -->|"clone"| LOCAL["Local Repository"]
+    ORIGINAL(["Original Repository"]) -->|"fork"| FORK(["Your Fork"])
+    FORK -->|"clone"| LOCAL(["Local Repository"])
     ORIGINAL -->|"git fetch upstream"| LOCAL
     LOCAL -->|"git push origin"| FORK
     FORK -->|"Pull Request"| ORIGINAL
 
-    classDef repository fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px,rx:8,ry:8
-    classDef local fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px,rx:8,ry:8
+    classDef repository fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef local fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class ORIGINAL,FORK repository
     class LOCAL local
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
 
 **مهم:** `upstream` مش لازم يشير للمشروع الأصلي، و`origin` مش لازم يشير إلى fork. الأسماء دي conventions شائعة، وإنت تقدر تستخدم أسماء مختلفة حسب المشروع.
 
----
+</InfoCard>
+
+</InfoCard>
+
 
 ## 9. Push Rejections and Synchronization
 
@@ -662,7 +676,6 @@ git push --force-with-lease
 
 <InfoCard variant="warning" title="Never Force Push as Your First Fix" description="When a push is rejected, fetch and inspect the remote history first. A rejection often protects commits that already exist on the remote repository." icon="shield" tags={["Synchronization", "Data Safety"]} />
 
----
 
 ## 10. Practical Workflow
 
@@ -743,7 +756,6 @@ git log --oneline --decorate -10
 </li>
 </Steps>
 
----
 
 ## 11. Common Mistakes
 
@@ -755,7 +767,6 @@ git log --oneline --decorate -10
 
 <InfoCard variant="tip" title="Use Explicit Commands While Learning" description="Commands such as git fetch origin, git merge origin/main, and git push -u origin feature/login make the source and destination easier to reason about." icon="layers" tags={["Best Practices"]} />
 
----
 
 ## 12. Key Takeaways
 

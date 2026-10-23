@@ -32,7 +32,7 @@ language: ar
 flowchart LR
     A(["A"]) --> B(["B"]) --> C(["C"])
 
-    classDef node fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
+    classDef node fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
     class A,B,C node
 
     linkStyle 0,1 stroke:#A68A64,stroke-width:2px
@@ -55,14 +55,14 @@ flowchart LR
     MAIN(["main"]) --> C
     FEATURE(["feature/login"]) --> C
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C commit
     class MAIN,FEATURE branch
 
     linkStyle 0,1 stroke:#A68A64,stroke-width:2px
-    linkStyle 2,3 stroke:#89977B,stroke-width:2px
+    linkStyle 2,3 stroke:#8AA184,stroke-width:2px
 ```
 
 لما تنتقل إلى `feature/login` وتعمل commit جديد `D`، الـ feature branch هو اللي بيتحرك إلى `D`، بينما `main` يفضل عند `C`.
@@ -74,14 +74,14 @@ flowchart LR
     MAIN(["main"]) --> C
     FEATURE(["feature/login"]) --> D
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C,D commit
     class MAIN,FEATURE branch
 
     linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px
-    linkStyle 3,4 stroke:#89977B,stroke-width:2px
+    linkStyle 3,4 stroke:#8AA184,stroke-width:2px
 ```
 
 ده معناه إن كل Branch يقدر يتقدم في مساره بشكل مستقل، مع إمكانية دمج التغييرات لاحقًا.
@@ -100,16 +100,18 @@ Git بيستخدم branch names كـ references للـ commits. الـ branch م
 
 ```mermaid
 flowchart TD
-    HEAD["HEAD"] --> MAIN["main"]
-    MAIN --> C["Commit C"]
-    FEATURE["feature/login"] --> D["Commit D"]
+    HEAD(["HEAD"]) --> MAIN(["main"])
+    MAIN --> C(["Commit C"])
+    FEATURE(["feature/login"]) --> D(["Commit D"])
     D --> C
 
-    classDef pointer fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px
-    classDef commit fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px
+    classDef pointer fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef commit fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class HEAD,MAIN,FEATURE pointer
     class C,D commit
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ diagram بيوضح إن `HEAD` بيحدد الـ current branch، بينما كل branch reference بيشير إلى commit. والـ commits نفسها بتحتفظ بعلاقاتها بالـ parent commits.
@@ -295,26 +297,28 @@ Git بيحاول يدمج التغييرات اللي وصلت لها `feature/l
 
 ```mermaid
 flowchart TD
-    A["Start on target branch"] --> B["Inspect working directory"]
-    B --> C["Switch to target branch"]
-    C --> D["Run git merge source-branch"]
-    D --> E{"Merge successful?"}
-    E -->|Yes| F["Inspect result and run tests"]
-    E -->|Conflicts| G["Resolve conflicting files"]
-    G --> H["Stage resolved files"]
-    H --> I["Complete the merge"]
+    A(["Start on target branch"]) --> B(["Inspect working directory"])
+    B --> C(["Switch to target branch"])
+    C --> D(["Run git merge source-branch"])
+    D --> E("Merge successful?")
+    E -->|Yes| F(["Inspect result and run tests"])
+    E -->|Conflicts| G(["Resolve conflicting files"])
+    G --> H(["Stage resolved files"])
+    H --> I(["Complete the merge"])
     I --> F
-    F --> J["Review final history"]
+    F --> J(["Review final history"])
 
-    classDef action fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px
-    classDef decision fill:#f5e4c7,stroke:#bd9259,color:#493522,stroke-width:1.5px
-    classDef success fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px
-    classDef warning fill:#f4e2dd,stroke:#b87568,color:#603a33,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef success fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef warning fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
 
     class A,B,C,D,H,I,F,J action
     class E decision
     class G warning
     class F success
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 مش كل Merge بيحتاج حل conflicts أو بيعمل merge commit جديد. النتيجة بتعتمد على تاريخ الـ commits وطبيعة التغييرات.
@@ -336,8 +340,8 @@ flowchart LR
     C --> D(["D"]) --> E(["E"])
     E ~~~ FEATURE(["feature/login"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C,D,E commit
     class MAIN,FEATURE branch
@@ -356,14 +360,14 @@ flowchart LR
     MAIN(["main"]) --> E
     FEATURE(["feature/login"]) --> E
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C,D,E commit
     class MAIN,FEATURE branch
 
     linkStyle 0,1,2,3 stroke:#A68A64,stroke-width:2px
-    linkStyle 4,5 stroke:#89977B,stroke-width:2px
+    linkStyle 4,5 stroke:#8AA184,stroke-width:2px
 ```
 
 في الحالة دي، Git بيحرّك الـ branch reference للأمام فقط.
@@ -401,8 +405,8 @@ flowchart TB
     E ~~~ FEATURE(["feature/login"])
     G ~~~ MAIN(["main"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C,D,E,F,G commit
     class FEATURE,MAIN branch
@@ -420,19 +424,21 @@ Git بيحدد ثلاث نقاط أساسية:
 
 ```mermaid
 flowchart TD
-    BASE["Common ancestor"] --> SOURCE["Source branch changes"]
-    BASE --> TARGET["Target branch changes"]
-    SOURCE --> MERGE["Merge commit"]
+    BASE(["Common ancestor"]) --> SOURCE(["Source branch changes"])
+    BASE --> TARGET(["Target branch changes"])
+    SOURCE --> MERGE(["Merge commit"])
     TARGET --> MERGE
-    MERGE --> RESULT["Combined history"]
+    MERGE --> RESULT(["Combined history"])
 
-    classDef base fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px
-    classDef branch fill:#e7e4f2,stroke:#8980ad,color:#39334f,stroke-width:1.5px
-    classDef merge fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px
+    classDef base fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef branch fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef merge fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class BASE base
     class SOURCE,TARGET branch
     class MERGE,RESULT merge
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### III. Comparison
@@ -443,6 +449,7 @@ flowchart TD
 </CardGrid>
 
 <TableCard title="Fast-Forward vs Three-Way Merge" caption="الفرق الأساسي في شكل التاريخ وإمكانية حدوث التعارض.">
+<TableCard>
 | Aspect | Fast-Forward | Three-Way Merge |
 |---|---|---|
 | Branch histories | امتداد مباشر لمسار واحد | فيه مساران تطوروا من نقطة مشتركة |
@@ -451,8 +458,17 @@ flowchart TD
 | Conflict possibility | عادةً لا يوجد تعارض بسبب تغييرات متفرعة في الطرفين | ممكن تحصل conflicts |
 | Common use | دمج فرع لم يتقدم عليه الـ target | دمج فروع اتطورت بشكل مستقل |
 </TableCard>
+</TableCard>
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
 
 **مهم:** الـ Fast-Forward مش استراتيجية لدمج محتوى الملفات بالطريقة نفسها اللي بيستخدمها Three-Way Merge؛ هو تحريك للـ branch reference لأن تاريخ الـ commits يسمح بده. وفي المقابل، Three-Way Merge بيستخدم الـ common ancestor والنسختين الحاليتين لتحديد التغييرات المطلوب دمجها.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 6. Merge Conflicts
 
@@ -621,6 +637,7 @@ git merge --abort
 </CardGrid>
 
 <TableCard title="Branch Naming Conventions" caption="prefixes شائعة بتساعد الفريق يفهم هدف الفرع من الاسم.">
+<TableCard>
 | Prefix | Purpose | Example |
 |---|---|---|
 | `feature/` | ميزة جديدة | `feature/user-auth` |
@@ -630,6 +647,7 @@ git merge --abort
 | `refactor/` | إعادة تنظيم الكود | `refactor/auth-service` |
 | `release/` | تجهيز إصدار | `release/1.2.0` |
 | `experiment/` | تجربة أو إثبات فكرة | `experiment/cache-layer` |
+</TableCard>
 </TableCard>
 
 دي conventions شائعة، مش قواعد إلزامية من Git.

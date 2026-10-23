@@ -31,7 +31,6 @@ language: ar
 
 <InfoCard variant="concept" title="Installation vs Configuration" description="تثبيت Git بيخلي الأداة متاحة على جهازك، لكن الـ Configuration بتحدد معلوماتك الشخصية وبعض السلوكيات الافتراضية اللي Git هيستخدمها أثناء الشغل." icon="wrench" tags={["Git CLI", "Configuration"]} />
 
----
 
 ## 1. Installation
 
@@ -58,12 +57,14 @@ git version 2.x.x
 طريقة التثبيت بتختلف حسب الـ Distribution والـ Package Manager المستخدم.
 
 <TableCard title="Install Git on Linux" caption="أوامر التثبيت باستخدام Package Manager لكل توزيعة.">
+<TableCard>
 | Distribution | Command |
 |---|---|
 | Fedora | `sudo dnf install git` |
 | Ubuntu / Debian | `sudo apt install git` |
 | Arch Linux | `sudo pacman -S git` |
 | openSUSE | `sudo zypper install git` |
+</TableCard>
 </TableCard>
 
 الأوامر دي بتستخدم الـ Package Manager الرسمي لكل توزيعة، وممكن تحتاج تحديث الـ Package Index أو تأكيد التثبيت حسب النظام.
@@ -98,7 +99,6 @@ xcode-select --install
 git --version
 ```
 
----
 
 ## 2. Understanding `git config`
 
@@ -144,7 +144,6 @@ git config --list --show-origin
 
 ده مفيد جدًا لما تلاقي قيمة مش زي اللي متوقعها، لأن ممكن تكون متعرفة في أكتر من مستوى.
 
----
 
 ## 3. System, Global, and Local Configuration
 
@@ -152,24 +151,26 @@ Git بيدعم أكتر من مستوى للـ Configuration. المستويات
 
 ```mermaid id="git-config-scopes"
 flowchart TD
-    S["System Configuration<br/>على مستوى الجهاز"]
-    G["Global Configuration<br/>للمستخدم"]
-    L["Local Configuration<br/>للـ Repository"]
-    E["Effective Configuration<br/>القيمة المستخدمة"]
+    S(["System Configuration<br/>على مستوى الجهاز"])
+    G(["Global Configuration<br/>للمستخدم"])
+    L(["Local Configuration<br/>للـ Repository"])
+    E(["Effective Configuration<br/>القيمة المستخدمة"])
 
     S --> G
     G --> L
     L --> E
 
-    classDef system fill:#E7E9E7,stroke:#A1AAA2,color:#39443D,stroke-width:1.5px
+    classDef system fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
     classDef global fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
-    classDef local fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px
-    classDef effective fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px
+    classDef local fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef effective fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
 
     class S system
     class G global
     class L local
     class E effective
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الرسم بيوضح مستويات الـ Configuration وترتيب الأولوية المعتاد لما نفس الإعداد يكون متعرف بأكتر من مستوى. فيه كمان مستويات أخرى زي `--worktree` في حالات معينة، لكن مش محتاجينها في البداية.
@@ -234,11 +235,13 @@ git config --local user.email "work@example.com"
 </CardGrid>
 
 <TableCard title="Configuration Scope Precedence" caption="الأكثر تحديدًا (Local) بيسبق الأقل (System).">
+<TableCard>
 | Scope | Applies To | Typical Use |
 |---|---|---|
 | System | كل المستخدمين على الجهاز | إعدادات عامة للجهاز |
 | Global | المستخدم الحالي | الهوية والإعدادات الشخصية |
 | Local | Repository واحد | Overrides خاصة بمشروع معين |
+</TableCard>
 </TableCard>
 
 **مثال عملي:**
@@ -258,7 +261,6 @@ git config user.email
 
 <InfoCard variant="warning" title="Be Careful With Local Configuration" description="أوامر git config --local لازم تتنفذ من داخل Git Repository. لو نفذتها في مجلد مش تابع لـ Repository، Git مش هيقدر يطبق الإعداد المحلي عليه." icon="shield" />
 
----
 
 ## 4. Username, Email, and Default Branch
 
@@ -296,7 +298,15 @@ git config --global init.defaultBranch main
 git config --global init.defaultBranch
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** الإعداد ده بيأثر على الـ Initial Branch عند إنشاء Repositories جديدة، لكنه مش بيغير تلقائيًا اسم الـ Branch في Repositories موجودة بالفعل.
+
+</InfoCard>
+
+</InfoCard>
 
 ### III. A Practical Initial Setup
 
@@ -316,7 +326,6 @@ git config --global --list
 
 مش لازم تضبط كل إعدادات Git من البداية. ابدأ بالأساسيات، وزوّد الإعدادات لما تحتاجها فعلًا.
 
----
 
 ## 5. `git init` — Create a New Repository
 
@@ -358,7 +367,6 @@ git commit -m "Initial commit"
 
 <InfoCard variant="tip" title="Use git init for Your Own Existing Project" description="لو المشروع موجود على جهازك ومش مربوط بـ Git Repository، غالبًا git init هو الاختيار المناسب لبدء تتبع تاريخه." icon="cube" />
 
----
 
 ## 6. `git clone` — Copy an Existing Repository
 
@@ -425,7 +433,6 @@ git clone git@github.com:OWNER/REPOSITORY.git
 
 الـ Public Repositories ممكن تسمح بالـ Clone من غير تسجيل دخول، بينما الـ Private Repositories بتحتاج صلاحيات وصول مناسبة.
 
----
 
 ## 7. `git init` vs `git clone`
 
@@ -439,26 +446,29 @@ git clone git@github.com:OWNER/REPOSITORY.git
 
 ```mermaid id="git-init-vs-clone"
 flowchart TD
-    Q{"What do you have?"}
-    Q -->|"A local project"| I["git init"]
-    Q -->|"An existing remote repository"| C["git clone"]
+    Q("What do you have?")
+    Q -->|"A local project"| I(["git init"])
+    Q -->|"An existing remote repository"| C(["git clone"])
 
-    I --> A["Initialize Git locally"]
-    C --> B["Download repository data<br/>and check out files"]
+    I --> A(["Initialize Git locally"])
+    C --> B(["Download repository data<br/>and check out files"])
 
-    A --> N["Start tracking changes"]
+    A --> N(["Start tracking changes"])
     B --> N
 
-    classDef question fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px
+    classDef question fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
     classDef command fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
-    classDef result fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px
+    classDef result fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class Q question
     class I,C command
     class A,B,N result
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 <TableCard title="When to Use init vs clone" caption="اختار الأوامر المناسب حسب وضع المشروع الحالي.">
+<TableCard>
 | Situation | Command |
 |---|---|
 | بدأت مشروع جديد على جهازك | `git init` |
@@ -466,8 +476,8 @@ flowchart TD
 | عايز تنزل Repository موجود على GitHub | `git clone` |
 | عايز نسخة محلية من Repository عندك صلاحية الوصول إليه | `git clone` |
 </TableCard>
+</TableCard>
 
----
 
 ## 8. Verify Your Setup
 
@@ -517,7 +527,6 @@ git config --global init.defaultBranch
 
 لو لسه مش داخل Repository، استخدم `--global` علشان تتحقق من الإعدادات الشخصية تحديدًا.
 
----
 
 ## 9. Common Mistakes
 
@@ -531,7 +540,6 @@ git config --global init.defaultBranch
   <InfoCard variant="warning" title="Changing the Default Branch of an Existing Repo" description="init.defaultBranch بيحدد الاسم الافتراضي للـ Initial Branch في Repositories الجديدة، ومش بيعيد تسمية Branch موجود تلقائيًا." icon="branch" />
 </CardGrid>
 
----
 
 ## Key Takeaways
 

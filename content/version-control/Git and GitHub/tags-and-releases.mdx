@@ -79,6 +79,7 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 ### III. Compare Tag Types
 
 <TableCard title="Lightweight vs Annotated" caption="الفرق الحقيقي بيظهر لما تفتح الـ tag object بنفسك.">
+<TableCard>
 | Aspect | Lightweight | Annotated |
 |---|---|---|
 | Internal representation | Reference مباشرة إلى object | Reference إلى tag object |
@@ -86,6 +87,7 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 | Tag message | لا توجد رسالة مستقلة | ممكنة |
 | Cryptographic signature | لا | ممكنة |
 | Common use | تسمية بسيطة لنقطة في التاريخ | الإصدارات الرسمية |
+</TableCard>
 </TableCard>
 
 ### IV. Inspect Tags
@@ -149,11 +151,13 @@ git rev-parse 'v1.0.0^{commit}'
 ### I. Version Examples
 
 <TableCard title="SemVer in Practice" caption="كل رقم بيقولك نوع التغيير اللي حصل.">
+<TableCard>
 | Version Change | Meaning | Example |
 |---|---|---|
 | `1.4.2` → `2.0.0` | Breaking change | `2.0.0` |
 | `1.4.2` → `1.5.0` | Backward-compatible feature | `1.5.0` |
 | `1.4.2` → `1.4.3` | Backward-compatible bug fix | `1.4.3` |
+</TableCard>
 </TableCard>
 
 الأرقام مش مجرد عدّاد؛ المفروض تعكس طبيعة التغييرات ومدى توافقها مع الإصدار السابق.
@@ -186,11 +190,23 @@ git rev-parse 'v1.0.0^{commit}'
 ### III. Versioning Rules to Remember
 
 <CardGrid columns={2} label="Versioning Rules to Remember">
-<InfoCard variant="concept" title="Stable Public API" description="الإصدارات العامة تبدأ عادةً من `1.0.0` لما المشروع يعلن عن واجهة مستقرة وفقًا لسياسة الإصدار." icon="tag" tags={["1.0.0"]} />
+<InfoCard variant="concept" title="Stable Public API" icon="tag" tags={["1.0.0"]}>
 
-<InfoCard variant="concept" title="Before 1.0.0" description="قبل `1.0.0`، المشروع بيكون في مرحلة التطوير الأولي، وقواعد التوافق بتختلف عن الإصدارات المستقرة." icon="flag" tags={["Early"]} />
+الإصدارات العامة تبدأ عادةً من `1.0.0` لما المشروع يعلن عن واجهة مستقرة وفقًا لسياسة الإصدار.
 
-<InfoCard variant="warning" title="No Leading Zeroes" description="أرقام الإصدارات العادية لا تحتوي على أصفار إضافية في بداية كل جزء؛ مثلًا `1.04.2` مش صيغة SemVer صحيحة." icon="shield" tags={["Format"]} />
+</InfoCard>
+
+<InfoCard variant="concept" title="Before 1.0.0" icon="flag" tags={["Early"]}>
+
+قبل `1.0.0`، المشروع بيكون في مرحلة التطوير الأولي، وقواعد التوافق بتختلف عن الإصدارات المستقرة.
+
+</InfoCard>
+
+<InfoCard variant="warning" title="No Leading Zeroes" icon="shield" tags={["Format"]}>
+
+أرقام الإصدارات العادية لا تحتوي على أصفار إضافية في بداية كل جزء؛ مثلًا `1.04.2` مش صيغة SemVer صحيحة.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="Follow Project Policy" description="لو المشروع لا يملك واجهة عامة مستقرة أو لا يتبع SemVer، فلا تفترض أن زيادة رقم معين تضمن مستوى محددًا من التوافق." icon="pulse" tags={["Policy"]} />
 </CardGrid>
@@ -295,18 +311,20 @@ git tag -s v1.2.0 -m "Release version 1.2.0"
 
 ```mermaid
 flowchart TD
-    A(["Finish and validate changes"]) --> B["Choose version"]
-    B --> C["Create annotated tag"]
-    C --> D["Push tag to remote"]
-    D --> E["Create GitHub Release"]
-    E --> F["Write release notes"]
-    F --> G["Attach release assets if needed"]
+    A(["Finish and validate changes"]) --> B(["Choose version"])
+    B --> C(["Create annotated tag"])
+    C --> D(["Push tag to remote"])
+    D --> E(["Create GitHub Release"])
+    E --> F(["Write release notes"])
+    F --> G(["Attach release assets if needed"])
     G --> H(["Publish release"])
 
-    classDef stage fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef stage fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,H stage
     class B,C,D,E,F,G action
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Creating a Release on GitHub
@@ -316,44 +334,37 @@ flowchart TD
 <Steps>
 <li>
 
-**افتح صفحة المشروع.**
-
+<InfoCard title="افتح صفحة المشروع" icon="cloud" />
 </li>
 
 <li>
 
-**انتقل إلى قسم Releases.**
-
+<InfoCard title="انتقل إلى قسم Releases" icon="tag" />
 </li>
 
 <li>
 
-**اختار إنشاء Release جديدة.**
-
+<InfoCard title="اختار إنشاء Release جديدة" icon="tag" />
 </li>
 
 <li>
 
-**حدد tag موجودة أو أنشئ tag جديدة من الواجهة لو ده مناسب للـ workflow.**
-
+<InfoCard title="حدد tag موجودة أو أنشئ tag جديدة من الواجهة لو ده مناسب للـ workflow" icon="tag" />
 </li>
 
 <li>
 
-**أضف عنوانًا ووصفًا واضحًا للتغييرات.**
-
+<InfoCard title="أضف عنوانًا ووصفًا واضحًا للتغييرات" icon="flag" />
 </li>
 
 <li>
 
-**أرفق ملفات الإصدار عند الحاجة.**
-
+<InfoCard title="أرفق ملفات الإصدار عند الحاجة" icon="tag" />
 </li>
 
 <li>
 
-**راجع التفاصيل قبل نشر الـ Release.**
-
+<InfoCard title="راجع التفاصيل قبل نشر الـ Release" icon="tag" />
 </li>
 </Steps>
 
@@ -391,16 +402,18 @@ GitHub بيقدر يوفر source code archives مرتبطة بالـ tag. لك�
 
 ```mermaid
 flowchart TD
-    A(["Large source file"]) --> B["Git LFS client"]
-    B --> C["Pointer file committed to Git"]
-    B --> D["Actual content stored in LFS storage"]
+    A(["Large source file"]) --> B(["Git LFS client"])
+    B --> C(["Pointer file committed to Git"])
+    B --> D(["Actual content stored in LFS storage"])
     C --> E(["Git repository"])
     D --> F(["LFS-compatible remote storage"])
 
-    classDef stage fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef stage fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,E,F stage
     class B,C,D action
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ pointer file بيحتوي على معلومات بتحدد نسخة محتوى الملف في LFS storage، مش على محتوى الملف الكبير نفسه.
@@ -453,7 +466,15 @@ git commit -m "chore: track design files with Git LFS"
 
 استبدل المسار بالمكان الفعلي للملف.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** إعداد Git LFS لا يحوّل تلقائيًا كل النسخ القديمة من ملف كبير إلى LFS. الملفات اللي اتضافت بالفعل إلى تاريخ Git العادي ممكن تفضل موجودة في التاريخ، حتى لو بدأت تتبع النسخ الجديدة باستخدام LFS.
+
+</InfoCard>
+
+</InfoCard>
 
 ### IV. Clone and Pull LFS Files
 
@@ -470,7 +491,11 @@ git lfs pull
 <CardGrid columns={2} label="Git LFS Considerations">
 <InfoCard variant="concept" title="Remote Support" description="الـ remote لازم يدعم Git LFS." icon="cloud" tags={["Support"]} />
 
-<InfoCard variant="warning" title="Verify the Upload" description="رفع pointer files لا يعني أن المحتوى الفعلي اترفع بنجاح؛ تأكد من نجاح عملية `git push` الخاصة بـ LFS." icon="shield" tags={["Push"]} />
+<InfoCard variant="warning" title="Verify the Upload" icon="shield" tags={["Push"]}>
+
+رفع pointer files لا يعني أن المحتوى الفعلي اترفع بنجاح؛ تأكد من نجاح عملية `git push` الخاصة بـ LFS.
+
+</InfoCard>
 
 <InfoCard variant="concept" title="Service Limits" description="حدود التخزين وعرض البيانات (bandwidth) بتختلف حسب مزود الخدمة والخطة." icon="database" tags={["Limits"]} />
 

@@ -53,22 +53,24 @@ language: ar
 
 ```mermaid
 flowchart TD
-    A(["Your Machine"]) --> B["SSH Private Key"]
-    B --> C["SSH Authentication"]
-    D["Registered Public Key"] --> C
-    C --> E{"Key Verified?"}
+    A(["Your Machine"]) --> B(["SSH Private Key"])
+    B --> C(["SSH Authentication"])
+    D(["Registered Public Key"]) --> C
+    C --> E("Key Verified?")
     E -->|Yes| F(["Repository Access"])
     E -->|No| G(["Access Denied"])
 
-    classDef local fill:#f4e8d2,stroke:#a67c52,color:#493522,stroke-width:1.5px;
-    classDef process fill:#e8dfcf,stroke:#947653,color:#493522,stroke-width:1.5px;
-    classDef success fill:#dce8d6,stroke:#718d64,color:#30452d,stroke-width:1.5px;
-    classDef failure fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px;
+    classDef local fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef process fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef success fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef failure fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
 
     class A,B,D local;
     class C,E process;
     class F success;
     class G failure;
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Generate an SSH Key on Fedora
@@ -87,7 +89,15 @@ ssh-keygen -t ed25519 -C "your-email@example.com"
 
 استبدل البريد الإلكتروني ببريدك، واختار مسار الحفظ المقترح أو مسارًا آخر لو عندك سبب واضح.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** لو عندك مفتاح موجود بالفعل، افحصه قبل إنشاء مفتاح جديد حتى لا تستبدله بالخطأ.
+
+</InfoCard>
+
+</InfoCard>
 
 ```bash
 ls -la ~/.ssh
@@ -169,6 +179,7 @@ https://github.com/OWNER/REPOSITORY.git
 
 ### II. SSH vs HTTPS
 
+<TableCard>
 | Aspect | SSH | HTTPS |
 |---|---|---|
 | Authentication | SSH key pair | Token أو credential mechanism مدعوم |
@@ -176,13 +187,18 @@ https://github.com/OWNER/REPOSITORY.git
 | Initial setup | إعداد SSH keys | إعداد credentials أو token عند الحاجة |
 | Secret to protect | Private key | PAT أو credentials |
 | Typical use | أجهزة المطورين والـ automation | أجهزة المطورين والـ automation |
+</TableCard>
 
 اختيارك يعتمد على بيئة العمل وسياسة المؤسسة. الاتنين طرق صالحة، ومفيش سبب يخليك تغيّر طريقة شغالة لمجرد إن الطريقة الثانية مشهورة.
 
 ### III. Token Safety
 
 <CardGrid columns={3} label="Token Safety">
-<InfoCard variant="concept" title="Least Privilege" description="استخدم أقل صلاحيات تسمح بالمهمة المطلوبة (**Least Privilege**)." icon="shield" tags={["Permissions"]} />
+<InfoCard variant="concept" title="Least Privilege" icon="shield" tags={["Permissions"]}>
+
+استخدم أقل صلاحيات تسمح بالمهمة المطلوبة (**Least Privilege**).
+
+</InfoCard>
 
 <InfoCard variant="concept" title="Expiration" description="اختار مدة صلاحية مناسبة لو الخدمة بتدعمها." icon="flag" tags={["Lifetime"]} />
 
@@ -271,19 +287,21 @@ Git بيحتفظ بتاريخ من الـ commits. لو عملت commit يحتو
 
 ```mermaid
 flowchart TD
-    A(["Commit A"]) --> B["Commit B: Secret Added"]
-    B --> C["Commit C: Secret Removed"]
+    A(["Commit A"]) --> B(["Commit B: Secret Added"])
+    B --> C(["Commit C: Secret Removed"])
     C --> D(["Current Working Tree"])
 
-    B -. "Still in history" .-> E["Old Secret May Remain Accessible"]
+    B -. "Still in history" .-> E(["Old Secret May Remain Accessible"])
 
-    classDef normal fill:#f4e8d2,stroke:#a67c52,color:#493522,stroke-width:1.5px;
-    classDef danger fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px;
-    classDef current fill:#dce8d6,stroke:#718d64,color:#30452d,stroke-width:1.5px;
+    classDef normal fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef danger fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
+    classDef current fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,B,C normal;
     class D current;
     class E danger;
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. The Correct Response
@@ -331,7 +349,15 @@ git log --oneline -10
 
 الأمر الأول يفحص ظهور الملف في التاريخ المتاح محليًا، لكنه وحده مش دليل كافٍ على أن كل النسخ أو الـ references أو النسخ البعيدة خالية منه.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** قد تظل هناك نسخ قديمة لدى collaborators أو forks أو caches أو references أخرى. اتبع إرشادات خدمة الاستضافة الخاصة بإزالة البيانات الحساسة، ونسّق أي force push مع الفريق.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 5. Signed Commits — Concept and Usage
 
@@ -409,6 +435,7 @@ Git Hooks هي scripts ينفذها Git عند نقاط محددة من دورة
 
 ### II. Common Hooks
 
+<TableCard>
 | Hook | Timing | Typical Use |
 |---|---|---|
 | `pre-commit` | قبل إنشاء commit | فحص الملفات أو تشغيل checks |
@@ -417,6 +444,7 @@ Git Hooks هي scripts ينفذها Git عند نقاط محددة من دورة
 | `post-commit` | بعد اكتمال commit | إشعار أو تسجيل حدث |
 | `pre-push` | قبل إرسال commits إلى remote | تشغيل فحوصات قبل push |
 | `post-merge` | بعد اكتمال merge | تنفيذ مهام محلية مرتبطة بالتحديث |
+</TableCard>
 
 مش كل hooks هدفها رفض العملية؛ بعض الـ hooks تعمل بعد اكتمال العملية، وبالتالي لا يمكنها منعها بأثر رجعي.
 
@@ -469,11 +497,19 @@ chmod +x .git/hooks/pre-commit
 ### IV. Important Hook Limitations
 
 <CardGrid columns={2} label="Hook Limitations">
-<InfoCard variant="warning" title="Local Only" description="الـ hooks الموجودة في `.git/hooks` محلية، ولا تُنسخ تلقائيًا عند clone." icon="code" tags={["Clone"]} />
+<InfoCard variant="warning" title="Local Only" icon="code" tags={["Clone"]}>
+
+الـ hooks الموجودة في `.git/hooks` محلية، ولا تُنسخ تلقائيًا عند clone.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="No Automatic Team Setup" description="إضافة ملف hook إلى repository لا تجعل Git يشغّله تلقائيًا على أجهزة باقي المطورين." icon="branch" tags={["Team"]} />
 
-<InfoCard variant="tip" title="Share With Setup" description="يمكن مشاركة scripts داخل repository، لكن الفريق يحتاج إعدادًا واضحًا لتشغيلها، مثل `core.hooksPath` أو أداة لإدارة hooks." icon="wrench" tags={["Configure"]} />
+<InfoCard variant="tip" title="Share With Setup" icon="wrench" tags={["Configure"]}>
+
+يمكن مشاركة scripts داخل repository، لكن الفريق يحتاج إعدادًا واضحًا لتشغيلها، مثل `core.hooksPath` أو أداة لإدارة hooks.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="Not a Security Boundary" description="الـ hooks المحلية يمكن تجاوز بعضها في ظروف معينة؛ لذلك لا تعتمد عليها وحدها كحد أمني على مستوى الخادم." icon="shield" tags={["Security"]} />
 
@@ -498,18 +534,20 @@ git config --local core.hooksPath .githooks
 
 ```mermaid
 flowchart TD
-    A(["Main Repository"]) --> B[".gitmodules"]
-    A --> C["Submodule Path"]
-    C --> D["Pinned Commit"]
+    A(["Main Repository"]) --> B([".gitmodules"])
+    A --> C(["Submodule Path"])
+    C --> D(["Pinned Commit"])
     D --> E(["Separate Repository History"])
 
-    classDef main fill:#f4e8d2,stroke:#a67c52,color:#493522,stroke-width:1.5px;
-    classDef detail fill:#e8dfcf,stroke:#947653,color:#493522,stroke-width:1.5px;
-    classDef external fill:#dce8d6,stroke:#718d64,color:#30452d,stroke-width:1.5px;
+    classDef main fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef detail fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef external fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A main;
     class B,C,D detail;
     class E external;
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Add a Submodule
@@ -556,18 +594,20 @@ Git Worktree يسمح لك بإنشاء working directory إضافي مرتبط 
 
 ```mermaid
 flowchart TD
-    A(["Shared Git Repository"]) --> B["Main Working Tree"]
-    A --> C["Additional Worktree"]
-    B --> D["Feature Branch"]
-    C --> E["Hotfix Branch"]
+    A(["Shared Git Repository"]) --> B(["Main Working Tree"])
+    A --> C(["Additional Worktree"])
+    B --> D(["Feature Branch"])
+    C --> E(["Hotfix Branch"])
 
-    classDef repo fill:#e8dfcf,stroke:#947653,color:#493522,stroke-width:1.5px;
-    classDef tree fill:#f4e8d2,stroke:#a67c52,color:#493522,stroke-width:1.5px;
-    classDef branch fill:#dce8d6,stroke:#718d64,color:#30452d,stroke-width:1.5px;
+    classDef repo fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef tree fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A repo;
     class B,C tree;
     class D,E branch;
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Create a Worktree
@@ -770,29 +810,32 @@ ssh -T git@github.com
 
 ```mermaid
 flowchart TD
-    A(["Git Command Failed"]) --> B["Read the Full Error"]
-    B --> C["Inspect Working Tree"]
-    C --> D["Check Branch and Remote"]
-    D --> E{"Is Local Work Safe?"}
-    E -->|No| F["Back Up or Preserve Changes"]
-    E -->|Yes| G["Choose a Targeted Fix"]
+    A(["Git Command Failed"]) --> B(["Read the Full Error"])
+    B --> C(["Inspect Working Tree"])
+    C --> D(["Check Branch and Remote"])
+    D --> E("Is Local Work Safe?")
+    E -->|No| F(["Back Up or Preserve Changes"])
+    E -->|Yes| G(["Choose a Targeted Fix"])
     F --> G
-    G --> H["Verify Status and History"]
+    G --> H(["Verify Status and History"])
     H --> I(["Retry Carefully"])
 
-    classDef start fill:#f4e8d2,stroke:#a67c52,color:#493522,stroke-width:1.5px;
-    classDef inspect fill:#e8dfcf,stroke:#947653,color:#493522,stroke-width:1.5px;
-    classDef decision fill:#efe2c9,stroke:#ad8b5b,color:#493522,stroke-width:1.5px;
-    classDef safe fill:#dce8d6,stroke:#718d64,color:#30452d,stroke-width:1.5px;
+    classDef start fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef inspect fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef safe fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,I start;
     class B,C,D,G,H inspect;
     class E decision;
     class F safe;
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### XI. Recovery Command Reference
 
+<TableCard>
 | Situation | First Command | Purpose |
 |---|---|---|
 | Understand repository state | `git status` | معرفة وضع الملفات والعمليات الجارية |
@@ -802,6 +845,7 @@ flowchart TD
 | Inspect local branches | `git branch -vv` | معرفة الفروع وعلاقات upstream |
 | Check uncommitted whitespace errors | `git diff --check` | اكتشاف whitespace problems في التغييرات غير staged |
 | Check staged whitespace errors | `git diff --cached --check` | فحص التغييرات الموجودة في staging |
+</TableCard>
 
 ## 10. Security and Recovery Best Practices
 

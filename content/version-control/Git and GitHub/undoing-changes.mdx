@@ -41,6 +41,7 @@ Git بيوفر أكتر من طريقة للتراجع، لكن **مش كل ال
 الأوامر المختلفة بتتعامل مع المناطق دي بطرق مختلفة.
 
 <TableCard title="Which Command for Which Situation" caption="اختار الأمر حسب مكان التغيير والهدف من التراجع.">
+<TableCard>
 | Situation | Typical command | What it changes |
 |---|---|---|
 | Discard unstaged file changes | `git restore <file>` | Working tree |
@@ -50,30 +51,33 @@ Git بيوفر أكتر من طريقة للتراجع، لكن **مش كل ال
 | Replace the latest commit | `git commit --amend` | Latest commit and branch history |
 | Find previous HEAD positions | `git reflog` | No changes by itself |
 </TableCard>
+</TableCard>
 
 ```mermaid
 flowchart TD
-    A(["Identify the change"]) --> B{"Where is it?"}
-    B --> C["Working Tree"]
-    B --> D["Staging Area"]
-    B --> E["Committed History"]
-    C --> F["git restore"]
-    D --> G["git restore --staged"]
-    E --> H{"What is the goal?"}
-    H --> I["Move branch and possibly discard changes"]
-    H --> J["Undo a commit with a new commit"]
-    H --> K["Edit the latest commit"]
-    I --> L["git reset"]
-    J --> M["git revert"]
-    K --> N["git commit --amend"]
+    A(["Identify the change"]) --> B("Where is it?")
+    B --> C(["Working Tree"])
+    B --> D(["Staging Area"])
+    B --> E(["Committed History"])
+    C --> F(["git restore"])
+    D --> G(["git restore --staged"])
+    E --> H("What is the goal?")
+    H --> I(["Move branch and possibly discard changes"])
+    H --> J(["Undo a commit with a new commit"])
+    H --> K(["Edit the latest commit"])
+    I --> L(["git reset"])
+    J --> M(["git revert"])
+    K --> N(["git commit --amend"])
 
-    classDef decision fill:#f5e8d5,stroke:#b28a5b,color:#493522,stroke-width:1.5px,rx:8,ry:8
-    classDef state fill:#e7e9df,stroke:#7c8c70,color:#344331,stroke-width:1.5px,rx:8,ry:8
-    classDef command fill:#eee6f2,stroke:#a18bad,color:#493b50,stroke-width:1.5px,rx:8,ry:8
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef state fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef command fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
 
     class B,H decision
     class C,D,E state
     class F,G,L,M,N command
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ابدأ دائمًا بالأوامر دي قبل أي عملية تراجع:
@@ -90,7 +94,6 @@ git log --oneline --decorate -10
 - `git diff --cached`: يعرض التغييرات الموجودة في الـ staging area.
 - `git log`: يعرض آخر commits في التاريخ.
 
----
 
 ## 2. `git restore`
 
@@ -167,6 +170,7 @@ git commit -m "fix: restore previous app implementation"
 ### IV. Quick Reference
 
 <TableCard title="git restore Variants" caption="كل variant بيستهدف منطقة مختلفة — راجع التأثير قبل التنفيذ.">
+<TableCard>
 | Command | Effect |
 |---|---|
 | `git restore file.txt` | Discard unstaged changes to the file |
@@ -174,10 +178,10 @@ git commit -m "fix: restore previous app implementation"
 | `git restore --source=HEAD~1 -- file.txt` | Restore the file from an older commit into the working tree |
 | `git restore --staged --worktree file.txt` | Restore both the index and working tree from the default source |
 </TableCard>
+</TableCard>
 
 في الأمر الأخير، المصدر الافتراضي هو `HEAD`؛ بالتالي الأمر ممكن يتخلص من تغييرات staged وunstaged في الملف المحدد. استخدمه فقط لو ده فعلًا المطلوب.
 
----
 
 ## 3. `git reset` — Soft, Mixed, and Hard
 
@@ -262,36 +266,40 @@ git reset --hard HEAD~1
 </CardGrid>
 
 <TableCard title="git reset Modes Compared" caption="كل mode بيحدد إيه اللي بيتم ضبطه تلقائيًا بعد تحريك الـ branch.">
+<TableCard>
 | Mode | Moves branch | Resets index | Resets working tree | Typical use |
 |---|---|---|---|---|
 | `--soft` | Yes | No | No | Undo a commit but keep changes staged |
 | `--mixed` | Yes | Yes | No | Undo a commit and keep changes unstaged |
 | `--hard` | Yes | Yes | Yes | Discard local changes and reset tracked files |
 </TableCard>
+</TableCard>
 
 ### VI. Visualizing Reset
 
 ```mermaid
 flowchart TD
-    A(["git reset <mode> <commit>"]) --> B["Move current branch"]
-    B --> C{"Selected mode"}
-    C --> D["--soft"]
-    C --> E["--mixed"]
-    C --> F["--hard"]
-    D --> G["Keep index and working tree"]
-    E --> H["Reset index, keep working tree changes"]
-    F --> I["Reset index and tracked working tree files"]
+    A(["git reset <mode> <commit>"]) --> B(["Move current branch"])
+    B --> C("Selected mode")
+    C --> D(["--soft"])
+    C --> E(["--mixed"])
+    C --> F(["--hard"])
+    D --> G(["Keep index and working tree"])
+    E --> H(["Reset index, keep working tree changes"])
+    F --> I(["Reset index and tracked working tree files"])
 
-    classDef action fill:#f3e8d5,stroke:#a67c52,color:#493522,stroke-width:1.5px,rx:8,ry:8
-    classDef safe fill:#e4e9df,stroke:#71866a,color:#344331,stroke-width:1.5px,rx:8,ry:8
-    classDef warning fill:#f4e2dd,stroke:#b87568,color:#603a33,stroke-width:1.5px,rx:8,ry:8
-    classDef decision fill:#f5e4c7,stroke:#bd9259,color:#493522,stroke-width:1.5px,rx:8,ry:8
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#493722,stroke-width:1.5px
+    classDef safe fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef warning fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
 
     class A,B action
     class C decision
     class D,G safe
     class E,H action
     class F,I warning
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### VII. A Practical Example
@@ -302,13 +310,13 @@ flowchart TD
 flowchart LR
     A(["A"]) --> B(["B"]) --> C(["C"]) --> D(["D · HEAD → main"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
-    classDef current fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px,rx:8,ry:8
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef current fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C commit
     class D current
 
-    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px,rx:8,ry:8
+    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px
 ```
 
 وعايز تلغي آخر commit، اللي هو `D`.
@@ -353,9 +361,16 @@ git reset --mixed a1b2c3d
 git log --oneline --decorate -10
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** `git reset` بيغيّر التاريخ اللي بيشير إليه الـ current branch. لو الـ commits دي اتعمل لها push واتشارك بها مع الفريق، تغيير التاريخ ممكن يسبب مشاكل للآخرين. في الحالات دي، `git revert` غالبًا أنسب.
 
----
+</InfoCard>
+
+</InfoCard>
+
 
 ## 4. `git revert`
 
@@ -393,10 +408,10 @@ Git هيحاول ينشئ commit جديد يعكس التغييرات اللي �
 flowchart LR
     A(["A"]) --> B(["B"]) --> C(["C"]) --> D(["D"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
     class A,B,C,D commit
 
-    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px,rx:8,ry:8
+    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px
 ```
 
 لنفترض إن `D` أدخل تغييرًا غير مرغوب فيه.
@@ -409,13 +424,13 @@ flowchart LR
 
     E ~~~ R(["Revert of D"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
-    classDef note fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px,rx:8,ry:8
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef note fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B,C,D commit
     class E,R note
 
-    linkStyle 0,1,2,3 stroke:#A68A64,stroke-width:2px,rx:8,ry:8
+    linkStyle 0,1,2,3 stroke:#A68A64,stroke-width:2px
 ```
 
 الـ commit `D` لسه موجود في التاريخ، والـ commit الجديد `E` بيعكس تأثيره قدر الإمكان.
@@ -423,6 +438,7 @@ flowchart LR
 ### III. Reset vs Revert
 
 <TableCard title="git reset vs git revert" caption="الأول بيعيد كتابة التاريخ، والتاني بيضيف commit جديد يعكس التأثير.">
+<TableCard>
 | Aspect | `git reset` | `git revert` |
 |---|---|---|
 | Creates a new commit | No | Yes |
@@ -430,6 +446,7 @@ flowchart LR
 | Preserves original commit in branch history | May remove it from the current branch history | Yes |
 | Appropriate for shared history | Requires care; can rewrite branch history | Often safer |
 | Can cause conflicts | Depending on operation and later work | Yes |
+</TableCard>
 </TableCard>
 
 ### IV. Revert a Merge Commit
@@ -454,7 +471,6 @@ git show --no-patch --pretty=raw <merge-commit>
 
 <InfoCard variant="tip" title="Prefer Revert for Shared History" description="When a commit has already been shared with teammates, creating a compensating commit is usually safer than moving a shared branch backward with reset." icon="wrench" tags={["Collaboration", "History"]} />
 
----
 
 ## 5. `git commit --amend`
 
@@ -489,7 +505,6 @@ git commit --amend --no-edit
 
 لو الـ commit اتعمل له push وناس تانية اعتمدت عليه، متعدّلوش بشكل عشوائي؛ تعديل التاريخ ممكن يتطلب تحديث الـ remote history والتنسيق مع الفريق.
 
----
 
 ## 6. `git reflog`
 
@@ -533,7 +548,6 @@ git reflog show main
 
 عادةً، سجلات الـ reflog بتكون محلية، وليها سياسات انتهاء صلاحية. ولو الـ commit objects بقت غير قابلة للوصول وتم حذفها فعليًا من قاعدة بيانات Git بعد عمليات الصيانة، ممكن الاسترجاع يبقى مستحيلًا.
 
----
 
 ## 7. Recovering Lost Commits
 
@@ -549,10 +563,10 @@ git reflog show main
 flowchart LR
     A(["A"]) --> B(["B"]) --> C(["C"]) --> D(["D"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
     class A,B,C,D commit
 
-    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px,rx:8,ry:8
+    linkStyle 0,1,2 stroke:#A68A64,stroke-width:2px
 ```
 
 وبعد تنفيذ:
@@ -568,13 +582,13 @@ flowchart LR
     A(["A"]) --> B(["B"])
     B ~~~ HEAD(["HEAD -> main"])
 
-    classDef commit fill:#E9DFCE,stroke:#A68A64,color:#443629,stroke-width:2px,rx:8,ry:8
-    classDef branch fill:#E3E8DC,stroke:#89977B,color:#344333,stroke-width:2px,rx:8,ry:8
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:2px
+    classDef branch fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class A,B commit
     class HEAD branch
 
-    linkStyle 0 stroke:#A68A64,stroke-width:2px,rx:8,ry:8
+    linkStyle 0 stroke:#A68A64,stroke-width:2px
 ```
 
 الـ commits `C` و`D` بقوا خارج التاريخ الحالي للـ branch، لكن ده مش معناه إنهم اتحذفوا فورًا من Git's object database.
@@ -618,7 +632,6 @@ git branch recovery/profile-page <commit>
 </li>
 </Steps>
 
----
 
 ### II. Alternative: Restore a Commit Without Moving the Branch Backward
 
@@ -701,7 +714,6 @@ git show <commit>
 
 الاسترجاع بيكون أسهل بكتير قبل انتهاء صلاحية الـ reflog أو حذف objects غير القابلة للوصول. عشان كده، أول ما تكتشف فقدان commit، تجنّب تشغيل أوامر cleanup عشوائية، وابدأ بالفحص.
 
----
 
 ## 8. Safe vs Destructive Operations
 
@@ -716,6 +728,7 @@ git show <commit>
 ### I. Safer Operations
 
 <TableCard title="Safer Operations" caption="بتغيّر شكل العرض أو الملفات بشكل محدود وقابل للتراجع.">
+<TableCard>
 | Operation | Why it is generally safer |
 |---|---|
 | `git status` | فحص الحالة من غير تغيير الملفات |
@@ -725,12 +738,14 @@ git show <commit>
 | `git restore --staged <file>` | إزالة الـ file changes من الـ staging مع الاحتفاظ بها في الـ working tree |
 | `git revert <commit>` | إنشاء commit جديد يعكس تغييرًا سابقًا بدل إزالة الـ commit من التاريخ الحالي |
 </TableCard>
+</TableCard>
 
 حتى الأوامر دي محتاجة فهم للسياق؛ مثلًا، `git revert` ممكن ينتج عنه conflicts، و`git restore --staged` مش معناه إن التغيير اتلغى من الملف.
 
 ### II. Operations That Need Extra Care
 
 <TableCard title="Operations That Need Extra Care" caption="بتغيّر الـ branch reference أو الـ index — راجع النتيجة بعد التنفيذ.">
+<TableCard>
 | Operation | Main risk |
 |---|---|
 | `git restore <file>` | التخلص من تعديلات غير معمولة لها commit في الملف |
@@ -739,16 +754,19 @@ git show <commit>
 | `git commit --amend` | استبدال آخر commit وتغيير الـ commit hash |
 | `git cherry-pick` | إنشاء commit جديد وقد ينتج عنه conflicts |
 </TableCard>
+</TableCard>
 
 ### III. Destructive Operations
 
 <TableCard title="Destructive Operations" caption="بيمسحوا تعديلات أو references — اعمل backup قبل التنفيذ.">
+<TableCard>
 | Operation | Main risk |
 |---|---|
 | `git reset --hard` | فقدان تعديلات محلية متتبعة عند استبدالها بمحتوى الـ target commit |
 | `git clean -fd` | حذف ملفات ومجلدات غير متتبعة |
 | `git clean -fdx` | حذف الملفات غير المتتبعة، بما فيها الملفات المتجاهلة بواسطة `.gitignore` |
 | `git branch -D <branch>` | حذف branch reference حتى لو كان يحتوي على commits غير مدمجة |
+</TableCard>
 </TableCard>
 
 قبل تنفيذ `git clean`، اعرض الملفات اللي هتتحذف باستخدام dry run:

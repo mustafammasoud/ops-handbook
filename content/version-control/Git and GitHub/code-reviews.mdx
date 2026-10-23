@@ -42,7 +42,11 @@ language: ar
 
 لو الـ Pull Request هدفها إصلاح Bug في Docker image، مثلًا، لازم تفهم المشكلة الأصلية، والتغيير المقترح، وإزاي نقدر نتأكد إن المشكلة اتحلت من غير ما نكسر سلوكًا موجودًا.
 
-### Step 1: Understand the Context
+<Steps>
+<li>
+
+<InfoCard title="Understand the Context" icon="flag" />
+
 
 قبل مراجعة الكود، اقرأ:
 
@@ -54,7 +58,11 @@ language: ar
 
 متبدأش باقتراح إعادة كتابة الكود قبل ما تفهم المشكلة اللي بيحاول يحلّها.
 
-### Step 2: Review the Diff
+</li>
+<li>
+
+<InfoCard title="Review the Diff" icon="code" />
+
 
 افتح تبويب `Files changed` في GitHub، وراجع الـ Diff.
 
@@ -67,7 +75,11 @@ language: ar
 - هل التغيير بيأثر على Security أو Performance؟
 - هل الاختبارات مناسبة للتغيير؟
 
-### Step 3: Check Correctness and Reliability
+</li>
+<li>
+
+<InfoCard title="Check Correctness and Reliability" icon="shield" />
+
 
 مش كل كود شكله صحيح بيكون صحيحًا في كل الحالات.
 
@@ -84,7 +96,11 @@ language: ar
 
 مش كل نقطة من دول مطلوبة في كل PR؛ اختار اللي يناسب نوع التغيير.
 
-### Step 4: Evaluate Tests
+</li>
+<li>
+
+<InfoCard title="Evaluate Tests" icon="pulse" />
+
 
 اسأل نفسك:
 
@@ -95,6 +111,9 @@ language: ar
 
 نجاح الاختبارات مؤشر مهم، لكنه مش ضمان مطلق إن التغيير خالٍ من الأخطاء.
 
+</li>
+</Steps>
+
 ### I. Effective Review Workflow
 
 ```mermaid
@@ -103,20 +122,20 @@ flowchart TD
     B --> C(["Inspect the Diff"])
     C --> D(["Check Correctness and Edge Cases"])
     D --> E(["Review Tests and Security"])
-    E --> F{"Issues Found?"}
+    E --> F("Issues Found?")
     F -->|Yes| G(["Write Constructive Feedback"])
     F -->|No| H(["Submit Review"])
     G --> I(["Discuss and Recheck"])
     I --> H
 
-    classDef context fill:#eee4d4,stroke:#a78b67,color:#403326,stroke-width:1.5px
-    classDef inspect fill:#e5eadf,stroke:#89977b,color:#344333,stroke-width:1.5px
-    classDef decision fill:#f0dfd5,stroke:#bd8c73,color:#57392d,stroke-width:1.5px
+    classDef context fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef inspect fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef decision fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
 
     class A,B context
     class C,D,E,G,H,I inspect
     class F decision
-    linkStyle default stroke:#a78b67,stroke-width:1.5px
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 <InfoCard variant="tip" title="Review the Change, Not the Person" description="خلي تركيزك على صحة الحل، وتأثيره، ومدى توافقه مع متطلبات المشروع. الهدف تحسين التغيير، مش تقييم الشخص اللي كتبه." icon="flag" />
@@ -185,12 +204,14 @@ step easier to test and maintain.
 
 ممكن تستخدم كلمات واضحة في وصف الملاحظة:
 
+<TableCard>
 | Label | Intended Meaning |
 |---|---|
 | `Blocking` | مشكلة لازم تتحل قبل الدمج |
 | `Suggestion` | تحسين مقترح يمكن مناقشته |
 | `Question` | نقطة محتاجة توضيح |
 | `Nitpick` | ملاحظة صغيرة غير جوهرية غالبًا |
+</TableCard>
 
 دي أمثلة على تصنيف التعليقات، مش Labels إلزامية بيفرضها GitHub. اتبع أسلوب الفريق لو عنده نظام محدد.
 
@@ -232,30 +253,32 @@ step easier to test and maintain.
 
 ### IV. Comparison
 
+<TableCard>
 | Action | Meaning | Typical Situation |
 |---|---|---|
 | Comment | ملاحظات أو نقاش من غير موافقة أو طلب تغييرات رسمي | محتاج توضيح أو عايز تسيب Feedback |
 | Approve | موافقة على التغيير من ناحية المراجعة | التغيير مقبول ومفيش مشكلة معروفة تمنع الدمج |
 | Request changes | طلب معالجة مشكلات قبل الدمج | فيه مشكلة مؤثرة لازم تتحل |
+</TableCard>
 
 ### V. Decision Flow
 
 ```mermaid
 flowchart TD
-    A(["Finish Reviewing PR"]) --> B{"Blocking Issue Found?"}
+    A(["Finish Reviewing PR"]) --> B("Blocking Issue Found?")
     B -->|Yes| C(["Request Changes"])
-    B -->|No| D{"Need Clarification?"}
+    B -->|No| D("Need Clarification?")
     D -->|Yes| E(["Comment"])
     D -->|No| F(["Approve"])
 
-    classDef start fill:#eee4d4,stroke:#a78b67,color:#403326,stroke-width:1.5px
-    classDef decision fill:#f0dfd5,stroke:#bd8c73,color:#57392d,stroke-width:1.5px
-    classDef result fill:#e5eadf,stroke:#89977b,color:#344333,stroke-width:1.5px
+    classDef start fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef decision fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
+    classDef result fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A start
     class B,D decision
     class C,E,F result
-    linkStyle default stroke:#a78b67,stroke-width:1.5px
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### V. Important: Approval Does Not Always Mean Merge Is Allowed
@@ -331,13 +354,21 @@ for the missing-directory case.
 
 مش معنى إن Reviewer طلب تغييرًا إنك لازم تنفذه حرفيًا من غير تفكير، لكن لازم تفهم السبب وتناقش أي اختلاف بشكل واضح.
 
-### Step 1: Read All Feedback
+<Steps>
+<li>
+
+<InfoCard title="Read All Feedback" icon="terminal" />
+
 
 اقرأ التعليقات كلها قبل ما تبدأ التعديلات.
 
 ده بيساعدك تكتشف لو فيه ملاحظات مرتبطة ببعض، أو لو فيه اقتراحات متعارضة محتاجة توضيح.
 
-### Step 2: Classify the Feedback
+</li>
+<li>
+
+<InfoCard title="Classify the Feedback" icon="sliders" />
+
 
 قسّم الملاحظات ذهنيًا إلى:
 
@@ -348,7 +379,11 @@ for the missing-directory case.
 
 التصنيف ده بيساعدك ترتب العمل وتحدد الأولويات.
 
-### Step 3: Make the Changes
+</li>
+<li>
+
+<InfoCard title="Make the Changes" icon="wrench" />
+
 
 عدّل الكود، وبعدها راجع التغييرات:
 
@@ -360,7 +395,11 @@ git diff --check
 
 شغّل الاختبارات المناسبة حسب التعديل.
 
-### Step 4: Push Updates
+</li>
+<li>
+
+<InfoCard title="Push Updates" icon="cloud" />
+
 
 لو بتشتغل على نفس الـ Branch المرتبطة بالـ PR:
 
@@ -374,7 +413,11 @@ git push origin feature/my-change
 
 الـ PR هتتحدّث بالـ Commits الجديدة.
 
-### Step 5: Respond to Comments
+</li>
+<li>
+
+<InfoCard title="Respond to Comments" icon="network" />
+
 
 رد باختصار ووضوح.
 
@@ -395,18 +438,25 @@ validation into a shared helper address the issue?
 
 الأمثلة دي توضح أسلوب الرد؛ عدّلها حسب التغيير الفعلي.
 
-### Step 6: Request Another Review if Needed
+</li>
+<li>
+
+<InfoCard title="Request Another Review if Needed" icon="git-pull-request" />
+
 
 بعد التعديلات، اطلب إعادة المراجعة لو المشروع محتاج كده، أو لو التغيير أثّر على أجزاء مهمة من الكود.
 
 ممكن كمان تراجع بنفسك التعليقات السابقة وتتأكد إنها اتعالجت.
+
+</li>
+</Steps>
 
 ### I. Feedback Workflow
 
 ```mermaid
 flowchart TD
     A(["Receive Review Feedback"]) --> B(["Understand Each Comment"])
-    B --> C{"Change Required?"}
+    B --> C("Change Required?")
     C -->|Yes| D(["Update Code or Tests"])
     C -->|No| E(["Explain or Discuss"])
     D --> F(["Run Relevant Checks"])
@@ -415,14 +465,14 @@ flowchart TD
     E --> H
     H --> I(["Re-review and Resolve Conversations"])
 
-    classDef feedback fill:#eee4d4,stroke:#a78b67,color:#403326,stroke-width:1.5px
-    classDef action fill:#e5eadf,stroke:#89977b,color:#344333,stroke-width:1.5px
-    classDef decision fill:#f0dfd5,stroke:#bd8c73,color:#57392d,stroke-width:1.5px
+    classDef feedback fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef decision fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
 
     class A,B feedback
     class D,E,F,G,H,I action
     class C decision
-    linkStyle default stroke:#a78b67,stroke-width:1.5px
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 <InfoCard variant="success" title="Respond, Don't React" description="اتعامل مع الملاحظات باعتبارها فرصة لتحسين التغيير. لو مش متفق مع اقتراح، اشرح السبب التقني واسأل عن بديل مناسب بدل ما تتجاهل التعليق." icon="network" />
@@ -477,12 +527,14 @@ flowchart TD
 
 ### III. Better Review Communication
 
+<TableCard>
 | Avoid | Prefer |
 |---|---|
 | "This is wrong." | "This may fail when the configuration is missing because..." |
 | "Rewrite this." | "Could we separate validation from execution to make it easier to test?" |
 | "You don't understand the code." | "I think there may be a missing assumption here. Can we clarify..." |
 | "Fine, whatever." | "I see the concern. I'll update the implementation and add a test." |
+</TableCard>
 
 ### IV. Keep Reviews Proportional
 
@@ -564,14 +616,14 @@ flowchart TD
     C --> D(["Request Reviews When Configured"])
     D --> E(["Owners Review Their Areas"])
 
-    classDef source fill:#eee4d4,stroke:#a78b67,color:#403326,stroke-width:1.5px
-    classDef process fill:#e5eadf,stroke:#89977b,color:#344333,stroke-width:1.5px
-    classDef review fill:#f0dfd5,stroke:#bd8c73,color:#57392d,stroke-width:1.5px
+    classDef source fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef process fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef review fill:#f0dcd4,stroke:#b47762,color:#663b2d,stroke-width:1.5px
 
     class A source
     class B,C,D process
     class E review
-    linkStyle default stroke:#a78b67,stroke-width:1.5px
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### V. Important CODEOWNERS Details
@@ -625,6 +677,7 @@ docs: explain local deployment steps
 
 التغيير في الكود غالبًا يحتاج اختبارًا مناسبًا، لكن نوع الاختبار بيختلف حسب المشكلة.
 
+<TableCard>
 | Change | Possible Validation |
 |---|---|
 | Bug fix | اختبار يثبت إن المشكلة اتحلت |
@@ -632,6 +685,7 @@ docs: explain local deployment steps
 | API change | Unit أو Integration Tests حسب السياق |
 | Infrastructure change | Validation أو Plan أو فحص مناسب للأداة المستخدمة |
 | Documentation change | مراجعة الأوامر والروابط والأمثلة |
+</TableCard>
 
 في تغييرات Infrastructure، مثلًا، نجاح `terraform validate` مش معناه إن تنفيذ التغييرات على بيئة حقيقية آمن تلقائيًا؛ لازم تراجع الـ Plan والـ Impact قبل التطبيق.
 
@@ -664,7 +718,11 @@ docs: explain local deployment steps
 
 في التطبيق ده، استخدم Repository تجريبية أو مشروعًا تملكه، واعمل PR فيها تغيير صغير، وبعدها راجعها من منظور الـ Author والـ Reviewer.
 
-### Step 1: Prepare a Small Change
+<Steps>
+<li>
+
+<InfoCard title="Prepare a Small Change" icon="branch" />
+
 
 أنشئ Branch جديدة:
 
@@ -680,7 +738,11 @@ git diff
 git diff --check
 ```
 
-### Step 2: Commit and Push
+</li>
+<li>
+
+<InfoCard title="Commit and Push" icon="git-merge" />
+
 
 ```bash
 git add path/to/changed-file
@@ -688,7 +750,11 @@ git commit -m "docs: improve setup instructions"
 git push -u origin docs/review-practice
 ```
 
-### Step 3: Open a Pull Request
+</li>
+<li>
+
+<InfoCard title="Open a Pull Request" icon="git-pull-request" />
+
 
 على GitHub:
 
@@ -697,7 +763,11 @@ git push -u origin docs/review-practice
 - لخّص المشكلة والحل.
 - اذكر الاختبارات أو الفحوصات اللي نفذتها فعلًا.
 
-### Step 4: Review the Diff
+</li>
+<li>
+
+<InfoCard title="Review the Diff" icon="code" />
+
 
 افتح `Files changed` واسأل نفسك:
 
@@ -708,7 +778,11 @@ git push -u origin docs/review-practice
 
 لو عندك حساب أو Collaborator تاني عنده الصلاحيات المناسبة، اطلب منه مراجعة التغيير. ولو بتتدرّب لوحدك، راجع الـ PR بنفسك وسجّل الملاحظات اللي كنت هتكتبها كـ Reviewer.
 
-### Step 5: Practice Review Feedback
+</li>
+<li>
+
+<InfoCard title="Practice Review Feedback" icon="network" />
+
 
 لو اكتشفت مشكلة، عدّلها على نفس الـ Branch:
 
@@ -720,20 +794,20 @@ git push origin docs/review-practice
 
 بعدها راجع الـ Diff من جديد وتأكد إن المشكلة اتعالجت.
 
-### Step 6: Complete the PR
+</li>
+<li>
+
+<InfoCard title="Complete the PR" icon="git-merge" />
+
 
 بعد ما تتأكد من صحة التغيير، ادمج الـ PR أو اقفلها حسب هدف التمرين وإعدادات الـ Repository.
 
+</li>
+</Steps>
+
 ### I. Lab Checklist
 
-- [ ] أنشأت Branch منفصلة.
-- [ ] عملت PR بوصف واضح.
-- [ ] راجعت `Files changed`.
-- [ ] حدّدت ملاحظة واحدة على الأقل تتعلق بالصحة أو سهولة الصيانة.
-- [ ] جرّبت التعامل مع Review Feedback.
-- [ ] راجعت التغييرات بعد التعديل.
-- [ ] فهمت الفرق بين Approve وRequest changes.
-- [ ] فهمت دور `CODEOWNERS` وحدوده.
+<ChecklistCard title="Lab Checklist" items={['أنشأت Branch منفصلة.', 'عملت PR بوصف واضح.', 'راجعت Files changed.', 'حدّدت ملاحظة واحدة على الأقل تتعلق بالصحة أو سهولة الصيانة.', 'جرّبت التعامل مع Review Feedback.', 'راجعت التغييرات بعد التعديل.', 'فهمت الفرق بين Approve وRequest changes.', 'فهمت دور CODEOWNERS وحدوده.']} />
 
 ## Summary
 

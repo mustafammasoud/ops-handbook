@@ -35,7 +35,6 @@ language: ar
 
 <InfoCard variant="concept" title="Two Important Responsibilities" description="الـ Commit History لازم يحكي قصة واضحة عن تطور المشروع، والـ Ignore Rules لازم تساعدك تمنع الملفات غير المطلوبة من الدخول في الـ Repository من الأساس." icon="wrench" tags={["History", "Repository Hygiene"]} />
 
----
 
 ## 1. Anatomy of a Commit
 
@@ -60,12 +59,12 @@ language: ar
 
 ```mermaid
 flowchart TD
-    C["Commit Object"]
-    T["Root Tree<br/>Project Snapshot"]
-    P["Parent Commit<br/>Previous History"]
-    A["Author Metadata"]
-    M["Committer Metadata"]
-    D["Commit Message"]
+    C(["Commit Object"])
+    T(["Root Tree<br/>Project Snapshot"])
+    P(["Parent Commit<br/>Previous History"])
+    A(["Author Metadata"])
+    M(["Committer Metadata"])
+    D(["Commit Message"])
 
     C --> T
     C --> P
@@ -73,13 +72,15 @@ flowchart TD
     C --> M
     C --> D
 
-    classDef commit fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px
-    classDef tree fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px
+    classDef commit fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef tree fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
     classDef metadata fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
 
     class C commit
     class T,P tree
     class A,M,D metadata
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الرسم بيوضح أهم المراجع والمعلومات الموجودة في الـ Commit. أما محتوى الملفات نفسه، فبيتم الوصول إليه عن طريق الـ Tree والـ Objects المرتبطة بيها.
@@ -103,7 +104,15 @@ committer Example User <user@example.com> 1729000000 +0300
 docs: explain commit structure
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **ملاحظة:** الـ Hashes والتواريخ في المثال توضيحية، ومش بتمثل Commit حقيقي من مشروعك.
+
+</InfoCard>
+
+</InfoCard>
 
 علشان تعرض ملخص الـ Commit بدل تفاصيل الـ Object:
 
@@ -119,7 +128,6 @@ git show --no-patch --format=fuller HEAD
 
 الأمر الأخير مفيد لمراجعة الـ Author والـ Committer والتوقيتات ورسالة الـ Commit.
 
----
 
 ## 2. Good Commit Messages
 
@@ -175,6 +183,7 @@ the application to prevent startup failures.
 ### III. Choosing the Right Level of Detail
 
 <TableCard title="Weak vs Better Commit Messages" caption="الرسالة الواضحة بتشرح الهدف مش بس إن فيه تغيير.">
+<TableCard>
 | Weak Message | Better Message |
 |---|---|
 | `fix` | `Fix null reference in user lookup` |
@@ -183,12 +192,12 @@ the application to prevent startup failures.
 | `bug fixed` | `Handle missing environment variables` |
 | `stuff` | `Add tests for invalid input` |
 </TableCard>
+</TableCard>
 
 مش مطلوب إن كل رسالة تبقى طويلة. لو الـ Subject بيوضح التغيير بشكل كافي، مش محتاج تضيف Body.
 
 <InfoCard variant="tip" title="Write for Your Future Self" description="اكتب الرسالة بحيث تقدر تفهم منها سبب التغيير بعد شهور، حتى لو نسيت تفاصيل المشكلة اللي كنت بتحلها وقتها." icon="wrench" tags={["Commit Quality", "Maintainability"]} />
 
----
 
 ## 3. Conventional Commits
 
@@ -207,6 +216,7 @@ the application to prevent startup failures.
 ### I. Common Commit Types
 
 <TableCard title="Conventional Commit Types" caption="أنواع شائعة بتستخدم في صيغة Conventional Commits.">
+<TableCard>
 | Type | Purpose | Example |
 |---|---|---|
 | `feat` | إضافة Feature جديدة | `feat: add user registration` |
@@ -219,6 +229,7 @@ the application to prevent startup failures.
 | `ci` | تغييرات إعدادات CI | `ci: adjust workflow permissions` |
 | `perf` | تحسين الأداء | `perf: reduce repeated database queries` |
 | `chore` | أعمال صيانة أخرى | `chore: remove obsolete files` |
+</TableCard>
 </TableCard>
 
 الـ Types دي شائعة، لكن مش كلها إلزامية في كل مشروع. اتبع الـ Convention المعتمد في الـ Repository لو موجود.
@@ -279,7 +290,6 @@ git commit -m "feat: add health check endpoint"
 
 <InfoCard variant="insight" title="Convention, Not a Git Command" description="Conventional Commits مش أمر مدمج داخل Git؛ هو أسلوب متفق عليه لكتابة الرسائل. Git نفسه بيسمح برسائل مختلفة، لكن الالتزام بالـ Convention بيخلي تاريخ المشروع أسهل في القراءة والأتمتة." icon="wrench" tags={["Conventions", "Team Workflow"]} />
 
----
 
 ## 4. Author vs Committer
 
@@ -303,11 +313,11 @@ git commit -m "feat: add health check endpoint"
 
 ```mermaid
 flowchart TD
-    A["Developer A<br/>Creates the change"]
-    B["Developer B<br/>Applies the change"]
-    C["New Commit Object"]
-    D["Author: Developer A"]
-    E["Committer: Developer B"]
+    A(["Developer A<br/>Creates the change"])
+    B(["Developer B<br/>Applies the change"])
+    C(["New Commit Object"])
+    D(["Author: Developer A"])
+    E(["Committer: Developer B"])
 
     A --> B
     B --> C
@@ -315,12 +325,14 @@ flowchart TD
     C --> E
 
     classDef developer fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
-    classDef commit fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px
-    classDef metadata fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px
+    classDef commit fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef metadata fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,B developer
     class C commit
     class D,E metadata
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ده سيناريو توضيحي، مش معناه إن كل عملية Merge أو Cherry-pick لازم ينتج عنها اختلاف بين الـ Author والـ Committer.
@@ -347,7 +359,6 @@ CommitDate: ...
 
 `user.name` و`user.email` في Git Configuration بيحددوا الهوية الافتراضية المستخدمة في إنشاء الـ Commits، لكن بيانات الـ Author والـ Committer ممكن تختلف في بعض العمليات أو عند استخدام خيارات مخصصة.
 
----
 
 ## 5. Viewing and Filtering History
 
@@ -460,6 +471,7 @@ git log -G"validate_.*input" --oneline
 ### IX. History Commands Summary
 
 <TableCard title="git log Command Reference" caption="مرجع سريع لأهم أوامر عرض وتصفية التاريخ.">
+<TableCard>
 | Goal | Command |
 |---|---|
 | عرض التاريخ الكامل | `git log` |
@@ -472,8 +484,8 @@ git log -G"validate_.*input" --oneline
 | البحث عن إضافة أو حذف نص | `git log -S"text"` |
 | عرض تفاصيل Commit | `git show <commit>` |
 </TableCard>
+</TableCard>
 
----
 
 ## 6. `.gitignore` and Ignore Patterns
 
@@ -523,11 +535,20 @@ build/
 
 ده مثال توضيحي، ومش لازم تنسخ كل الأنماط دي لأي مشروع. اختار القواعد المناسبة للـ Tech Stack وطريقة شغل الفريق.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** بعض الملفات زي `.vscode/` ممكن تكون مفيدة لو الفريق بيشارك إعدادات المحرر؛ ماتتجاهلهاش تلقائيًا من غير ما تفكر في احتياج المشروع.
+
+</InfoCard>
+
+</InfoCard>
 
 ### II. Common Ignore Patterns
 
 <TableCard title="Common .gitignore Patterns" caption="أنماط شائعة لتجاهل ملفات أو مجلدات محددة.">
+<TableCard>
 | Pattern | Meaning |
 |---|---|
 | `*.log` | تجاهل الملفات اللي أسماؤها بتنتهي بـ `.log` |
@@ -536,6 +557,7 @@ build/
 | `config.local` | تجاهل المسارات المطابقة للاسم ده حسب مكان قاعدة التجاهل |
 | `!important.log` | استثناء ملف من قاعدة تجاهل سابقة، إذا سمحت القواعد بذلك |
 | `**/cache/` | تجاهل المجلدات المطابقة لـ `cache` عبر مستويات المجلدات |
+</TableCard>
 </TableCard>
 
 ### III. Understanding Pattern Scope
@@ -612,9 +634,12 @@ git status
 
 بعد ما تعمل Commit للتغيير، Git مش هيستمر في تتبع الملف إلا لو أضفته تاني بطريقة مناسبة.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **تنبيه أمني:** لو الملف كان يحتوي على Password أو API Key أو Secret واتعمله Commit، إضافة الملف إلى `.gitignore` مش بتمسح البيانات من الـ History السابق. لو Secret اتكشف، لازم تتعامل معاه باعتباره مكشوفًا وتعمل Rotation أو Revocation حسب الحالة.
 
----
+</InfoCard>
+
 
 ## 7. `.gitkeep` and Empty Directories
 
@@ -671,11 +696,13 @@ git commit -m "chore: preserve logs directory"
 ### III. `.gitkeep` vs `.gitignore`
 
 <TableCard title=".gitkeep vs .gitignore" caption="اتنين أسماء شائعة لكن وظائفهم مختلفة تمامًا.">
+<TableCard>
 | `.gitkeep` | `.gitignore` |
 |---|---|
 | ملف عادي يُستخدم اصطلاحيًا للحفاظ على مجلد فارغ داخل الـ Repository | ملف بيحدد أنماط المسارات اللي Git يتجاهلها |
 | مش Feature خاصة في Git | اسم معترف به من Git لقواعد التجاهل |
 | ممكن يكون فارغًا | لازم يحتوي على Patterns لو عايز قواعد تجاهل فعلية |
+</TableCard>
 </TableCard>
 
 ### IV. Keeping an Empty Directory While Ignoring Its Contents
@@ -702,9 +729,16 @@ my-project/
 
 لو محتاج تتجاهل ملفات ومجلدات فرعية داخل `logs/` كمان، لازم تختبر الأنماط وتضبطها حسب البنية المطلوبة.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** وجود `.gitkeep` مش معناه إن Git هيحافظ تلقائيًا على المجلد بعد حذفه من الـ Working Directory؛ الملف نفسه لازم يفضل موجودًا ضمن الملفات المتتبعة.
 
----
+</InfoCard>
+
+</InfoCard>
+
 
 ## 8. Practical Workflow: Commit and Ignore Files
 
@@ -846,7 +880,6 @@ git status
 
 بالشكل ده، إنت استخدمت Commit Message واضحة، وراجعت التغييرات قبل تسجيلها، وحددت قواعد تمنع الملفات غير المطلوبة من الدخول في الـ Repository.
 
----
 
 ## 9. Common Mistakes
 
@@ -860,7 +893,6 @@ git status
   <InfoCard variant="warning" title="Assuming .gitkeep Is Built In" description=".gitkeep مجرد اسم متعارف عليه لملف عادي، مش أمر أو خاصية خاصة في Git." icon="cube" />
 </CardGrid>
 
----
 
 ## Key Takeaways
 
@@ -875,4 +907,3 @@ git status
 - إضافة ملف متتبع بالفعل إلى `.gitignore` مش بتوقف تتبعه تلقائيًا.
 - `.gitkeep` اسم اصطلاحي شائع لملف عادي بيُستخدم للحفاظ على المجلدات الفارغة داخل الـ Repository.
 
----

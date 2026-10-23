@@ -32,7 +32,6 @@ language: ar
 
 <InfoCard variant="concept" title="The Core Workflow" description="راجع التغييرات، جهّز اللي تقصده، راجع الـ Staging Area، وبعدها اعمل Commit. الهدف مش إنك تنفذ الأوامر بسرعة، لكن إنك تكون عارف بالضبط إيه اللي هيتسجل في تاريخ المشروع." icon="wrench" tags={["Inspect", "Stage", "Commit"]} />
 
----
 
 ## 1. The Daily Git Workflow
 
@@ -47,30 +46,31 @@ language: ar
 
 ```mermaid
 flowchart TD
-    A["Modify Files<br/>تعديل الملفات"] --> B["git status<br/>Check File States"]
-    B --> C["git diff<br/>Review Changes"]
-    C --> D["git add<br/>Stage Selected Changes"]
-    D --> E["git diff --cached<br/>Review Staged Changes"]
-    E --> F{"Ready to Commit?"}
-    F -->|"No"| G["Edit or Unstage Changes"]
+    A(["Modify Files<br/>تعديل الملفات"]) --> B(["git status<br/>Check File States"])
+    B --> C(["git diff<br/>Review Changes"])
+    C --> D(["git add<br/>Stage Selected Changes"])
+    D --> E(["git diff --cached<br/>Review Staged Changes"])
+    E --> F("Ready to Commit?")
+    F -->|"No"| G(["Edit or Unstage Changes"])
     G --> B
-    F -->|"Yes"| H["git commit<br/>Record a Snapshot"]
-    H --> I["git log / git show<br/>Inspect History"]
+    F -->|"Yes"| H(["git commit<br/>Record a Snapshot"])
+    H --> I(["git log / git show<br/>Inspect History"])
 
     classDef work fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
-    classDef inspect fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px
-    classDef stage fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px
-    classDef decision fill:#E7E9E7,stroke:#A1AAA2,color:#39443D,stroke-width:1.5px
+    classDef inspect fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef stage fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef decision fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,G work
     class B,C,E,I inspect
     class D,H stage
     class F decision
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 مش لازم كل مرة تنفذ نفس الأوامر بنفس الترتيب حرفيًا، لكن دي طريقة منظمة وآمنة، خصوصًا لما تكون لسه بتتعلم أو بتشتغل على مشروع مهم.
 
----
 
 ## 2. `git status` — Understand the Current State
 
@@ -126,7 +126,6 @@ git status --short
 
 <InfoCard variant="tip" title="Start With git status" description="استخدم git status قبل ما تعمل add أو commit. الأمر بيديك صورة واضحة عن حالة الملفات وبيقلل احتمالية تسجيل تغييرات مش مقصودة." icon="terminal" tags={["Inspection", "Workflow"]} />
 
----
 
 ## 3. `git add` — Stage Your Changes
 
@@ -183,7 +182,6 @@ git diff --cached
 
 <InfoCard variant="warning" title="git add Does Not Create a Commit" description="git add بيحدّث الـ Staging Area فقط. التغييرات مش بتدخل في تاريخ المشروع إلا لما تنفذ git commit بنجاح." icon="layers" />
 
----
 
 ## 4. `git diff` — Review Changes
 
@@ -248,6 +246,7 @@ git diff -- src/app.py
 ### VI. Which Diff Should You Use?
 
 <TableCard title="Which git diff to Use" caption="كل diff بيقارن بين حالتين مختلفتين من الملفات.">
+<TableCard>
 | Command | What It Compares |
 |---|---|
 | `git diff` | Working Directory vs Staging Area |
@@ -255,10 +254,10 @@ git diff -- src/app.py
 | `git diff HEAD` | Working Directory and Index changes vs `HEAD` |
 | `git diff COMMIT_A COMMIT_B` | Two Commit snapshots |
 </TableCard>
+</TableCard>
 
 <InfoCard variant="insight" title="Review Both Sides" description="git diff بيراجع التغييرات غير المجهزة، وgit diff --cached بيراجع التغييرات المجهزة. لو هتعمل Commit، مراجعة الـ Staged Changes تحديدًا خطوة مهمة." icon="pulse" tags={["Diff", "Code Review"]} />
 
----
 
 ## 5. `git commit` — Record a Snapshot
 
@@ -325,7 +324,6 @@ git commit -am "Update application logic"
 
 في البداية، الأفضل تستخدم `git add` بشكل صريح علشان تبقى عارف إيه اللي هيدخل في الـ Commit.
 
----
 
 ## 6. `git log` — Explore Commit History
 
@@ -399,7 +397,6 @@ git log --stat
 
 دي أدوات مفيدة لما المشروع يكبر ويبقى صعب تراجع التاريخ كله يدويًا.
 
----
 
 ## 7. `git show` — Inspect a Specific Commit
 
@@ -443,7 +440,6 @@ git show a81f3d2:README.md
 - `git show` بيفحص Commit أو Object محدد.
 - `git diff` بيقارن بين حالات مختلفة.
 
----
 
 ## 8. Putting Everything Together
 
@@ -521,7 +517,6 @@ git show --stat HEAD
 </li>
 </Steps>
 
----
 
 ## 9. Common Mistakes
 
@@ -535,7 +530,6 @@ git show --stat HEAD
   <InfoCard variant="warning" title="Using Vague Messages" description="رسالة Commit واضحة بتخلي فهم تاريخ المشروع ومراجعة التغييرات أسهل على المدى الطويل." icon="layers" />
 </CardGrid>
 
----
 
 ## Key Takeaways
 
@@ -549,4 +543,3 @@ git show --stat HEAD
 - `git show` بيفحص Commit أو Object محدد.
 - مراجعة التغييرات قبل الـ Commit جزء أساسي من الـ Git Workflow، مش خطوة إضافية مالهاش لازمة.
 
----

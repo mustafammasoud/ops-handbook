@@ -52,12 +52,12 @@ language: ar
 
 ```mermaid
 flowchart LR
-    A["Initial Version"] --> B["Add a Feature"]
-    B --> C["Fix a Bug"]
-    C --> D["Update Configuration"]
+    A(["Initial Version"]) --> B(["Add a Feature"])
+    B --> C(["Fix a Bug"])
+    C --> D(["Update Configuration"])
 
-    classDef version fill:#F3E8D8,stroke:#B89A72,color:#403326,stroke-width:1.5px
-    classDef latest fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px
+    classDef version fill:#F3E6D0,stroke:#B99A6A,color:#46372A,stroke-width:1.5px
+    classDef latest fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,B,C version
     class D latest
@@ -67,7 +67,15 @@ flowchart LR
 
 كل مرحلة هنا بتعبّر عن تطور المشروع. تقدر تراجع الفروق بين المراحل، وتعرف التغيير اللي حصل في كل واحدة.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** الـ Version Control مش بالضرورة بيعمل نسخة كاملة مستقلة من كل ملف عند كل تغيير. طريقة تخزين التاريخ بتختلف من نظام للتاني. Git مثلًا بيستخدم Objects وبيمثل تاريخ المشروع في صورة Snapshots مترابطة.
+
+</InfoCard>
+
+</InfoCard>
 
 هنشرح الـ Commits والـ Snapshots بالتفصيل في صفحة Git Architecture & Core Concepts.
 
@@ -89,18 +97,20 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    D["Developer's Computer"]
-    P["Project Files"]
-    V["Local Version History"]
+    D(["Developer's Computer"])
+    P(["Project Files"])
+    V(["Local Version History"])
 
     D --> P
     P <--> V
 
-    classDef device fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.5px
-    classDef history fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px
+    classDef device fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef history fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class D,P device
     class V history
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 **Main limitation:** لو محتاج تشارك التغييرات مع فريق على أجهزة مختلفة، هتحتاج آلية إضافية للتبادل والتعاون.
@@ -115,19 +125,21 @@ flowchart TB
 flowchart TB
     S[("Central Repository")]
 
-    A["Developer A"]
-    B["Developer B"]
-    C["Developer C"]
+    A(["Developer A"])
+    B(["Developer B"])
+    C(["Developer C"])
 
     A <--> S
     B <--> S
     C <--> S
 
-    classDef server fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px
-    classDef developer fill:#F3E8D8,stroke:#B89A72,color:#403326,stroke-width:1.5px
+    classDef server fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
+    classDef developer fill:#F3E6D0,stroke:#B99A6A,color:#46372A,stroke-width:1.5px
 
     class S server
     class A,B,C developer
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الفريق هنا بيتشارك مستودعًا مركزيًا واحدًا. لكن مدى الاعتماد على السيرفر بيختلف حسب النظام والعملية المطلوبة.
@@ -144,19 +156,21 @@ flowchart TB
 flowchart TB
     R[("Shared Remote Repository")]
 
-    A["Developer A<br/>Local Repository"]
-    B["Developer B<br/>Local Repository"]
-    C["Developer C<br/>Local Repository"]
+    A(["Developer A<br/>Local Repository"])
+    B(["Developer B<br/>Local Repository"])
+    C(["Developer C<br/>Local Repository"])
 
     A <--> R
     B <--> R
     C <--> R
 
-    classDef remote fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:2px
-    classDef local fill:#F3E8D8,stroke:#B89A72,color:#403326,stroke-width:1.5px
+    classDef remote fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
+    classDef local fill:#F3E6D0,stroke:#B99A6A,color:#46372A,stroke-width:1.5px
 
     class R remote
     class A,B,C local
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 كل مستودع محلي عنده تاريخ المشروع، والتغييرات ممكن تتبادل بين المستودعات من خلال عمليات Git المناسبة.
@@ -166,6 +180,7 @@ flowchart TB
 ### IV. Centralized vs Distributed
 
 <TableCard title="Centralized vs Distributed VCS" caption="الفرق الأساسي في مكان تخزين التاريخ وطريقة التعاون.">
+<TableCard>
 | Comparison | Centralized VCS | Distributed VCS |
 |---|---|---|
 | Repository model | مستودع مركزي مشترك | مستودعات محلية كاملة مع إمكانية وجود Remotes |
@@ -173,6 +188,7 @@ flowchart TB
 | Offline work | بيعتمد على العملية والنظام | معظم عمليات Git المحلية متاحة |
 | Collaboration | غالبًا من خلال السيرفر المركزي | من خلال تبادل التغييرات بين المستودعات |
 | Example | SVN | Git |
+</TableCard>
 </TableCard>
 
 مش معنى كده إن كل نظام Distributed مناسب لكل سيناريو؛ الفكرة إن Git بيدينا نموذج مرن لإدارة التاريخ والعمل محليًا والتعاون مع الآخرين.
@@ -195,20 +211,22 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    A["Developer"] --> B["Git"]
+    A(["Developer"]) --> B(["Git"])
     B --> C[("Local Repository")]
     C <-->|"Push / Fetch"| D[("GitHub or GitLab")]
-    D --> E["Pull Requests<br/>Code Reviews<br/>Team Collaboration"]
+    D --> E(["Pull Requests<br/>Code Reviews<br/>Team Collaboration"])
 
-    classDef developer fill:#F3E8D8,stroke:#B89A72,color:#403326,stroke-width:1.5px
-    classDef git fill:#E8E0ED,stroke:#A394B3,color:#44374F,stroke-width:1.5px
-    classDef repository fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px
-    classDef platform fill:#F6F1E8,stroke:#C3AD8C,color:#44392D,stroke-width:1.5px
+    classDef developer fill:#F3E6D0,stroke:#B99A6A,color:#46372A,stroke-width:1.5px
+    classDef git fill:#F3E6D0,stroke:#B99A6A,color:#493722,stroke-width:1.5px
+    classDef repository fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef platform fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
 
     class A developer
     class B git
     class C repository
     class D,E platform
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ Workflow هنا بيتقسم إلى جزئين:
@@ -226,14 +244,14 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["Modify Files"] --> B["Review Changes"]
-    B --> C["Create Commit"]
-    C --> D["Push to Remote"]
-    D --> E["Review and Collaborate"]
+    A(["Modify Files"]) --> B(["Review Changes"])
+    B --> C(["Create Commit"])
+    C --> D(["Push to Remote"])
+    D --> E(["Review and Collaborate"])
 
-    classDef work fill:#F3E8D8,stroke:#B89A72,color:#403326,stroke-width:1.5px
-    classDef commit fill:#E8E0ED,stroke:#A394B3,color:#44374F,stroke-width:1.5px
-    classDef remote fill:#E3EBE4,stroke:#829A87,color:#33483A,stroke-width:1.5px
+    classDef work fill:#F3E6D0,stroke:#B99A6A,color:#46372A,stroke-width:1.5px
+    classDef commit fill:#F3E6D0,stroke:#B99A6A,color:#493722,stroke-width:1.5px
+    classDef remote fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,B work
     class C commit

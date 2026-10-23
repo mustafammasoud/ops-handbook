@@ -49,16 +49,18 @@ language: ar
 
 ```mermaid
 flowchart LR
-    A(["A: common base"]) --> B["B: main update"]
-    A --> C["C: feature change"]
-    C --> D["D: feature change"]
+    A(["A: common base"]) --> B(["B: main update"])
+    A --> C(["C: feature change"])
+    C --> D(["D: feature change"])
     B --> E(["main"])
     D --> F(["feature/login"])
 
-    classDef commit fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef branch fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef branch fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
     class A,B,C,D commit
     class E,F branch
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ branchين عندهم commit مشترك `A`، وبعده كل فرع اتحرك في اتجاه مختلف.
@@ -79,16 +81,18 @@ Git هيحدد commits الخاصة بالـ feature بعد نقطة الالت�
 
 ```mermaid
 flowchart TD
-    A(["A: common base"]) --> B["B: main update"]
-    B --> C["C': feature change"]
-    C --> D["D': feature change"]
+    A(["A: common base"]) --> B(["B: main update"])
+    B --> C(["C': feature change"])
+    C --> D(["D': feature change"])
     B --> E(["main"])
     D --> F(["feature/login"])
 
-    classDef commit fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef branch fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef branch fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
     class A,B,C,D commit
     class E,F branch
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الرمز `C'` و`D'` بيوضح إن دي commits جديدة ناتجة عن إعادة تطبيق التغييرات، حتى لو محتواها قريب جدًا من commits الأصلية.
@@ -134,7 +138,15 @@ git rebase --continue
 git rebase --abort
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** `git rebase --abort` بيُلغي عملية rebase الحالية، مش أي rebase انتهى بالفعل.
+
+</InfoCard>
+
+</InfoCard>
 
 ### VI. When to Use Rebase
 
@@ -179,6 +191,7 @@ git rebase main
 ### III. Comparison
 
 <TableCard title="Merge vs Rebase" caption="الاتنين بيعدّلوا التاريخ، لكن بطرق مختلفة تمامًا.">
+<TableCard>
 | Aspect | Merge | Rebase |
 |---|---|---|
 | History | بيحافظ على تاريخ التفرع، وقد ينشئ merge commit | بيعيد تطبيق commits وبيغيّر هويتها |
@@ -188,12 +201,13 @@ git rebase main
 | History Shape | ممكن يحتوي على تفرعات وmerge commits | ممكن ينتج تاريخ خطي |
 | Typical Use | دمج feature branch مع الاحتفاظ بسياق التفرع | تحديث feature branch أو تنظيم commits قبل مشاركتها |
 </TableCard>
+</TableCard>
 
 ### IV. Visual Comparison
 
 ```mermaid
 flowchart TD
-    subgraph Merge["Merge"]
+    subgraph Merge(["Merge"])
         direction LR
         M1(["A"]) --> M2(["B"])
         M1 --> M3(["C"])
@@ -201,15 +215,17 @@ flowchart TD
         M3 --> M4
     end
 
-    subgraph Rebase["Rebase"]
+    subgraph Rebase(["Rebase"])
         direction LR
         R1(["A"]) --> R2(["B"])
         R2 --> R3(["C'"])
         R3 --> R4(["D'"])
     end
 
-    classDef commit fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
     class M1,M2,M3,M4,R1,R2,R3,R4 commit
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 المخطط توضيحي: في مثال الـ merge، الفرعان بيتجمعوا في merge commit. في مثال الـ rebase، commits الخاصة بالفرع بتتطبق فوق تاريخ جديد.
@@ -263,6 +279,7 @@ Git هيفتح محرر نصوص يعرض قائمة commits. الأوامر ا�
 ### I. Common Interactive Rebase Commands
 
 <TableCard title="Interactive Rebase Commands" caption="الأوامر المتاحة داخل الـ todo list.">
+<TableCard>
 | Command | Meaning |
 |---|---|
 | `pick` | الاحتفاظ بالـ commit كما هي |
@@ -271,6 +288,7 @@ Git هيفتح محرر نصوص يعرض قائمة commits. الأوامر ا�
 | `squash` | دمج التغيير مع الـ commit السابقة مع إمكانية تحرير الرسائل |
 | `fixup` | دمج التغيير مع الـ commit السابقة مع تجاهل رسالة الـ commit الحالية |
 | `drop` | حذف الـ commit من التاريخ المعاد بناؤه |
+</TableCard>
 </TableCard>
 
 ### II. Example: Reword a Commit
@@ -318,9 +336,17 @@ git rebase --continue
 <CardGrid columns={2} label="Interactive Rebase Safety">
 <InfoCard variant="tip" title="Review First" description="راجع الـ commits قبل بدء interactive rebase." icon="pulse" tags={["Inspect"]} />
 
-<InfoCard variant="warning" title="Understand drop" description="ما تستخدمش `drop` لمجرد إنك مش فاهم commit معينة؛ افهم تأثير حذفها الأول." icon="shield" tags={["Caution"]} />
+<InfoCard variant="warning" title="Understand drop" icon="shield" tags={["Caution"]}>
 
-<InfoCard variant="tip" title="Abort Is Available" description="لو العملية لسه شغالة، `git rebase --abort` بيلغيها." icon="git-merge" tags={["Abort"]} />
+ما تستخدمش `drop` لمجرد إنك مش فاهم commit معينة؛ افهم تأثير حذفها الأول.
+
+</InfoCard>
+
+<InfoCard variant="tip" title="Abort Is Available" icon="git-merge" tags={["Abort"]}>
+
+لو العملية لسه شغالة، `git rebase --abort` بيلغيها.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="Shared History" description="تجنّب إعادة كتابة commits منشورة على branch مشترك إلا باتفاق واضح مع الفريق." icon="flag" tags={["Shared Branch"]} />
 </CardGrid>
@@ -387,7 +413,11 @@ squash d45ef67 fix tests
 المصطلحين مرتبطين لكن مش متطابقين:
 
 <CardGrid columns={2} label="Squash Approaches">
-<InfoCard variant="concept" title="Interactive Rebase Squashing" description="بتعيد تنظيم تاريخ commits في branch باستخدام `git rebase -i`." icon="sliders" tags={["Local History"]} />
+<InfoCard variant="concept" title="Interactive Rebase Squashing" icon="sliders" tags={["Local History"]}>
+
+بتعيد تنظيم تاريخ commits في branch باستخدام `git rebase -i`.
+
+</InfoCard>
 
 <InfoCard variant="concept" title="Squash Merge" description="أسلوب دمج بيجمع تغييرات branch في commit واحدة على الفرع المستهدف، وغالبًا بيتنفذ من واجهة GitHub أو بأوامر Git مناسبة." icon="git-merge" tags={["Single Commit"]} />
 </CardGrid>
@@ -453,10 +483,12 @@ git cherry-pick --abort
 ### VII. Cherry-pick vs Merge
 
 <TableCard title="Cherry-pick vs Merge" caption="بيدمج كل واحد بمستوى مختلف من التاريخ.">
+<TableCard>
 | Operation | What It Applies |
 |---|---|
 | `git merge` | بيدمج تاريخ branch في الفرع الحالي |
 | `git cherry-pick` | بيطبق تغييرات commit محددة على الفرع الحالي |
+</TableCard>
 </TableCard>
 
 الـ cherry-pick مفيد لنقل hotfix أو تغيير مستقل بين فروع مختلفة، لكن استخدامه المتكرر من غير تنظيم ممكن يصعّب تتبع مصدر التغييرات أو يؤدي إلى وجود commits مختلفة تمثل تغييرات متشابهة في أكثر من فرع.
@@ -568,7 +600,15 @@ git bisect reset
 
 الأمر ده بيرجعك إلى الحالة السابقة لعملية bisect، عادةً الفرع أو الـ commit اللي بدأت منها.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** لازم يكون تعريف `good` و`bad` واضحًا، والاختبار قابلًا للتكرار. لو بعض الـ commits لا يمكن اختبارها بسبب تغييرات في بيئة التشغيل أو اعتماديات مفقودة، لازم تتعامل مع النتائج بحذر.
+
+</InfoCard>
+
+</InfoCard>
 
 #### Automated Bisect
 
@@ -621,12 +661,14 @@ git show <commit>
 ### IV. Bisect vs Blame
 
 <TableCard title="Which Git Tool Answers What?" caption="كل أداة بترد على سؤال مختلف في التاريخ.">
+<TableCard>
 | Tool | Main Question | Best Use |
 |---|---|---|
 | `git bisect` | أنهي commit أدخلت الـ regression؟ | البحث عن مصدر bug بين commits كثيرة |
 | `git blame` | أنهي commit غيّرت السطور دي؟ | فهم تاريخ جزء معين من الملف |
 | `git log` | إيه التغييرات اللي حصلت مع الوقت؟ | مراجعة التاريخ العام |
 | `git show` | إيه محتوى commit معينة؟ | فحص التغيير المرتبط بـ commit |
+</TableCard>
 </TableCard>
 
 ## 8. Practical Safety Checklist
@@ -636,8 +678,7 @@ git show <commit>
 <Steps>
 <li>
 
-**راجع حالة المستودع:**
-
+<InfoCard title="راجع حالة المستودع" icon="terminal" />
 ```bash
 git status
 ```
@@ -646,8 +687,7 @@ git status
 
 <li>
 
-**افحص التاريخ قبل التعديل:**
-
+<InfoCard title="افحص التاريخ قبل التعديل" icon="terminal" />
 ```bash
 git log --oneline --graph --decorate -15
 ```
@@ -656,8 +696,7 @@ git log --oneline --graph --decorate -15
 
 <li>
 
-**تأكد إنك واقف على الفرع الصحيح:**
-
+<InfoCard title="تأكد إنك واقف على الفرع الصحيح" icon="branch" />
 ```bash
 git branch --show-current
 ```
@@ -708,7 +747,11 @@ git branch --show-current
 
 <InfoCard variant="tip" title="Detached HEAD" description="مفيد لفحص commits قديمة، لكن لازم تحفظ أي شغل جديد في branch لو عايز تحتفظ به." icon="branch" tags={["Inspect"]} />
 
-<InfoCard variant="tip" title="bisect & blame" description="`bisect` بيساعدك تحدد commit أدخلت bug، و`blame` بيساعدك تفهم تاريخ السطور الحالية." icon="code" tags={["Investigate"]} />
+<InfoCard variant="tip" title="bisect & blame" icon="code" tags={["Investigate"]}>
+
+`bisect` بيساعدك تحدد commit أدخلت bug، و`blame` بيساعدك تفهم تاريخ السطور الحالية.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="Handle With Care" description="أدوات تعديل التاريخ قوية، لكن استخدامها على commits مشتركة يحتاج حذرًا وتنسيقًا مع الفريق." icon="shield" tags={["Caution"]} />
 </CardGrid>

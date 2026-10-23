@@ -28,7 +28,11 @@ Git مش مجرد مجموعة أوامر زي `add` و`commit` و`merge`. هو 
 
 <InfoCard variant="concept" title="History Rewrites Create Objects" description="تعديل commit بيؤدي غالبًا إلى إنشاء commit جديدة." icon="cycle" tags={["New Hash"]} />
 
-<InfoCard variant="concept" title="HEAD Is a Pointer" description="`HEAD` بيحدد إنت واقف فين داخل تاريخ المشروع." icon="flag" tags={["Position"]} />
+<InfoCard variant="concept" title="HEAD Is a Pointer" icon="flag" tags={["Position"]}>
+
+`HEAD` بيحدد إنت واقف فين داخل تاريخ المشروع.
+
+</InfoCard>
 
 <InfoCard variant="concept" title="Old Files Are Recoverable" description="Git يقدر يرجع ملفات من commits قديمة." icon="database" tags={["Recover"]} />
 
@@ -72,6 +76,7 @@ my-project/
 ### I. Important Components
 
 <TableCard title="Inside the .git Directory" caption="أهم ملفات ومجلدات اللي بتمثل حالة المستودع.">
+<TableCard>
 | Component | Purpose |
 |---|---|
 | `HEAD` | بيحدد الـ commit أو المرجع المرتبط بالـ working state الحالية. |
@@ -83,6 +88,7 @@ my-project/
 | `refs/remotes/` | بيحتوي على remote-tracking references، لما تكون مخزنة كـ loose refs. |
 | `logs/` | بيحتوي على reflogs لبعض المراجع، حسب إعدادات Git. |
 | `hooks/` | مكان للـ repository hooks، اللي ممكن تنفذ scripts عند أحداث معينة. |
+</TableCard>
 </TableCard>
 
 ### II. Inspect the Repository
@@ -111,7 +117,15 @@ git rev-parse --git-path index
 ls -la .git
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **ملحوظة:** ما تعدلش الملفات الداخلية يدويًا لمجرد التجربة. استخدم أوامر Git الرسمية، وافحص النتائج بأوامر القراءة.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 2. HEAD and References
 
@@ -151,15 +165,17 @@ git rev-parse HEAD
 
 ```mermaid
 flowchart TD
-    A(["HEAD"]) --> B["refs/heads/main"]
-    B --> C["Commit object"]
-    C --> D["Tree object"]
-    C --> E["Parent commit"]
+    A(["HEAD"]) --> B(["refs/heads/main"])
+    B --> C(["Commit object"])
+    C --> D(["Tree object"])
+    C --> E(["Parent commit"])
 
-    classDef reference fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef object fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef reference fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef object fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,B reference
     class C,D,E object
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 المخطط بيعرض الحالة الشائعة لما `HEAD` بيشير إلى branch. في حالة **Detached HEAD**، بيشير `HEAD` مباشرةً إلى commit بدل branch reference.
@@ -239,6 +255,7 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 ### III. Branch vs Tag
 
 <TableCard title="Branch vs Tag" caption="الاتنين references، لكن بيتصرفوا مختلف تمامًا.">
+<TableCard>
 | Aspect | Branch | Tag |
 |---|---|---|
 | Main purpose | متابعة خط التطوير | تسمية نقطة محددة، غالبًا إصدار |
@@ -246,6 +263,7 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 | Moves with new commits | نعم، عند إضافة commits للفرع | لا، مش بيتحرك تلقائيًا |
 | Common example | `main` | `v1.0.0` |
 | Typical usage | تطوير تغييرات جديدة | تحديد إصدار أو milestone |
+</TableCard>
 </TableCard>
 
 ### IV. Inspect Tags
@@ -269,7 +287,15 @@ git rev-parse 'v1.0.0^{commit}'
 
 الصيغة دي بتطلب من Git حل الـ tag إلى commit، بشرط إن الـ tag في النهاية تشير إلى commit.
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** تعديل محتوى ملفات repository الداخلية يدويًا ممكن يسبب references غير صحيحة أو يفسد حالة المستودع. استخدم `git branch` و`git tag` وأوامر Git المناسبة لإدارة المراجع.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 4. Git Object Database
 
@@ -289,20 +315,22 @@ Git بيخزن بياناته الأساسية في **Object Database**. الأ�
 
 ```mermaid
 flowchart TD
-    A(["Commit object"]) --> B["Root tree"]
-    A --> C["Parent commit"]
-    B --> D["Source directory tree"]
-    B --> E["README blob"]
-    D --> F["Application tree"]
-    F --> G["Source file blob"]
-    F --> H["Configuration blob"]
+    A(["Commit object"]) --> B(["Root tree"])
+    A --> C(["Parent commit"])
+    B --> D(["Source directory tree"])
+    B --> E(["README blob"])
+    D --> F(["Application tree"])
+    F --> G(["Source file blob"])
+    F --> H(["Configuration blob"])
 
-    classDef commit fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
-    classDef tree fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1px
-    classDef blob fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef commit fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
+    classDef tree fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
+    classDef blob fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,C commit
     class B,D,F tree
     class E,G,H blob
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 المخطط توضيحي لعلاقات objects؛ أسماء الملفات الفعلية بتظهر في الـ tree objects، بينما الـ blobs بتحتوي على محتوى الملفات.
@@ -416,19 +444,21 @@ APP_PORT=9090
 
 ```mermaid
 flowchart TD
-    A(["Commit A"]) --> B["Tree A"]
-    C(["Commit B"]) --> D["Tree B"]
-    B --> E["config.txt blob"]
+    A(["Commit A"]) --> B(["Tree A"])
+    C(["Commit B"]) --> D(["Tree B"])
+    B --> E(["config.txt blob"])
     D --> E
-    B --> F["README blob"]
-    D --> G["Updated README blob"]
+    B --> F(["README blob"])
+    D --> G(["Updated README blob"])
 
-    classDef commit fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
-    classDef tree fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1px
-    classDef blob fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef commit fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
+    classDef tree fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
+    classDef blob fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,C commit
     class B,D tree
     class E,F,G blob
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 المخطط بيوضح مثالًا ممكن فيه الـ commits تشترك في blob لملف لم يتغير محتواه، بينما ملف آخر اتغير فبقى له blob مختلفة.
@@ -483,8 +513,10 @@ flowchart LR
     B --> C(["C"])
     C --> D(["D"])
 
-    classDef commit fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
     class A,B,C,D commit
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ده شكل تاريخ خطي: كل commit بعد الأولى لها parent واحدة في السلسلة.
@@ -500,8 +532,10 @@ flowchart TD
     D --> F(["F: merge commit"])
     E --> F
 
-    classDef commit fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
+    classDef commit fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
     class A,B,C,D,E,F commit
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 في المثال ده، الـ merge commit لها parent من كل فرع. العلاقات دي هي اللي بتخلي Git قادر يمثل تاريخ التفرع والدمج.
@@ -529,9 +563,17 @@ git log --oneline --graph --decorate --all
 فهم الـ DAG بيساعدك تفهم ليه:
 
 <CardGrid columns={3} label="Why the DAG Matters">
-<InfoCard variant="concept" title="Merges Add Parents" description="`git merge` ممكن ينشئ commit لها أكثر من parent." icon="git-merge" tags={["Merge Commit"]} />
+<InfoCard variant="concept" title="Merges Add Parents" icon="git-merge" tags={["Merge Commit"]}>
 
-<InfoCard variant="concept" title="Rebase Rewires Parents" description="`git rebase` بيعيد تطبيق commits وبيغيّر parent relationships." icon="cycle" tags={["Replay"]} />
+`git merge` ممكن ينشئ commit لها أكثر من parent.
+
+</InfoCard>
+
+<InfoCard variant="concept" title="Rebase Rewires Parents" icon="cycle" tags={["Replay"]}>
+
+`git rebase` بيعيد تطبيق commits وبيغيّر parent relationships.
+
+</InfoCard>
 
 <InfoCard variant="concept" title="Branch = Pointer" description="الفرع مش نسخة منفصلة من ملفات المشروع؛ هو reference بيحدد نقطة في التاريخ." icon="branch" tags={["Reference"]} />
 
@@ -609,7 +651,11 @@ git gc
 ### VI. Important Safety Note
 
 <CardGrid columns={2} label="Object Storage Safety">
-<InfoCard variant="warning" title="Never Touch .git/objects" description="ما تمسحش ملفات من `.git/objects` يدويًا." icon="shield" tags={["Manual Delete"]} />
+<InfoCard variant="warning" title="Never Touch .git/objects" icon="shield" tags={["Manual Delete"]}>
+
+ما تمسحش ملفات من `.git/objects` يدويًا.
+
+</InfoCard>
 
 <InfoCard variant="warning" title="Reflog Is Not a Backup" description="ما تعتبرش الـ reflog أو unreachable objects بديلًا عن backup." icon="database" tags={["Not a Backup"]} />
 
@@ -626,9 +672,7 @@ git gc
 
 <li>
 
-**Create a Test Repository**
-
-
+<InfoCard title="Create a Test Repository" icon="cube" />
 ```bash
 mkdir git-internals-lab
 cd git-internals-lab
@@ -644,9 +688,7 @@ git config user.email "lab@example.com"
 
 <li>
 
-**Create the First Commit**
-
-
+<InfoCard title="Create the First Commit" icon="git-merge" />
 ```bash
 printf "Git internals lab\n" > README.md
 
@@ -660,9 +702,7 @@ git log --oneline --decorate
 
 <li>
 
-**Inspect HEAD and the Branch**
-
-
+<InfoCard title="Inspect HEAD and the Branch" icon="terminal" />
 ```bash
 cat "$(git rev-parse --git-path HEAD)"
 
@@ -677,9 +717,7 @@ git rev-parse HEAD
 
 <li>
 
-**Inspect the Commit Object**
-
-
+<InfoCard title="Inspect the Commit Object" icon="terminal" />
 ```bash
 git cat-file -t HEAD
 
@@ -692,9 +730,7 @@ git cat-file -p HEAD
 
 <li>
 
-**Inspect the Tree**
-
-
+<InfoCard title="Inspect the Tree" icon="terminal" />
 ```bash
 git ls-tree HEAD
 ```
@@ -715,9 +751,7 @@ git cat-file -p <blob-object-id>
 
 <li>
 
-**Create Another Commit**
-
-
+<InfoCard title="Create Another Commit" icon="git-merge" />
 ```bash
 printf "\nSecond line\n" >> README.md
 
@@ -741,9 +775,7 @@ git cat-file -p HEAD^
 
 <li>
 
-**Create and Inspect a Tag**
-
-
+<InfoCard title="Create and Inspect a Tag" icon="terminal" />
 ```bash
 git tag -a v0.1.0 -m "Internals lab checkpoint"
 
@@ -758,9 +790,7 @@ git cat-file -t v0.1.0
 
 <li>
 
-**Inspect Storage Statistics**
-
-
+<InfoCard title="Inspect Storage Statistics" icon="terminal" />
 ```bash
 git count-objects -v
 
@@ -794,5 +824,9 @@ Git **مش سحر** — هو object database من أربعة أنواع (Blob/Tr
 
 <InfoCard variant="tip" title="Packfiles & GC" description="Packfiles وgarbage collection بيساعدوا Git يدير التخزين بكفاءة." icon="wrench" tags={["Storage"]} />
 
-<InfoCard variant="warning" title="Don't Edit .git Manually" description="فهم الـ internals بيساعدك تستخدم Git بأمان أكبر، لكنه مش سبب لتعديل ملفات `.git` يدويًا." icon="shield" tags={["Caution"]} />
+<InfoCard variant="warning" title="Don't Edit .git Manually" icon="shield" tags={["Caution"]}>
+
+فهم الـ internals بيساعدك تستخدم Git بأمان أكبر، لكنه مش سبب لتعديل ملفات `.git` يدويًا.
+
+</InfoCard>
 </CardGrid>

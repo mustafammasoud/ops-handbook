@@ -51,6 +51,7 @@ language: ar
 ### III. Comparison
 
 <TableCard title="Fork vs Clone">
+<TableCard>
 | Feature | Fork | Clone |
 |---|---|---|
 | Where does it live? | على GitHub | على جهازك |
@@ -59,6 +60,7 @@ language: ar
 | Creates a local copy? | لا، مش لوحده | نعم |
 | Creates a GitHub repository? | نعم، على حسابك | لا |
 | Common use | المساهمة في مشروع خارجي | التطوير والاختبار محليًا |
+</TableCard>
 </TableCard>
 
 <InfoCard variant="insight" title="Important Distinction" description="الـ Fork مش بديل عن Clone. في الـ Open Source workflow المعتاد، بتعمل Fork على GitHub، وبعدها Clone للـ Fork على جهازك." icon="layers" />
@@ -229,7 +231,15 @@ upstream  https://github.com/open-source-owner/sample-project.git (fetch)
 upstream  https://github.com/open-source-owner/sample-project.git (push)
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **ملاحظة:** المثال بيعرض عنوان `upstream` للـ fetch والـ push لأن Git بيعرض الاتنين افتراضيًا، لكن وجود عنوان Push لا يعني إن عندك صلاحية الكتابة على المشروع الأصلي. في المعتاد، هتحتاج Push على `origin` فقط.
+
+</InfoCard>
+
+</InfoCard>
 
 </li>
 <li>
@@ -320,8 +330,16 @@ git rebase main
 
 <CardGrid columns={1} label="origin">
   <InfoCard title="Your GitHub copy" description="بيشير إلى Repository بتاعتك على GitHub." icon="cloud" variant="concept" />
-  <InfoCard title="Fetch and pull" description="بتعمل منه `fetch` و`pull` حسب احتياجك." icon="cycle" variant="concept" />
-  <InfoCard title="Push your work" description="بتعمل له `push` علشان ترفع الـ Branches والـ Commits الخاصة بيك." icon="git-pull-request" variant="concept" />
+  <InfoCard variant="concept" title="Fetch and pull" icon="cycle">
+
+بتعمل منه `fetch` و`pull` حسب احتياجك.
+
+</InfoCard>
+  <InfoCard variant="concept" title="Push your work" icon="git-pull-request">
+
+بتعمل له `push` علشان ترفع الـ Branches والـ Commits الخاصة بيك.
+
+</InfoCard>
 </CardGrid>
 
 ### II. upstream
@@ -355,6 +373,7 @@ flowchart LR
 ### IV. Commands You Should Know
 
 <TableCard title="Remote Commands">
+<TableCard>
 | Command | Purpose |
 |---|---|
 | `git remote -v` | عرض أسماء وعناوين الـ Remotes |
@@ -365,6 +384,7 @@ flowchart LR
 | `git switch main` | الانتقال إلى الـ Branch المحلية `main` |
 | `git merge --ff-only upstream/main` | تحديث `main` المحلية باستخدام Fast-forward فقط |
 | `git push origin main` | رفع `main` المحلية إلى الـ Fork |
+</TableCard>
 </TableCard>
 
 ### V. Practical Example
@@ -447,6 +467,7 @@ flowchart TD
 ممكن تلاقي Labels زي:
 
 <TableCard title="Common Issue Labels">
+<TableCard>
 | Label | Typical Meaning |
 |---|---|
 | `good first issue` | مشكلة مناسبة غالبًا للمساهمين الجدد |
@@ -455,6 +476,7 @@ flowchart TD
 | `documentation` | تحسين أو تصحيح Documentation |
 | `enhancement` | اقتراح Feature أو تحسين |
 | `question` | استفسار أو نقاش، مش بالضرورة مهمة تنفيذية |
+</TableCard>
 </TableCard>
 
 الـ Labels دي مش Standard إلزامي؛ كل مشروع ممكن يعرّفها ويستخدمها بطريقة مختلفة.
@@ -558,6 +580,7 @@ npm test
 ### I. Common Guideline Files
 
 <TableCard title="Contribution Files">
+<TableCard>
 | File | Purpose |
 |---|---|
 | `CONTRIBUTING.md` | شرح خطوات المساهمة ومتطلبات التطوير والاختبار |
@@ -567,6 +590,7 @@ npm test
 | `SECURITY.md` | طريقة الإبلاغ عن الثغرات الأمنية |
 | Issue templates | معلومات لازم تتوفر عند الإبلاغ عن مشكلة |
 | Pull request template | المعلومات المطلوبة عند تقديم تغييرات |
+</TableCard>
 </TableCard>
 
 مش شرط كل مشروع يحتوي على كل الملفات دي، وممكن يحط تعليمات المساهمة داخل Documentation أو ملفات أخرى.
@@ -629,7 +653,11 @@ npm test
 <CardGrid columns={2} label="Lab Objectives">
   <InfoCard title="Fork" description="إنشاء Fork على GitHub." icon="network" variant="concept" />
   <InfoCard title="Clone" description="استنساخ الـ Fork محليًا." icon="terminal" variant="concept" />
-  <InfoCard title="Upstream" description="إضافة `upstream`." icon="cycle" variant="concept" />
+  <InfoCard variant="concept" title="Upstream" icon="cycle">
+
+إضافة `upstream`.
+
+</InfoCard>
   <InfoCard title="Branch" description="إنشاء Branch جديدة." icon="branch" variant="concept" />
   <InfoCard title="Change and check" description="تعديل ملف وتشغيل الفحوصات المناسبة." icon="wrench" variant="concept" />
   <InfoCard title="Push" description="رفع التغييرات إلى الـ Fork." icon="git-pull-request" variant="concept" />
@@ -706,7 +734,11 @@ git push -u origin docs/improve-readme
 
 <CardGrid columns={2} label="PR Direction">
   <InfoCard title="Head repository" description="الـ Fork بتاعتك." icon="cloud" variant="concept" />
-  <InfoCard title="Compare branch" description="`docs/improve-readme`." icon="branch" variant="concept" />
+  <InfoCard variant="concept" title="Compare branch" icon="branch">
+
+`docs/improve-readme`.
+
+</InfoCard>
   <InfoCard title="Base repository" description="المشروع الأصلي." icon="network" variant="concept" />
   <InfoCard title="Base branch" description="الـ Branch الأساسية اللي المشروع بيقبل عليها المساهمات." icon="flag" variant="concept" />
 </CardGrid>

@@ -57,32 +57,40 @@ Git نفسه بيديك الأدوات زي `branch`, `merge`, `rebase` و`tag`�
 <Steps>
 <li>
 
+<InfoCard title="Start from the Latest Main" icon="branch">
+
 تبدأ من آخر نسخة من `main`.
 
-</li>
-<li>
-
-تنشئ branch جديد للتغيير المطلوب.
+</InfoCard>
 
 </li>
 <li>
 
-تنفذ التعديل وتعمل commits صغيرة وواضحة.
+<InfoCard title="تنشئ branch جديد للتغيير المطلوب." icon="branch" />
 
 </li>
 <li>
 
-ترفع الـ branch إلى remote repository.
+<InfoCard title="تنفذ التعديل وتعمل commits صغيرة وواضحة." icon="code" />
 
 </li>
 <li>
 
-تفتح Pull Request لو الفريق بيستخدم code review.
+<InfoCard title="ترفع الـ branch إلى remote repository." icon="cloud" />
 
 </li>
 <li>
+
+<InfoCard title="تفتح Pull Request لو الفريق بيستخدم code review." icon="git-pull-request" />
+
+</li>
+<li>
+
+<InfoCard title="Merge After Review and Tests" icon="git-merge">
 
 بعد المراجعة والاختبارات، تدمج التغيير في `main`.
+
+</InfoCard>
 
 </li>
 </Steps>
@@ -109,21 +117,23 @@ git push -u origin feature/user-profile
 
 ```mermaid
 flowchart TD
-    A(["main"]) --> B["Create feature branch"]
-    B --> C["Implement changes"]
-    C --> D["Commit and push"]
-    D --> E["Review and test"]
-    E --> F{"Approved?"}
+    A(["main"]) --> B(["Create feature branch"])
+    B --> C(["Implement changes"])
+    C --> D(["Commit and push"])
+    D --> E(["Review and test"])
+    E --> F("Approved?")
     F -->|No| C
-    F -->|Yes| G["Merge into main"]
+    F -->|Yes| G(["Merge into main"])
     G --> H(["Updated main"])
 
-    classDef branch fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
-    classDef decision fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
+    classDef branch fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
     class A,H branch
     class B,C,D,E,G action
     class F decision
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### III. Advantages
@@ -151,22 +161,24 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A(["main: stable"]) --> B["Create short-lived branch"]
-    B --> C["Develop and commit"]
-    C --> D["Open Pull Request"]
-    D --> E["Review and run checks"]
-    E --> F{"Ready to merge?"}
+    A(["main: stable"]) --> B(["Create short-lived branch"])
+    B --> C(["Develop and commit"])
+    C --> D(["Open Pull Request"])
+    D --> E(["Review and run checks"])
+    E --> F("Ready to merge?")
     F -->|No| C
-    F -->|Yes| G["Merge into main"]
-    G --> H["Deploy or release"]
+    F -->|Yes| G(["Merge into main"])
+    G --> H(["Deploy or release"])
     H --> I(["Next change"])
 
-    classDef branch fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
-    classDef decision fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
+    classDef branch fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
     class A,I branch
     class B,C,D,E,G,H action
     class F decision
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Practical Example
@@ -192,27 +204,31 @@ git push -u origin fix/login-validation
 <Steps>
 <li>
 
+<InfoCard title="Open the Pull Request" icon="git-pull-request">
+
 تفتح Pull Request من `fix/login-validation` إلى `main`.
 
-</li>
-<li>
-
-تستنى الـ review والـ required checks لو المشروع بيفرضهم.
+</InfoCard>
 
 </li>
 <li>
 
-تعالج الملاحظات لو موجودة.
+<InfoCard title="تستنى الـ review والـ required checks لو المشروع بيفرضهم." icon="pulse" />
 
 </li>
 <li>
 
-تدمج التغيير بعد استيفاء شروط المشروع.
+<InfoCard title="تعالج الملاحظات لو موجودة." icon="wrench" />
 
 </li>
 <li>
 
-تحذف الـ branch بعد الدمج لو مبقاش محتاجه.
+<InfoCard title="تدمج التغيير بعد استيفاء شروط المشروع." icon="git-merge" />
+
+</li>
+<li>
+
+<InfoCard title="تحذف الـ branch بعد الدمج لو مبقاش محتاجه." icon="branch" />
 
 </li>
 </Steps>
@@ -253,6 +269,7 @@ git push -u origin fix/login-validation
 
 <TableCard title="Git Flow Branch Types" caption="The five branch roles in the Git Flow model.">
 
+<TableCard>
 | Branch | Purpose |
 |---|---|
 | `main` | يمثل الإصدارات المستقرة أو التاريخ المرتبط بالـ production releases وفقًا لقواعد المشروع. |
@@ -260,6 +277,7 @@ git push -u origin fix/login-validation
 | `feature/*` | لتطوير features جديدة، وعادةً بيتفرع من `develop`. |
 | `release/*` | لتجهيز إصدار محدد، وإجراء الإصلاحات النهائية قبل إطلاقه. |
 | `hotfix/*` | لإصلاح مشكلة عاجلة في إصدار production، وعادةً بيتفرع من `main`. |
+</TableCard>
 
 </TableCard>
 
@@ -267,24 +285,26 @@ git push -u origin fix/login-validation
 
 ```mermaid
 flowchart TD
-    A(["main"]) --> B["hotfix/*"]
-    B --> C["Merge fix into main"]
-    C --> D["Back-merge into develop"]
+    A(["main"]) --> B(["hotfix/*"])
+    B --> C(["Merge fix into main"])
+    C --> D(["Back-merge into develop"])
 
-    E(["develop"]) --> F["feature/*"]
-    F --> G["Merge feature into develop"]
+    E(["develop"]) --> F(["feature/*"])
+    F --> G(["Merge feature into develop"])
     G --> E
 
-    E --> H["release/*"]
-    H --> I["Final fixes and validation"]
-    I --> J["Merge release into main"]
-    J --> K["Merge release changes into develop"]
+    E --> H(["release/*"])
+    H --> I(["Final fixes and validation"])
+    I --> J(["Merge release into main"])
+    J --> K(["Merge release changes into develop"])
     K --> L(["Next development cycle"])
 
-    classDef branch fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
+    classDef branch fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
     class A,E,L branch
     class B,C,D,F,G,H,I,J,K action
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 المخطط بيوضح العلاقات العامة بين أنواع الفروع، لكنه مش بديل عن قواعد الدمج الدقيقة اللي لازم يحددها المشروع.
@@ -316,7 +336,11 @@ git switch -c release/1.4.0
 
 الـ release branch بيُستخدم للتحقق النهائي وإصلاح المشاكل المرتبطة بالإصدار. بعد اعتماده، بيتم دمجه في `main`، وغالبًا بيتعمل tag للإصدار، وبعدها بتتنقل الإصلاحات المطلوبة إلى `develop` عشان تفضل متزامنة.
 
-> إنشاء `release/1.4.0` من `develop` بيفترض إن `develop` هو مصدر التغييرات المعتمدة للإصدار في المشروع. تأكد إن الفرع محدث وإن سياسة الإصدار واضحة قبل بدء العملية.
+<InfoCard variant="tip" title="Release Branch Note" icon="flag">
+
+إنشاء `release/1.4.0` من `develop` بيفترض إن `develop` هو مصدر التغييرات المعتمدة للإصدار في المشروع. تأكد إن الفرع محدث وإن سياسة الإصدار واضحة قبل بدء العملية.
+
+</InfoCard>
 
 ### V. Hotfix Handling
 
@@ -361,25 +385,27 @@ git switch -c hotfix/payment-crash
 
 ```mermaid
 flowchart TD
-    A(["main / trunk"]) --> B["Small isolated change"]
-    B --> C["Commit and validate"]
-    C --> D{"Using a short-lived branch?"}
-    D -->|Yes| E["Quick review and merge"]
-    D -->|No| F["Integrate into trunk"]
-    E --> G["Run required checks"]
+    A(["main / trunk"]) --> B(["Small isolated change"])
+    B --> C(["Commit and validate"])
+    C --> D("Using a short-lived branch?")
+    D -->|Yes| E(["Quick review and merge"])
+    D -->|No| F(["Integrate into trunk"])
+    E --> G(["Run required checks"])
     F --> G
-    G --> H{"Healthy build?"}
-    H -->|No| I["Fix or revert promptly"]
+    G --> H("Healthy build?")
+    H -->|No| I(["Fix or revert promptly"])
     I --> A
     H -->|Yes| J(["Ready for next change"])
     J --> A
 
-    classDef branch fill:#efe3d2,stroke:#a88763,color:#493729,stroke-width:1.5px
-    classDef action fill:#f7f0e6,stroke:#c5ad91,color:#493729,stroke-width:1px
-    classDef decision fill:#e8d8bd,stroke:#9d7b53,color:#493729,stroke-width:1.5px
+    classDef branch fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1.5px
+    classDef action fill:#E7DCC8,stroke:#9B8059,color:#46372A,stroke-width:1px
+    classDef decision fill:#F3E6D0,stroke:#B99A70,color:#46372A,stroke-width:1.5px
     class A,J branch
     class B,C,E,F,G,I action
     class D,H decision
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Feature Flags
@@ -428,12 +454,14 @@ else
 
 <TableCard title="Workflow Comparison" caption="Branching model, release style, strength, and trade-off for each workflow.">
 
+<TableCard>
 | Workflow | Branching Model | Release Style | Main Strength | Main Trade-off |
 |---|---|---|---|---|
 | Feature Branch | Branch لكل تغيير | مرن | عزل ومراجعة التغييرات | الفروع الطويلة بتصعّب الدمج |
 | GitHub Flow | Branches قصيرة + `main` | نشر متكرر عند الجاهزية | البساطة وسرعة الدمج | يحتاج `main` مستقرة |
 | Git Flow | `main`, `develop` وفروع إضافية | إصدارات منظمة | فصل التطوير عن تجهيز الإصدار | قواعد وفروع أكثر |
 | Trunk-Based | دمج متكرر في `main` أو `trunk` | تكامل مستمر | تقليل divergence | يعتمد على اختبارات سريعة وانضباط الفريق |
+</TableCard>
 
 </TableCard>
 
@@ -506,6 +534,7 @@ git commit -m "fix: handle payment processing crash"
 
 <TableCard title="Release Branch vs Hotfix Branch" caption="When each branch type is used and how it behaves after merge.">
 
+<TableCard>
 | Aspect | Release Branch | Hotfix Branch |
 |---|---|---|
 | Purpose | تجهيز إصدار مخطط | إصلاح مشكلة عاجلة |
@@ -513,6 +542,7 @@ git commit -m "fix: handle payment processing crash"
 | Scope | مجموعة تغييرات مرتبطة بالإصدار | إصلاح محدود ومحدد |
 | Timing | قبل إصدار مخطط | عند ظهور مشكلة عاجلة |
 | After Merge | اعتماد الإصدار ومزامنة التغييرات المطلوبة | نشر الإصلاح ونقله للفروع المتأثرة |
+</TableCard>
 
 </TableCard>
 

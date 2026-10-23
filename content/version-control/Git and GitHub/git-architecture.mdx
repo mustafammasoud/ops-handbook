@@ -34,7 +34,6 @@ Git مش مجرد أداة بتحتفظ بنسخ قديمة من ملفاتك؛ 
 
 <InfoCard variant="concept" title="The Core Idea" description="Git بيسجل حالات المشروع على هيئة Commits، وكل Commit بيشير إلى Snapshot محددة من ملفات المشروع، مع الاحتفاظ بمعلومات تربطها بتاريخ التغييرات السابقة." icon="layers" tags={["Repository", "Commit", "Snapshot"]} />
 
----
 
 ## 1. Git Architecture at a Glance
 
@@ -52,9 +51,9 @@ flowchart TB
     LR <-->|"git push / git fetch / git pull"| RR
 
     classDef workspace fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:2px
-    classDef staging fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:2px
-    classDef local fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:2px
-    classDef remote fill:#E7E9E7,stroke:#A1AAA2,color:#39443D,stroke-width:2px
+    classDef staging fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
+    classDef local fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:2px
+    classDef remote fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:2px
 
     class WD workspace
     class SA staging
@@ -66,7 +65,6 @@ flowchart TB
 
 خد بالك من نقطة مهمة: كل جزء من دول له وظيفة مختلفة. تعديل ملف مش معناه إنه اتضاف للـ Staging Area، وإضافته للـ Staging Area مش معناها إنه اتحفظ في الـ Repository على هيئة Commit.
 
----
 
 ## 2. Git Repository
 
@@ -106,9 +104,16 @@ git rev-parse --git-dir
 git status
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** مش كل ملف موجود داخل مجلد المشروع بيكون متتبع بواسطة Git. فيه ملفات ممكن تكون `Untracked` أو مستبعدة عن طريق `.gitignore`.
 
----
+</InfoCard>
+
+</InfoCard>
+
 
 ## 3. Working Directory
 
@@ -149,7 +154,6 @@ git status
 
 <InfoCard variant="insight" title="A Common Misunderstanding" description="مجرد إنك تعدّل ملف وتحفظه في المحرر مش معناه إن Git سجّل التعديل. الحفظ في المحرر شيء، وتجهيز التغيير أو تسجيله في Git شيء تاني." icon="layers" />
 
----
 
 ## 4. Staging Area (Index)
 
@@ -189,20 +193,22 @@ git diff --cached
 
 ```mermaid
 flowchart TD
-    A["Edit a file<br/>تعديل الملف"] --> B["Working Directory"]
-    B -->|"git add"| C["Staging Area"]
-    C -->|"Review staged changes"| D["git diff --cached"]
-    D -->|"git commit"| E["New Commit"]
+    A(["Edit a file<br/>تعديل الملف"]) --> B(["Working Directory"])
+    B -->|"git add"| C(["Staging Area"])
+    C -->|"Review staged changes"| D(["git diff --cached"])
+    D -->|"git commit"| E(["New Commit"])
 
-    classDef edit fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px,rx:8,ry:8
-    classDef stage fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px,rx:8,ry:8
-    classDef review fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px,rx:8,ry:8
-    classDef commit fill:#E7E9E7,stroke:#A1AAA2,color:#39443D,stroke-width:1.5px,rx:8,ry:8
+    classDef edit fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
+    classDef stage fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef review fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef commit fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class A,B edit
     class C stage
     class D review
     class E commit
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### III. What If You Edit a File After `git add`?
@@ -228,7 +234,6 @@ git add src/app.py
 
 <InfoCard variant="warning" title="Review Before Committing" description="ماتعتمدش على إنك نفذت git add وخلاص. راجع git diff --cached علشان تتأكد إن الـ Commit هيحتوي على التغييرات اللي إنت قاصد تسجلها فعلًا." icon="shield" tags={["Staging", "Review"]} />
 
----
 
 ## 5. Local vs Remote Repository
 
@@ -255,6 +260,7 @@ git add src/app.py
 أهم الأوامر المرتبطة بالتعامل مع الـ Remote:
 
 <TableCard title="Remote Commands" caption="أهم أوامر التعامل مع المستودعات البعيدة.">
+<TableCard>
 | Command | Purpose |
 |---|---|
 | `git remote -v` | عرض الـ Remote URLs المسجلة |
@@ -262,36 +268,46 @@ git add src/app.py
 | `git pull` | جلب التحديثات ودمجها أو إعادة تطبيقها حسب الإعدادات |
 | `git push` | إرسال الـ Commits المحلية إلى الـ Remote |
 </TableCard>
+</TableCard>
 
 ### III. How Local and Remote Repositories Work Together
 
 ```mermaid
 flowchart LR
-    subgraph LOCAL["Local Machine"]
-        WD["Working Directory"]
+    subgraph LOCAL(["Local Machine"])
+        WD(["Working Directory"])
         LR[("Local Repository")]
         WD -->|"git add / git commit"| LR
     end
 
-    subgraph REMOTE["Remote Server"]
+    subgraph REMOTE(["Remote Server"])
         RR[("Remote Repository")]
     end
 
     LR -->|"git push"| RR
     RR -->|"git fetch"| LR
 
-    classDef work fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px,rx:8,ry:8
-    classDef repo fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px,rx:8,ry:8
-    classDef remote fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px,rx:8,ry:8
+    classDef work fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
+    classDef repo fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef remote fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
 
     class WD work
     class LR repo
     class RR remote
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
 
 **مهم:** `git fetch` مش هو نفسه `git pull`. الأول بيحدّث المعلومات اللي عندك عن الـ Remote، أما التاني فبيحاول يدمج التحديثات في سياق الـ Branch الحالي، أو يعيد تطبيقها لو إعدادات `pull.rebase` مفعّلة.
 
----
+</InfoCard>
+
+</InfoCard>
+
 
 ## 6. Git Objects: Blob, Tree, and Commit
 
@@ -337,12 +353,12 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    C["Commit Object<br/>Metadata + Parent References"]
-    T["Root Tree Object<br/>Project Structure"]
-    T1["Tree Object<br/>src/"]
-    T2["Blob Object<br/>README.md"]
-    B1["Blob Object<br/>app.py"]
-    B2["Blob Object<br/>utils.py"]
+    C(["Commit Object<br/>Metadata + Parent References"])
+    T(["Root Tree Object<br/>Project Structure"])
+    T1(["Tree Object<br/>src/"])
+    T2(["Blob Object<br/>README.md"])
+    B1(["Blob Object<br/>app.py"])
+    B2(["Blob Object<br/>utils.py"])
 
     C -->|"points to"| T
     T -->|"directory entry"| T1
@@ -350,13 +366,15 @@ flowchart TD
     T1 -->|"file entry"| B1
     T1 -->|"file entry"| B2
 
-    classDef commit fill:#E9E3F0,stroke:#A99ABF,color:#463B58,stroke-width:1.5px,rx:8,ry:8
-    classDef tree fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px,rx:8,ry:8
-    classDef blob fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px,rx:8,ry:8
+    classDef commit fill:#F3E6D0,stroke:#B99A70,color:#493722,stroke-width:1.5px
+    classDef tree fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
+    classDef blob fill:#F4E7D3,stroke:#B99A6A,color:#493722,stroke-width:1.5px
 
     class C commit
     class T,T1 tree
     class T2,B1,B2 blob
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الرسم توضيحي للفكرة العامة: الـ Commit بيشير إلى Root Tree، والـ Trees بتربط أسماء الملفات والمجلدات بالـ Objects المناسبة. الرسم مش بيمثل الـ IDs الحقيقية أو كل تفاصيل التخزين الداخلي.
@@ -391,7 +409,6 @@ git ls-tree HEAD
 
 الأمر ده بيعرض Entries الموجودة في Root Tree، زي الملفات والمجلدات التي تمثلها الـ Objects.
 
----
 
 ## 7. Hashes and Object Identity
 
@@ -435,7 +452,6 @@ git hash-object -w README.md
 
 <InfoCard variant="insight" title="Content-Based Identity" description="الـ Hash بيساعد Git يحدد الـ Objects ويكتشف اختلاف البيانات. لكنه مش معناه إن كل ملف ليه Hash منفصل دائمًا؛ المحتوى المتطابق ممكن ينتج نفس الـ Object ID، والـ Hash مش بديل عن مراجعة الكود أو ضمان أمني مطلق." icon="wrench" tags={["Hash", "Object ID"]} />
 
----
 
 ## 8. Snapshots vs Diffs
 
@@ -475,16 +491,18 @@ git diff --cached
 
 ```mermaid
 flowchart LR
-    C1["Commit A<br/>Snapshot A"]
-    C2["Commit B<br/>Snapshot B"]
-    C3["Commit C<br/>Snapshot C"]
+    C1(["Commit A<br/>Snapshot A"])
+    C2(["Commit B<br/>Snapshot B"])
+    C3(["Commit C<br/>Snapshot C"])
 
     C1 -->|"parent"| C2
     C2 -->|"parent"| C3
 
-    classDef snapshot fill:#E5EBDD,stroke:#8CA184,color:#344734,stroke-width:1.5px,rx:8,ry:8
+    classDef snapshot fill:#DDE8D8,stroke:#8AA184,color:#344B38,stroke-width:1.5px
 
     class C1,C2,C3 snapshot
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الرسم بيشرح علاقة الـ Commits عبر الزمن بصورة مبسطة. كل Commit بيشير إلى Snapshot، ويرتبط بالـ Parent Commit المناسب، وده بيكوّن تاريخ المشروع.
@@ -500,7 +518,6 @@ Git ممكن يعيد استخدام Objects بين Snapshots بدل ما يكر
 - إزاي الـ Branches بتشير إلى Commits مختلفة داخل التاريخ.
 - ليه الـ Commit يقدر يحدد حالة المشروع حتى لو ملفات الـ Working Directory اتغيرت بعده.
 
----
 
 ## 9. Putting the Concepts Together
 
@@ -572,7 +589,6 @@ git ls-tree HEAD
 </li>
 </Steps>
 
----
 
 ## 10. Common Misconceptions
 
@@ -586,7 +602,6 @@ git ls-tree HEAD
   <InfoCard variant="comparison" title="Snapshot vs Full Copy" description="الـ Snapshot بتمثل حالة المشروع، لكن Git ممكن يعيد استخدام Objects موجودة بدل ما يكرر تخزين نفس المحتوى." icon="cube" />
 </CardGrid>
 
----
 
 ## 11. Key Takeaways
 

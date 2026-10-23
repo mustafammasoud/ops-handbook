@@ -84,7 +84,15 @@ flowchart TD
     linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
 **مهم:** فتح PR مش معناه إن التغييرات اتدمجت بالفعل. هي بتفضل اقتراحًا قيد المراجعة لحد ما يتم دمجها أو إغلاقها.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 2. Creating a PR
 
@@ -227,10 +235,12 @@ flowchart LR
 لو بتساهم في مشروع مش بتملكه، ممكن تكون الإعدادات بالشكل ده:
 
 <TableCard title="Fork PR Settings">
+<TableCard>
 | Setting | Repository | Branch |
 |---|---|---|
 | Base | المشروع الأصلي | `main` |
 | Compare / Head | الـ Fork بتاعتك | `feature/health-check` |
+</TableCard>
 </TableCard>
 
 أما لو بتشتغل داخل نفس الـ Repository، فالـ Base والـ Compare ممكن يكونوا Branches من نفس المستودع.
@@ -261,12 +271,14 @@ flowchart LR
 ### II. Draft vs Ready for Review
 
 <TableCard title="Draft vs Ready for Review">
+<TableCard>
 | Draft PR | Ready for Review |
 |---|---|
 | التغيير لسه قيد التطوير | التغيير جاهز للمراجعة |
 | مناسب للنقاش المبكر | مناسب للمراجعة الرسمية |
 | مش بتُعامل كطلب مراجعة نهائي | ممكن تبدأ مراجعتها وفقًا لسياسة المشروع |
 | يمكن تحويلها لاحقًا إلى Ready for review | يمكن طلب مراجعات واستكمال إجراءات الدمج |
+</TableCard>
 </TableCard>
 
 لما تكمّل التغييرات، استخدم **Ready for review** لتحويل الـ Draft إلى PR جاهزة للمراجعة.
@@ -304,10 +316,26 @@ Final version
 الوصف الجيد بيجاوب عن الأسئلة دي:
 
 <CardGrid columns={2} label="Description Questions">
-  <InfoCard title="What changed?" description="**What changed?** إيه اللي اتغير؟" icon="code" variant="concept" />
-  <InfoCard title="Why was it needed?" description="**Why was it needed?** ليه التغيير ده مطلوب؟" icon="flag" variant="concept" />
-  <InfoCard title="How was it tested?" description="**How was it tested?** اختبرت التغيير إزاي؟" icon="shield" variant="concept" />
-  <InfoCard title="Related issues" description="**Related issues:** هل فيه Issue مرتبطة؟" icon="branch" variant="concept" />
+  <InfoCard variant="concept" title="What changed?" icon="code">
+
+**What changed?** إيه اللي اتغير؟
+
+</InfoCard>
+  <InfoCard variant="concept" title="Why was it needed?" icon="flag">
+
+**Why was it needed?** ليه التغيير ده مطلوب؟
+
+</InfoCard>
+  <InfoCard variant="concept" title="How was it tested?" icon="shield">
+
+**How was it tested?** اختبرت التغيير إزاي؟
+
+</InfoCard>
+  <InfoCard variant="concept" title="Related issues" icon="branch">
+
+**Related issues:** هل فيه Issue مرتبطة؟
+
+</InfoCard>
 </CardGrid>
 
 ### III. Example PR Description
@@ -395,8 +423,16 @@ Closes #42
 التفسير:
 
 <CardGrid columns={2} label="Reading a Diff">
-  <InfoCard title="- line" description="السطر اللي بيبدأ بـ `-` كان موجودًا قبل التغيير." icon="tag" variant="concept" />
-  <InfoCard title="+ line" description="السطر اللي بيبدأ بـ `+` هو السطر الجديد." icon="flag" variant="concept" />
+  <InfoCard variant="concept" title="- line" icon="tag">
+
+السطر اللي بيبدأ بـ `-` كان موجودًا قبل التغيير.
+
+</InfoCard>
+  <InfoCard variant="concept" title="+ line" icon="flag">
+
+السطر اللي بيبدأ بـ `+` هو السطر الجديد.
+
+</InfoCard>
 </CardGrid>
 
 علامات `-` و`+` هنا جزء من عرض الـ Diff، مش بالضرورة أوامر أو محتوى حرفي هيتحط في الملف.
@@ -641,11 +677,13 @@ flowchart TD
 GitHub بتدعم طرق دمج مختلفة حسب إعدادات الـ Repository.
 
 <TableCard title="Merge Strategies">
+<TableCard>
 | Strategy | How It Works | Typical Use |
 |---|---|---|
 | Create a merge commit | بتحتفظ بتاريخ الـ Branches وبتضيف Merge Commit | لما يكون مهم الاحتفاظ بتاريخ الدمج |
 | Squash and merge | بتجمع Commits الخاصة بالـ PR في Commit واحدة على الـ Base branch | لما يكون المطلوب تاريخًا أبسط |
 | Rebase and merge | بتعيد تطبيق Commits الـ PR على الـ Base branch من غير Merge Commit تقليدية | لما يكون المطلوب تاريخًا خطيًا |
+</TableCard>
 </TableCard>
 
 الاستراتيجيات المتاحة بتعتمد على إعدادات المشروع، ومش كل فريق بيسمح بالثلاثة.
@@ -686,12 +724,14 @@ git branch -d feature/health-check
 ### IV. Closing vs Merging
 
 <TableCard title="Closing vs Merging">
+<TableCard>
 | Action | Result |
 |---|---|
 | Merge PR | دمج التغييرات في الـ Base branch |
 | Close PR without merging | إغلاق الاقتراح من غير دمج التغييرات |
 | Reopen a closed PR | إعادة فتح PR، لو GitHub وقواعد المشروع بتسمح |
 | Delete the source branch | حذف الـ Branch المصدر، مش الـ PR نفسها |
+</TableCard>
 </TableCard>
 
 ### V. Final PR Checklist
@@ -710,7 +750,11 @@ git branch -d feature/health-check
   <InfoCard variant="summary" title="Base vs Compare" description="الـ Base branch هي المستهدفة، والـ Compare branch هي مصدر التغييرات المقترحة." icon="branch" />
   <InfoCard variant="summary" title="Draft PRs" description="الـ Draft PR مناسبة لما يكون التغيير لسه قيد التطوير." icon="code" />
   <InfoCard variant="summary" title="Clear descriptions" description="الوصف الواضح والـ Template المناسب بيسهّلوا فهم التغيير ومراجعته." icon="layers" />
-  <InfoCard variant="summary" title="Files changed" description="تبويب `Files changed` بيساعدك تفحص الـ Diff والتعليقات." icon="pulse" />
+  <InfoCard variant="summary" title="Files changed" icon="pulse">
+
+تبويب `Files changed` بيساعدك تفحص الـ Diff والتعليقات.
+
+</InfoCard>
   <InfoCard variant="summary" title="Updating PRs" description="تحديث نفس الـ Head branch بيحدّث الـ PR الموجودة." icon="cycle" />
   <InfoCard variant="summary" title="Conflicts" description="حل الـ Conflicts لازم يتبعه مراجعة واختبارات مناسبة." icon="wrench" />
   <InfoCard variant="summary" title="Merge vs close" description="الدمج والإغلاق عمليتان مختلفتان؛ إغلاق PR لا يعني دمج تغييراتها." icon="git-merge" />

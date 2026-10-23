@@ -95,7 +95,11 @@ and the container should use an appropriate health check.
 <Steps>
 <li>
 
-<InfoCard title="Open the Issues tab" description="افتح تبويب **Issues**." icon="pulse" />
+<InfoCard title="Open the Issues tab" icon="pulse">
+
+افتح تبويب **Issues**.
+
+</InfoCard>
 
 </li>
 <li>
@@ -142,12 +146,14 @@ and the container should use an appropriate health check.
 العنوان الجيد يوضح العمل المطلوب من غير تفاصيل زائدة.
 
 <TableCard title="Weak vs Better Titles">
+<TableCard>
 | Weak Title | Better Title |
 |---|---|
 | `Bug` | `Fix container startup failure when configuration is missing` |
 | `Improve docs` | `Document the local Kubernetes setup procedure` |
 | `New feature` | `Add readiness and liveness probes to the deployment` |
 | `Problem with CI` | `Fix test job failing on pull requests` |
+</TableCard>
 </TableCard>
 
 خلي العنوان محددًا قدر الإمكان، واستخدم الوصف لتوضيح التفاصيل والـ acceptance criteria.
@@ -163,6 +169,7 @@ and the container should use an appropriate health check.
 أمثلة على Labels ممكن تستخدمها:
 
 <TableCard title="Example Labels">
+<TableCard>
 | Label | Purpose |
 |---|---|
 | `bug` | مشكلة تحتاج إلى إصلاح |
@@ -171,6 +178,7 @@ and the container should use an appropriate health check.
 | `good first issue` | مهمة مناسبة للمساهمين الجدد، إذا كانت فعلًا مناسبة |
 | `priority:high` | مهمة ذات أولوية مرتفعة وفق معايير المشروع |
 | `needs-triage` | عنصر يحتاج إلى مراجعة وتصنيف أولي |
+</TableCard>
 </TableCard>
 
 GitHub يوفر بعض الـ default labels، وتقدر تضيف Labels مخصصة حسب احتياج المشروع.
@@ -182,10 +190,26 @@ GitHub يوفر بعض الـ default labels، وتقدر تضيف Labels مخص
 ممكن تقسّمها ذهنيًا إلى مجموعات:
 
 <CardGrid columns={2} label="Label Groups">
-  <InfoCard title="Type" description="`bug`, `enhancement`, `documentation`" icon="tag" variant="concept" />
-  <InfoCard title="Priority" description="`priority:high`, `priority:medium`, `priority:low`" icon="flag" variant="concept" />
-  <InfoCard title="Status" description="`needs-triage`, `blocked`" icon="pulse" variant="concept" />
-  <InfoCard title="Contribution" description="`good first issue`, `help wanted`" icon="network" variant="concept" />
+  <InfoCard variant="concept" title="Type" icon="tag">
+
+`bug`, `enhancement`, `documentation`
+
+</InfoCard>
+  <InfoCard variant="concept" title="Priority" icon="flag">
+
+`priority:high`, `priority:medium`, `priority:low`
+
+</InfoCard>
+  <InfoCard variant="concept" title="Status" icon="pulse">
+
+`needs-triage`, `blocked`
+
+</InfoCard>
+  <InfoCard variant="concept" title="Contribution" icon="network">
+
+`good first issue`, `help wanted`
+
+</InfoCard>
 </CardGrid>
 
 دي طريقة تنظيم مقترحة، وليست تصنيفًا إجباريًا في GitHub.
@@ -207,12 +231,14 @@ GitHub يوفر بعض الـ default labels، وتقدر تضيف Labels مخص
 ### IV. Labels vs Assignees
 
 <TableCard title="Labels vs Assignees">
+<TableCard>
 | Feature | Labels | Assignees |
 |---|---|---|
 | Main purpose | تصنيف العنصر | تحديد المسؤول عن متابعته |
 | Example | `bug`, `documentation` | مستخدم أو عضو فريق |
 | Can help with filtering? | نعم | نعم |
 | Answers the question | ما نوع العمل؟ | من المسؤول عنه؟ |
+</TableCard>
 </TableCard>
 
 <InfoCard variant="insight" title="Classification Is Not Ownership" description="الـ Label يصف الـ Issue، بينما الـ Assignee يحدد المسؤول عنها. استخدام الاتنين معًا يسهّل فهم العمل وتوزيعه." icon="network" />
@@ -245,6 +271,8 @@ flowchart TD
     class A milestone
     class B,C,D task
     class E result
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. What Can a Milestone Track?
@@ -263,6 +291,7 @@ flowchart TD
 ### III. Example: Project Milestones
 
 <TableCard title="Milestone Examples">
+<TableCard>
 | Milestone | Example Scope |
 |---|---|
 | `v0.1.0 — Foundation` | Initial structure and basic configuration |
@@ -270,13 +299,18 @@ flowchart TD
 | `v0.3.0 — Deployment` | Kubernetes deployment and service |
 | `v1.0.0 — Initial Release` | Documentation, validation, and release readiness |
 </TableCard>
+</TableCard>
 
 دي أمثلة توضيحية لتقسيم مشروع تدريبي؛ مش شرط كل مشروع يستخدم Milestone لكل إصدار.
 
 ### IV. Milestone vs Label vs Project
 
 <CardGrid columns={3} label="Three Levels of Organization">
-  <InfoCard title="Label" description="تصنيف العنصر، مثل `bug`." icon="tag" variant="concept" />
+  <InfoCard variant="concept" title="Label" icon="tag">
+
+تصنيف العنصر، مثل `bug`.
+
+</InfoCard>
   <InfoCard title="Milestone" description="تجميع عناصر مرتبطة بهدف أو مرحلة." icon="flag" variant="concept" />
   <InfoCard title="GitHub Project" description="مساحة أوسع لتنظيم ومتابعة العمل باستخدام views وfields وغيرها." icon="modules" variant="concept" />
 </CardGrid>
@@ -413,6 +447,7 @@ body:
 ### IV. When to Use Markdown Templates vs Forms
 
 <TableCard title="Markdown Templates vs Issue Forms">
+<TableCard>
 | Markdown Templates | Issue Forms |
 |---|---|
 | مناسبة لوصف حر وبسيط | مناسبة لجمع معلومات منظمة |
@@ -420,8 +455,17 @@ body:
 | تتيح للمستخدم كتابة محتوى مرن | تساعد في تقليل المعلومات الناقصة |
 | مناسبة لقوالب عامة | مفيدة للـ bug reports المتكررة |
 </TableCard>
+</TableCard>
+
+<InfoCard variant="concept" title="Note" icon="flag">
+
+<InfoCard variant="concept" title="Note" icon="flag">
 
 **مهم:** وجود template لا يضمن أن كل Issue ستكون مكتملة، لكنه يوضح للمساهم ما المعلومات التي يحتاج المشروع إليها.
+
+</InfoCard>
+
+</InfoCard>
 
 ## 5. Linking Issues to Commits and Pull Requests
 
@@ -482,6 +526,8 @@ flowchart TD
     class B,C development
     class D,E review
     class F done
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 الـ Issue ممكن ترتبط بأكثر من commit أو Pull Request حسب طبيعة المهمة. المهم إن الروابط توضح السياق بدل ما تكون مجرد أرقام غير مفهومة.
@@ -495,9 +541,21 @@ GitHub يدعم كلمات معينة في commit messages وأوصاف Pull Req
 من الكلمات الشائعة:
 
 <CardGrid columns={3} label="Closing Keywords">
-  <InfoCard title="close" description="`close` / `closes` / `closed`" icon="branch" variant="concept" />
-  <InfoCard title="fix" description="`fix` / `fixes` / `fixed`" icon="wrench" variant="concept" />
-  <InfoCard title="resolve" description="`resolve` / `resolves` / `resolved`" icon="shield" variant="concept" />
+  <InfoCard variant="concept" title="close" icon="branch">
+
+`close` / `closes` / `closed`
+
+</InfoCard>
+  <InfoCard variant="concept" title="fix" icon="wrench">
+
+`fix` / `fixes` / `fixed`
+
+</InfoCard>
+  <InfoCard variant="concept" title="resolve" icon="shield">
+
+`resolve` / `resolves` / `resolved`
+
+</InfoCard>
 </CardGrid>
 
 يمكن استخدامها مع رقم Issue، مثل:
@@ -537,8 +595,16 @@ Fixes #42, closes #43
 لكن انتبه إلى الآتي:
 
 <CardGrid columns={2} label="Closing Keyword Caveats">
-  <InfoCard title="#42 alone" description="كتابة `#42` وحدها لا تعني إغلاق Issue." icon="tag" variant="warning" />
-  <InfoCard title="Refs is not closing" description="`Refs #42` تربط العمل بالـ Issue، لكنها ليست closing keyword." icon="branch" variant="warning" />
+  <InfoCard variant="warning" title="#42 alone" icon="tag">
+
+كتابة `#42` وحدها لا تعني إغلاق Issue.
+
+</InfoCard>
+  <InfoCard variant="warning" title="Refs is not closing" icon="branch">
+
+`Refs #42` تربط العمل بالـ Issue، لكنها ليست closing keyword.
+
+</InfoCard>
   <InfoCard title="Commits in branches" description="عند استخدام closing keywords في commit messages، قد تختلف النتيجة حسب مكان الـ commit والفرع الذي ينتمي إليه." icon="network" variant="warning" />
   <InfoCard title="Non-default base" description="لو الـ Pull Request استهدف فرعًا غير الـ default branch، فقد لا تُغلق الـ Issue بالطريقة التي تتوقعها تلقائيًا؛ راجع سلوك GitHub والفرع المستهدف." icon="flag" variant="warning" />
   <InfoCard title="Correct reference" description="لازم يكون رقم الـ Issue صحيحًا وأن تكون الصياغة واضحة." icon="pulse" variant="warning" />
@@ -567,12 +633,14 @@ Fixes #42, closes #43
 ### II. Discussions vs Issues
 
 <TableCard title="Discussions vs Issues">
+<TableCard>
 | Aspect | Issues | Discussions |
 |---|---|---|
 | Main purpose | متابعة مشكلة أو مهمة أو طلب تغيير | النقاش والأسئلة وتبادل الأفكار |
 | Typical example | إصلاح Bug محدد | مناقشة أفضل تصميم لحل المشكلة |
 | Tracking work | مناسبة لتتبع العمل المطلوب | مناسبة للحوار قبل أو أثناء تحديد العمل |
 | Outcome | قد تنتهي بإصلاح أو إكمال مهمة | قد تنتج عنها فكرة أو Issue جديدة |
+</TableCard>
 </TableCard>
 
 ### III. Example Workflow
@@ -636,6 +704,8 @@ flowchart LR
     class B progress
     class C review
     class D done
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ده مثال على workflow ممكن تعمله داخل Project. أسماء الأعمدة وترتيبها قابلة للتغيير حسب احتياجك.
@@ -645,11 +715,13 @@ flowchart LR
 الـ Table view بتعرض عناصر العمل في صورة جدول، ويمكنك إضافة حقول مناسبة مثل:
 
 <TableCard title="Example Table View">
+<TableCard>
 | Item | Status | Priority | Area |
 |---|---|---|---|
 | Add container health check | In Progress | High | Docker |
 | Document deployment process | Todo | Medium | Documentation |
 | Fix startup validation | In Review | High | Application |
+</TableCard>
 </TableCard>
 
 الجدول هنا مثال على طريقة تنظيم البيانات، وليس بيانات مأخوذة من مشروع حقيقي.
@@ -678,6 +750,8 @@ flowchart TD
     class B project
     class C,D,E issue
     class F,G tracking
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### V. Create a Basic Project
@@ -727,11 +801,13 @@ flowchart TD
 ### VI. Issue vs Milestone vs Project
 
 <TableCard title="Issue vs Milestone vs Project">
+<TableCard>
 | Tool | Main Question | Example |
 |---|---|---|
 | Issue | ما المهمة أو المشكلة المطلوب التعامل معها؟ | Add a health check |
 | Milestone | ما مجموعة المهام المرتبطة بهدف أو إصدار؟ | `v1.0.0` |
 | Project | كيف نخطط للعمل ونتابع تقدمه عبر عدة عناصر؟ | Deployment Roadmap |
+</TableCard>
 </TableCard>
 
 تقدر تجمع الأدوات دي في workflow واحد:
@@ -807,10 +883,26 @@ Review and validate the deployment configuration.
 استخدم Labels مناسبة مثل:
 
 <CardGrid columns={2} label="Lab Labels">
-  <InfoCard title="enhancement" description="`enhancement`" icon="flag" variant="concept" />
-  <InfoCard title="documentation" description="`documentation`" icon="layers" variant="concept" />
-  <InfoCard title="priority:high" description="`priority:high`" icon="pulse" variant="concept" />
-  <InfoCard title="needs-triage" description="`needs-triage`" icon="tag" variant="concept" />
+  <InfoCard variant="concept" title="enhancement" icon="flag">
+
+`enhancement`
+
+</InfoCard>
+  <InfoCard variant="concept" title="documentation" icon="layers">
+
+`documentation`
+
+</InfoCard>
+  <InfoCard variant="concept" title="priority:high" icon="pulse">
+
+`priority:high`
+
+</InfoCard>
+  <InfoCard variant="concept" title="needs-triage" icon="tag">
+
+`needs-triage`
+
+</InfoCard>
 </CardGrid>
 
 اختَر Labels تعبر فعلًا عن طبيعة كل مهمة، وعيّن المسؤول المناسب إذا كنت تعمل ضمن فريق.

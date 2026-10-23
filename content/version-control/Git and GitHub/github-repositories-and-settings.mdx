@@ -76,6 +76,7 @@ my-project/
 ### III. Git Repository vs GitHub Repository
 
 <TableCard title="Git vs GitHub Repository">
+<TableCard>
 | Aspect | Git Repository | GitHub Repository |
 |---|---|---|
 | Core purpose | تتبع تاريخ الملفات وإدارة التغييرات | استضافة Git repository وإتاحة التعاون حوله |
@@ -83,6 +84,7 @@ my-project/
 | Local operation | يعمل محليًا بدون اتصال بالإنترنت | يحتاج اتصالًا للوصول إلى الخدمة |
 | Issues & Pull Requests | ليست جزءًا من Git نفسه | أدوات تعاون توفرها منصة GitHub |
 | Access management | يعتمد على الوصول إلى ملفات الـ repository والبيئة المحيطة | يوفر إعدادات صلاحيات ورؤية للـ repository |
+</TableCard>
 </TableCard>
 
 **الخلاصة:** Git هو نظام إدارة الإصدارات، وGitHub هو منصة تستضيف Git repositories وتضيف أدوات للتعاون والإدارة.
@@ -121,7 +123,11 @@ my-project/
 </li>
 <li>
 
-<InfoCard title="Initialize" description="قرر إذا كنت تريد تهيئة repository بملف README أو `.gitignore` أو LICENSE." icon="code" />
+<InfoCard title="Initialize" icon="code">
+
+قرر إذا كنت تريد تهيئة repository بملف README أو `.gitignore` أو LICENSE.
+
+</InfoCard>
 
 </li>
 <li>
@@ -233,6 +239,7 @@ git remote set-url origin git@github.com:OWNER/REPOSITORY.git
 ### III. Comparison
 
 <TableCard title="Public vs Private">
+<TableCard>
 | Aspect | Public | Private |
 |---|---|---|
 | General visibility | متاح للعامة | مقتصر على من لديهم صلاحية |
@@ -240,6 +247,7 @@ git remote set-url origin git@github.com:OWNER/REPOSITORY.git
 | Collaboration | يمكن التعاون مع مساهمين وفق الصلاحيات | التعاون يتطلب منح الوصول المناسب |
 | Secret protection | ضروري | ضروري أيضًا |
 | Best use | Open source والمحتوى العام | المشاريع الداخلية أو غير المنشورة |
+</TableCard>
 </TableCard>
 
 ### IV. How to Choose
@@ -263,6 +271,8 @@ flowchart TD
     class B decision
     class C,D option
     class E,F,G safe
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 قبل تحويل repository إلى Public، راجع الملفات وتاريخ Git وأي معلومات حساسة. تغيير visibility لا يمحو الأسرار التي سبق أن دخلت التاريخ، ولا يضمن إزالة نسخ سابقة لدى أشخاص أو خدمات أخرى.
@@ -296,6 +306,8 @@ flowchart TD
     class B,C branch
     class D,E review
     class F success
+
+    linkStyle default stroke:#9B8059,stroke-width:1.5px
 ```
 
 ### II. Changing the Default Branch
@@ -560,12 +572,14 @@ project-template/
 ### IV. Template vs Fork vs Clone
 
 <TableCard title="Template vs Fork vs Clone">
+<TableCard>
 | Feature | Template | Fork | Clone |
 |---|---|---|---|
 | Primary purpose | بدء repository جديد من structure جاهز | إنشاء نسخة مرتبطة بالـ upstream repository | إنشاء working copy محلية |
 | Relationship to source | لا ينشئ عادةً علاقة fork | يحتفظ بعلاقة fork على GitHub | لا ينشئ وحده علاقة fork على GitHub |
 | Typical use | Project scaffolding | المساهمة في مشروع آخر أو تطوير fork | العمل محليًا على repository |
 | Git history | يعتمد على طريقة إنشاء template والخيارات المستخدمة | يُحافظ عادةً على تاريخ المشروع الأصلي | ينقل تاريخ Git المتاح في المصدر المستنسخ |
+</TableCard>
 </TableCard>
 
 **نقطة مهمة:** إنشاء مشروع من template ليس بديلًا عن `git clone`. الأول ينشئ repository جديدًا اعتمادًا على قالب، بينما الثاني ينشئ نسخة محلية من repository موجود.
