@@ -33,7 +33,7 @@ Kubernetes بيصدر إصدارات جديدة بشكل دوري. الرقم ا
 
 </InfoCard>
 
-### Key Concepts
+### I. Key Concepts
 
 - **Major / Minor Versions:** تحديد الإصدار الحالي وفهم الفروق بين الإصدارات.
 - **Patch Releases:** تحديثات صغيرة لإصلاح الأخطاء والثغرات الأمنية.
@@ -73,7 +73,7 @@ Kubernetes بيصدر إصدارات جديدة بشكل دوري. الرقم ا
 
 ## 4. Upgrade Execution
 
-### Control Plane Upgrade
+### I. Control Plane Upgrade
 
 ابدأ بترقية مكونات الـ Control Plane أولًا، لأن ده بيضمن إن الـ Cluster يتعامل مع الإصدارات الجديدة بشكل صحيح.
 
@@ -83,7 +83,7 @@ Kubernetes بيصدر إصدارات جديدة بشكل دوري. الرقم ا
 
 </InfoCard>
 
-### Worker Node Upgrade
+### II. Worker Node Upgrade
 
 بعد التأكد من سلامة الـ Control Plane، ابدأ بترقية الـ Worker Nodes واحدة تلو الأخرى، مع استخدام `drain` لتجهيز كل Node قبل الصيانة.
 
