@@ -1,0 +1,130 @@
+---
+title: Kubernetes Releases — Versions & Compatibility
+description: Understanding Kubernetes release versions, version compatibility rules, upgrade planning, control plane upgrades, and worker node upgrades.
+order: 46
+level: beginner
+tags:
+  - kubernetes
+  - cluster-maintenance
+  - cluster-upgrades
+  - release-versions
+  - version-compatibility
+draft: false
+language: ar
+---
+
+## Overview
+
+ترقية Kubernetes مش مجرد تحديث رقم الإصدار. كل إصدار بيحمل تحسينات، إصلاحات أمان، وتغييرات في الـ APIs. في هذا الموضوع، هنفهم إزاي نقرأ أرقام الإصدارات، ونختار إصدارًا متوافقًا، ونخطط للترقية بأمان.
+
+<InfoCard title="Learning Objectives" icon="flag" variant="insight">
+
+بنهاية الموضوع، هتكون قادر على فهم نظام إصدارات Kubernetes، ومراجعة التوافق بين المكونات، والتخطيط لترقية منسقة تقلل التأثير على التطبيقات.
+
+</InfoCard>
+
+## 1. Kubernetes Release Versions
+
+Kubernetes بيصدر إصدارات جديدة بشكل دوري. الرقم الأساسي (مثل `1.28`) بيمثل إصدارًا رئيسيًا يتضمن تحديثات عبر جميع المكونات.
+
+<InfoCard title="Release Cycle" icon="cycle" variant="concept">
+
+كل إصدار جديد بيتم نشره بعد اختبارات مكثفة، وبيتم دعمه لفترة محددة قبل إيقاف التحديثات الأمنية له.
+
+</InfoCard>
+
+### Key Concepts
+
+- **Major / Minor Versions:** تحديد الإصدار الحالي وفهم الفروق بين الإصدارات.
+- **Patch Releases:** تحديثات صغيرة لإصلاح الأخطاء والثغرات الأمنية.
+- **Version Skew Policy:** القاعدة اللي بتحدد مدى اختلاف الإصدارات بين مكونات الـ Cluster.
+
+## 2. Version Compatibility
+
+قبل تنفيذ أي ترقية، لازم نتأكد إن كل المكونات متوافقة مع الإصدار الجديد.
+
+<CardGrid>
+
+<InfoCard title="API Compatibility" icon="shield" variant="feature">
+
+تأكد إن الـ APIs اللي بتستخدمها التطبيقات متوفرة ومُدعمة في الإصدار المستهدف.
+
+</InfoCard>
+
+<InfoCard title="Component Versions" icon="layers" variant="feature">
+
+راجع توافق إصدارات `kubelet`، `kubeadm`، ومكونات الـ Control Plane معًا.
+
+</InfoCard>
+
+</CardGrid>
+
+## 3. Upgrade Planning
+
+التخطيط الجيد هو أساس الترقية الآمنة. اتبع الخطوات المنظمة:
+
+<Steps>
+<li>راجع الإصدار الحالي وأرقام المكونات.</li>
+<li>حدد الإصدار المستهدف بناءً على متطلبات التوافق والأمان.</li>
+<li>افحص الـ Release Notes للتغييرات المحتملة على الـ APIs والـ Features.</li>
+<li>جهّز بيئة اختبار للتحقق من تأثير الترقية.</li>
+<li>حدّد ترتيب الترقية: Control Plane أولًا، ثم Worker Nodes.</li>
+</Steps>
+
+## 4. Upgrade Execution
+
+### Control Plane Upgrade
+
+ابدأ بترقية مكونات الـ Control Plane أولًا، لأن ده بيضمن إن الـ Cluster يتعامل مع الإصدارات الجديدة بشكل صحيح.
+
+<InfoCard title="Control Plane First" icon="wrench" variant="tip">
+
+ترقية الـ Control Plane قبل الـ Worker Nodes تقلل من مخاطر التوافق أثناء العملية.
+
+</InfoCard>
+
+### Worker Node Upgrade
+
+بعد التأكد من سلامة الـ Control Plane، ابدأ بترقية الـ Worker Nodes واحدة تلو الأخرى، مع استخدام `drain` لتجهيز كل Node قبل الصيانة.
+
+<ChecklistCard title="Before Upgrading Nodes" items={[
+  "مراجعة صحة الـ Cluster الحالية",
+  "التأكد من وجود Capacity كافية على Nodes بديلة",
+  "مراجعة PodDisruptionBudgets",
+  "تنفيذ Drain على الـ Node المستهدفة",
+  "تنفيذ الترقية والتحقق من نجاحها"
+]} />
+
+## 5. Modern Upgrade Flow
+
+المخطط التالي يوضح مسار الترقية المنظم:
+
+```mermaid
+flowchart TD
+    A(["Current Cluster"]) --> B(["Review Release Notes"])
+    B --> C(["Plan Upgrade Path"])
+    C --> D(["Upgrade Control Plane"])
+    D --> E(["Verify Control Plane"])
+    E --> F(["Drain Worker Nodes"])
+    F --> G(["Upgrade Nodes One by One"])
+    G --> H(["Validate Cluster Health"])
+    H --> I(["Upgrade Complete"])
+
+    classDef start fill:#e8d8bd,stroke:#9a7953,color:#35291f,rx:12,ry:12,stroke-width:2px
+    classDef process fill:#f4ead9,stroke:#b79b76,color:#35291f,rx:10,ry:10,stroke-width:1.5px
+    classDef verify fill:#e3e8dc,stroke:#849276,color:#30392c,rx:10,ry:10,stroke-width:1.5px
+    classDef complete fill:#dce8dc,stroke:#729174,color:#263c2b,rx:12,ry:12,stroke-width:2px
+
+    class A start
+    class B,C,D,E,F,G,H process
+    class I complete
+```
+
+## Summary
+
+- **Releases:** فهم أرقام الإصدارات ودورة الإصدار.
+- **Compatibility:** مراجعة التوافق قبل الترقية.
+- **Planning:** التخطيط للترقية بأمان مع تقليل التأثير.
+- **Execution:** ترقية Control Plane أولًا، ثم Worker Nodes واحدة تلو الأخرى.
+
+في الموضوع القادم، هنبدأ بأول مشكلة عملية: **إيه اللي بيحصل لما نفقد Node من الـ Cluster، وإزاي نجهزها للصيانة بطريقة آمنة؟**
