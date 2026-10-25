@@ -1,0 +1,795 @@
+---
+title: Kubernetes Cluster Architecture — Overview
+description: Understand the main components of a Kubernetes cluster and how the control plane and worker nodes work together.
+order: 4
+category: container-orchestration
+level: beginner
+draft: false
+tags: [kubernetes]
+language: ar
+---
+
+## 1. Big Picture
+
+<InfoCard variant="concept" title="The Big Picture" icon="layers">
+  الـKubernetes Cluster بيتكوّن من Control Plane بيدير الـCluster، وWorker Nodes بتوفّر بيئة تشغيل الـapplication workloads.
+</InfoCard>
+
+قبل ما ندخل في تفاصيل كل Component، خلينا نفهم الأول **Kubernetes Cluster Architecture** بشكل عام.
+
+الـ**Cluster** هو مجموعة من الـMachines والـcomponents اللي بتشتغل مع بعض علشان Kubernetes يقدر يشغّل ويدير الـcontainerized applications.
+
+الـarchitecture بتتقسم بشكل أساسي إلى جزأين:
+
+```mermaid
+flowchart TB
+    C(["Kubernetes Cluster"])
+
+    C --> CP(["Control Plane"])
+    C --> W(["Worker Nodes"])
+
+    CP --> M(["Manage the Cluster"])
+    W --> R(["Run Workloads"])
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef plane fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef role fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+
+    class C cluster
+    class CP plane
+    class W worker
+    class M,R role
+
+```
+
+بشكل مبسط:
+
+> **Control Plane = Manages the Cluster**
+>
+> **Worker Nodes = Run the Workloads**
+
+الـControl Plane مسؤول عن إدارة حالة الـCluster واتخاذ قرارات الـorchestration، بينما الـWorker Nodes بتشغّل الـPods اللي بتحتوي على الـapplication containers.
+
+## 2. Kubernetes Cluster Architecture
+
+<InfoCard variant="concept" title="Architecture Overview" icon="layers">
+  كل Component ليه مسؤولية محددة، والـcomponents بتتواصل من خلال Kubernetes API أو آليات الاتصال الداخلية المناسبة لكل Component.
+</InfoCard>
+
+الـControl Plane بيضم المكونات المسؤولة عن إدارة الـCluster، والـWorker Nodes بتضم المكونات المسؤولة عن إدارة الـPods وتشغيل الـcontainers على الـNode.
+
+```mermaid
+flowchart TB
+    subgraph CL["Kubernetes Cluster"]
+        direction TB
+
+        subgraph CP["Control Plane"]
+            direction TB
+            API(["kube-apiserver"])
+            ETCD(["etcd"])
+            SCH(["kube-scheduler"])
+            CTRL(["kube-controller-manager"])
+        end
+
+        subgraph W["Worker Node"]
+            direction TB
+            KL(["kubelet"])
+            KP(["kube-proxy"])
+            CR(["Container Runtime"])
+            POD(["Pods"])
+            CONT(["Containers"])
+
+            CR --> CONT
+            POD --> CONT
+        end
+
+        API <--> ETCD
+        SCH --> API
+        CTRL --> API
+        KL <--> API
+        KL --> CR
+        KP -.-> NET(["Service Networking Rules"])
+    end
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef control fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class API,ETCD,SCH,CTRL control
+    class KL,KP,CR worker
+    class POD,CONT workload
+    class NET component
+
+    style CL fill:#FAF6EF,stroke:#B99A6A,stroke-width:2px
+    style CP fill:#F7EEDF,stroke:#B99A6A,stroke-width:1.5px
+    style W fill:#F0E7D8,stroke:#9B8059,stroke-width:1.5px
+
+```
+
+الرسمة دي **conceptual overview**؛ مش معناها إن كل الاتصالات بتحصل مباشرة بين كل Component والتانية، أو إن كل Cluster لازم يكون فيه Worker Node واحدة فقط.
+
+<Callout type="note">
+الـ`kube-proxy` مش شرط يكون موجودًا في كل Kubernetes installation؛ بعض الـnetworking implementations بتوفّر وظائف Service networking بطرق بديلة.
+</Callout>
+
+## 3. Control Plane
+
+<InfoCard variant="concept" title="Control Plane" icon="layers">
+  الـControl Plane هو مجموعة المكونات المسؤولة عن إدارة الـCluster، وتخزين الحالة المطلوبة، واتخاذ قرارات زي Scheduling، ومتابعة الـresources عن طريق Controllers.
+</InfoCard>
+
+الـ**Control Plane** هو الجزء المسؤول عن إدارة الـCluster.
+
+وظائفه الأساسية بتشمل:
+
+- استقبال ومعالجة الـKubernetes API requests.
+- تخزين الـCluster state.
+- اختيار Node مناسبة للـPods اللي محتاجة Scheduling.
+- تشغيل Controllers بتراقب الموارد وتحاول تحقق الـdesired state.
+
+الـControl Plane الأساسي بيضم:
+
+```mermaid
+flowchart TB
+    CP(["Control Plane"])
+
+    CP --> API(["kube-apiserver"])
+    CP --> ETCD(["etcd"])
+    CP --> SCH(["kube-scheduler"])
+    CP --> CTRL(["kube-controller-manager"])
+
+    classDef plane fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+
+    class CP plane
+    class API,ETCD,SCH,CTRL component
+
+```
+
+كل Component ليه وظيفة مختلفة، وهنفهمها واحدة واحدة.
+
+## 4. kube-apiserver
+
+<InfoCard variant="concept" title="kube-apiserver" icon="layers">
+  الـ`kube-apiserver` هو الـfront end الأساسي للـKubernetes Control Plane، وبيوفّر الـKubernetes API اللي بتتواصل من خلالها الأدوات والـcomponents.
+</InfoCard>
+
+الـ**kube-apiserver** هو نقطة الاتصال الأساسية مع Kubernetes API.
+
+لما تستخدم:
+
+```bash
+kubectl get pods
+```
+
+أنت مش بتكلم الـPods مباشرةً.
+
+الـ`kubectl` بيبعت API request للـAPI Server، والـAPI Server بيتعامل مع الطلب حسب نوعه وصلاحيات المستخدم وحالة الـCluster.
+
+```mermaid
+flowchart LR
+    U(["User"]) --> K(["kubectl"])
+    K --> API(["kube-apiserver"])
+    API --> R(["API Response"])
+    R --> K
+
+    classDef client fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef response fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class U,K client
+    class API api
+    class R response
+
+```
+
+الـAPI Server بيتعامل مع الـetcd، وبيوفّر واجهة الـAPI اللي الـScheduler والـControllers والـkubelet بيستخدموها في عملياتهم.
+
+مثلًا، عند تنفيذ:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+الـAPI Server بيستقبل الـrequest ويتحقق من الـauthentication والـauthorization والـvalidation المناسبين، وبعدها بيتم حفظ التغيير المقبول في الـCluster state.
+
+**افتكر:**
+
+> **kube-apiserver = The Kubernetes API entry point**
+
+هو مش المسؤول عن تشغيل الـcontainers بنفسه؛ مسؤوليته الأساسية هي توفير وإدارة الوصول إلى الـKubernetes API.
+
+## 5. etcd
+
+<InfoCard variant="concept" title="etcd" icon="layers">
+  الـ`etcd` هو distributed key-value store بيستخدمه Kubernetes لتخزين بيانات الـCluster state بشكل دائم.
+</InfoCard>
+
+الـ**etcd** بيخزن البيانات اللي Kubernetes محتاجها عشان يحتفظ بحالة الـresources.
+
+من أمثلة البيانات دي:
+
+- تعريفات الـNodes والـPods.
+- الـDeployments والـReplicaSets.
+- الـdesired configuration للـresources.
+- بيانات وmetadata خاصة بالـCluster.
+
+```mermaid
+flowchart TB
+    API(["kube-apiserver"])
+    ETCD(["etcd"])
+    STATE(["Persisted Cluster State"])
+
+    API <--> ETCD
+    ETCD --> STATE
+
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef store fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef state fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class API api
+    class ETCD store
+    class STATE state
+
+```
+
+مثلًا، لو عايز Deployment يكون عنده:
+
+```yaml
+spec:
+  replicas: 3
+```
+
+القيمة دي جزء من الـdesired state اللي Kubernetes بيحتفظ بيه.
+
+**المهم:**
+
+> **etcd stores the cluster data; it doesn't run your applications.**
+
+حماية الـetcd مهمة جدًا، لأن الوصول غير المصرّح به لبياناته ممكن يعرّض الـCluster كله للخطر.
+
+## 6. kube-scheduler
+
+<InfoCard variant="concept" title="kube-scheduler" icon="layers">
+  الـ`kube-scheduler` بيختار Node مناسبة للـPod اللي لسه متعملهاش Scheduling، بناءً على الـresource requirements والـconstraints والـpolicies.
+</InfoCard>
+
+الـ**kube-scheduler** مسؤول عن اختيار الـNode المناسبة للـPod.
+
+لما تكون عندنا Pod لسه مش متعيّن لها Node، الـScheduler بيقيّم الـNodes المتاحة ويختار واحدة مناسبة لو فيه Node مستوفية الشروط.
+
+```mermaid
+flowchart TB
+    P(["Unscheduled Pod"])
+    P --> S(["kube-scheduler"])
+
+    S --> A(["Node A"])
+    S --> B(["Node B"])
+    S --> C(["Node C"])
+
+    A --> X(["Not Suitable"])
+    B --> Y(["Selected Node"])
+    C --> Z(["Not Suitable"])
+
+    classDef pod fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef scheduler fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef node fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef result fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class P pod
+    class S scheduler
+    class A,B,C node
+    class X,Z result
+    class Y scheduler
+
+```
+
+الـScheduler ممكن ياخد في اعتباره:
+
+- CPU وMemory requests.
+- Node conditions وavailable resources.
+- `nodeSelector` وnode affinity.
+- Taints وtolerations.
+- Pod affinity وanti-affinity.
+- Topology constraints والـscheduling policies.
+
+لكن خد بالك من نقطة مهمة:
+
+> **The Scheduler selects the Node; it does not run the Pod.**
+
+بعد اختيار الـNode، الـkubelet الموجود عليها بيتولى التأكد من تشغيل الـPod المطلوبة.
+
+ولو مفيش Node مناسبة، ممكن تفضل الـPod في حالة `Pending` لحد ما المشكلة تتحل أو الظروف تتغير.
+
+## 7. Controllers and Reconciliation
+
+<InfoCard variant="concept" title="Controllers" icon="layers">
+  الـControllers بتراقب Kubernetes resources، وبتقارن الـcurrent state بالـdesired state، وبتنفّذ الإجراءات اللازمة لتقليل الفرق بينهم.
+</InfoCard>
+
+الـ**Controllers** من أهم الأفكار في Kubernetes.
+
+وظيفتها الأساسية هي متابعة الموارد ومحاولة الوصول للحالة المطلوبة.
+
+مثلًا، لو الـdesired state هو 3 Pods، لكن الموجود حاليًا Pod واحدة فقط، فالـcontroller المسؤولة عن إدارة الـreplicas هتحاول تعوّض الـPods الناقصة.
+
+```mermaid
+flowchart TB
+    D(["Desired State<br/>3 Pods"])
+    C(["Current State<br/>1 Pod"])
+
+    D --> R(["Reconciliation"])
+    C --> R
+
+    R --> A(["Create Missing Pods"])
+    A --> N(["Current State Moves Toward 3 Pods"])
+
+    classDef state fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef reconcile fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef action fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class D,C state
+    class R reconcile
+    class A,N action
+
+```
+
+العملية دي اسمها **Reconciliation**.
+
+وهي مش مجرد عملية بتحصل مرة واحدة؛ الـControllers بتكرر المراقبة والاستجابة للتغييرات.
+
+```mermaid
+flowchart LR
+    D(["Desired State"]) --> C(["Controller"])
+    S(["Current State"]) --> C
+
+    C --> A(["Corrective Action"])
+    A --> N(["Updated State"])
+    N -.-> C
+
+    classDef state fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef controller fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef action fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class D,S,N state
+    class C controller
+    class A action
+
+```
+
+الـ`kube-controller-manager` بيشغّل مجموعة من الـControllers الأساسية، لكن مش كل Controller في Kubernetes لازم تكون جزءًا منه؛ بعض الـControllers بتشتغل داخل مكونات أو إضافات أخرى.
+
+**افتكر:**
+
+> **Controllers continuously work to move the current state toward the desired state.**
+
+## 8. Worker Nodes
+
+<InfoCard variant="concept" title="Worker Nodes" icon="layers">
+  الـWorker Nodes هي الـMachines اللي بتشغّل الـPods، وبتحتوي عادةً على kubelet وContainer Runtime، بالإضافة إلى مكونات الـnetworking حسب الـCluster setup.
+</InfoCard>
+
+الجزء التاني من الـCluster هو **Worker Nodes**.
+
+الـNode ممكن تكون:
+
+- Physical machine.
+- Virtual machine.
+- Cloud instance.
+
+وكل Node بتوفّر الـcompute resources المطلوبة لتشغيل الـworkloads.
+
+```mermaid
+flowchart TB
+    N(["Worker Node"])
+
+    N --> KL(["kubelet"])
+    N --> CR(["Container Runtime"])
+    N --> KP(["kube-proxy<br/>when used"])
+    N --> P(["Pods"])
+
+    CR --> C(["Containers"])
+    P --> C
+
+    classDef node fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class N node
+    class KL,CR,KP component
+    class P,C workload
+
+```
+
+كل Component ليها دور مختلف في تشغيل الـPods وإدارة الـNode والـnetworking.
+
+## 9. kubelet
+
+<InfoCard variant="concept" title="kubelet" icon="layers">
+  الـ`kubelet` هو الـNode Agent اللي بيتأكد من تنفيذ الـPod specifications المسندة للـNode، وبيتابع حالة الـPods والـcontainers.
+</InfoCard>
+
+الـ**kubelet** بيشتغل على الـNode، وبيتواصل مع الـAPI Server علشان يتابع الـPod specifications المسندة للـNode.
+
+ومن مسؤولياته:
+
+- التأكد من تشغيل الـPods المطلوبة على الـNode.
+- التواصل مع الـContainer Runtime من خلال الـCRI.
+- متابعة حالة الـPods والـcontainers.
+- إرسال معلومات عن حالة الـNode والـworkloads للـControl Plane.
+
+```mermaid
+flowchart TB
+    API(["kube-apiserver"])
+    KL(["kubelet"])
+    CR(["Container Runtime"])
+    P(["Pods and Containers"])
+
+    API <--> KL
+    KL <--> CR
+    CR --> P
+
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef agent fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef runtime fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class API api
+    class KL agent
+    class CR,P runtime
+
+```
+
+الـkubelet مش هو الـScheduler، ومش بيقرر بنفسه الـPod المفروض تتوزع على أنهي Node. هو بيتعامل مع الـPods المسندة للـNode بتاعته.
+
+## 10. Container Runtime
+
+<InfoCard variant="concept" title="Container Runtime" icon="layers">
+  الـContainer Runtime هو البرنامج اللي بيتولى تشغيل وإدارة الـcontainers على الـNode، وKubernetes بيتعامل معاه من خلال الـContainer Runtime Interface (CRI).
+</InfoCard>
+
+الـ**Container Runtime** مسؤول عن تشغيل الـcontainers وإدارة دورة حياتها على الـNode.
+
+من الأمثلة الشائعة:
+
+- `containerd`
+- `CRI-O`
+
+الـkubelet بيتواصل مع الـruntime من خلال **CRI — Container Runtime Interface**.
+
+```mermaid
+flowchart TB
+    K(["kubelet"])
+    CRI(["Container Runtime Interface"])
+    R(["Container Runtime"])
+    C(["Application Containers"])
+
+    K <--> CRI
+    CRI <--> R
+    R --> C
+
+    classDef agent fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef interface fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef runtime fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class K agent
+    class CRI interface
+    class R,C runtime
+
+```
+
+بالتالي، Kubernetes مش هو الـsoftware اللي بينفّذ تشغيل الـcontainer مباشرةً؛ الـkubelet بيطلب من الـruntime تنفيذ العمليات المطلوبة.
+
+## 11. kube-proxy
+
+<InfoCard variant="concept" title="kube-proxy" icon="layers">
+  الـ`kube-proxy` بيساعد في تنفيذ Service networking على الـNodes عن طريق إدارة network rules لتوجيه الاتصالات إلى الـService backends.
+</InfoCard>
+
+الـ**kube-proxy** مرتبط بالـnetworking داخل Kubernetes.
+
+في الـsetups اللي بتستخدمه، بيعمل configuration لقواعد الشبكة المطلوبة عشان الـtraffic الموجّه للـService يوصل للـappropriate backend Pods.
+
+```mermaid
+flowchart TB
+    C(["Client"])
+    S(["Service"])
+    KP(["kube-proxy<br/>or equivalent networking implementation"])
+    P1(["Pod 1"])
+    P2(["Pod 2"])
+
+    C --> S
+    S --> KP
+    KP --> P1
+    KP --> P2
+
+    classDef client fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef service fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+    classDef networking fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef pod fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class C client
+    class S service
+    class KP networking
+    class P1,P2 pod
+
+```
+
+الرسم ده conceptual؛ الـService مش بالضرورة تكون software process مستقلة بتستقبل كل packet، والـtraffic handling الفعلي بيعتمد على الـnetwork rules والـCNI والـimplementation المستخدمة.
+
+<Callout type="note">
+مش كل Kubernetes Cluster محتاج `kube-proxy` تحديدًا. بعض الـnetworking implementations بتنفّذ وظائف Service forwarding بطرق بديلة.
+</Callout>
+
+## 12. The Complete Architecture
+
+<InfoCard variant="concept" title="The Complete Architecture" icon="layers">
+  الـControl Plane بيقدّم الإدارة والـAPI والـScheduling والـReconciliation، بينما الـWorker Nodes بتنفّذ الـworkloads باستخدام الـkubelet والـContainer Runtime.
+</InfoCard>
+
+```mermaid
+flowchart TB
+    subgraph CL["Kubernetes Cluster"]
+        direction TB
+
+        subgraph CP["Control Plane"]
+            direction TB
+            API(["kube-apiserver"])
+            ETCD(["etcd"])
+            SCH(["kube-scheduler"])
+            CTRL(["kube-controller-manager"])
+
+            API <--> ETCD
+            SCH --> API
+            CTRL --> API
+        end
+
+        subgraph W["Worker Node"]
+            direction TB
+            KL(["kubelet"])
+            CR(["Container Runtime"])
+            P(["Pods"])
+            C(["Containers"])
+
+            KL <--> CR
+            CR --> C
+            P --> C
+        end
+
+        API <--> KL
+    end
+
+    classDef control fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class API,ETCD,SCH,CTRL control
+    class KL,CR worker
+    class P,C workload
+
+    style CL fill:#FAF6EF,stroke:#B99A6A,stroke-width:2px
+    style CP fill:#F7EEDF,stroke:#B99A6A,stroke-width:1.5px
+    style W fill:#F0E7D8,stroke:#9B8059,stroke-width:1.5px
+
+```
+
+الـarchitecture دي مبسطة لتوضيح المكونات الرئيسية. الـCluster الحقيقي ممكن يحتوي على عدة Control Plane Nodes وعدة Worker Nodes، ومكونات إضافية للـnetworking والـstorage والـobservability.
+
+## 13. How Everything Works Together
+
+<InfoCard variant="concept" title="From API Request to Running Workload" icon="layers">
+  لما نعمل apply لـDeployment، Kubernetes بيحفظ الـdesired state، والـControllers بتنشئ وتدير الـReplicaSets والـPods، والـScheduler بيختار Node، وبعدها الـkubelet والـContainer Runtime بيتولوا تشغيل الـworkload.
+</InfoCard>
+
+خلينا ناخد مثال: عايزين نشغّل Deployment فيها 3 replicas.
+
+```mermaid
+flowchart TB
+    U(["kubectl apply"])
+    API(["kube-apiserver"])
+    DB(["etcd"])
+    CTRL(["Deployment Controller"])
+    RS(["ReplicaSet"])
+    SCH(["kube-scheduler"])
+    KL(["kubelet"])
+    CR(["Container Runtime"])
+    P(["Running Pods"])
+
+    U --> API
+    API <--> DB
+    API --> CTRL
+    CTRL --> RS
+    RS --> SCH
+    SCH --> API
+    API --> KL
+    KL --> CR
+    CR --> P
+
+    classDef client fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef api fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef control fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+
+    class U client
+    class API,DB api
+    class CTRL,RS,SCH control
+    class KL,CR,P worker
+
+```
+
+الرسم ده بيعرض المسار بشكل مبسط، مش sequence زمني كامل لكل request داخلي.
+
+خلينا نفهم الخطوات:
+
+1. `kubectl` بيبعت الـmanifest للـAPI Server.
+2. الـAPI Server بيتحقق من الطلب ويحفظ التغييرات المقبولة في الـCluster state.
+3. الـDeployment Controller بيلاحظ الـDeployment وبيضمن وجود ReplicaSet مناسبة.
+4. الـReplicaSet Controller بيحاول توفير العدد المطلوب من الـPods.
+5. الـScheduler بيختار Node مناسبة لكل Pod محتاجة Scheduling.
+6. الـkubelet على الـNode المختارة بيطلب من الـContainer Runtime تشغيل الـcontainers المطلوبة.
+7. Kubernetes بيستمر في متابعة الحالة ومحاولة تحقيق الـdesired state.
+
+**مهم:** مش كل الخطوات بتحصل كعملية واحدة متزامنة. Kubernetes بيعتمد على Controllers وComponents بتراقب التغييرات وتستجيب لها بشكل مستمر.
+
+## 14. The Kubernetes Control Loop
+
+<InfoCard variant="concept" title="The Kubernetes Control Loop" icon="layers">
+  Kubernetes نظام قائم على المراقبة المستمرة والـReconciliation؛ الـControllers بتحاول تقلل الفرق بين الـdesired state والـcurrent state.
+</InfoCard>
+
+Kubernetes مش مجرد مجموعة Commands بتنفذها مرة واحدة وخلاص.
+
+هو **Continuous Control System**.
+
+لو الـdesired state هو 3 replicas، لكن الـcurrent state فيها Replica واحدة، الـcontroller المناسبة هتحاول تعالج الفرق.
+
+```mermaid
+flowchart TB
+    D(["Desired State"])
+    C(["Current State"])
+    R(["Controller Reconciliation"])
+    A(["Corrective Action"])
+    N(["Updated Current State"])
+
+    D --> R
+    C --> R
+    R --> A
+    A --> N
+    N -.-> R
+
+    classDef state fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+    classDef controller fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef action fill:#f5efe6,stroke:#b08b62,stroke-width:2px,color:#3d3329;
+
+    class D,C,N state
+    class R controller
+    class A action
+
+```
+
+الآلية دي بتساعد Kubernetes في التعامل مع:
+
+- Failed Pods.
+- Replica count changes.
+- بعض حالات الـNode failure.
+- Application rollouts.
+- Changes in resource specifications.
+
+لكن ده مش معناه إن Kubernetes يقدر يصلّح أي Application Failure أو يضمن توافر الـapplication في كل الظروف.
+
+مثلًا، لو الـapplication فيها Bug أو محتاجة Database غير متاحة، إعادة إنشاء Pod مش بالضرورة تحل المشكلة.
+
+**الفكرة الأساسية:**
+
+> Kubernetes continuously tries to move the current state toward the desired state.
+
+## 15. The Most Important Mental Model
+
+<InfoCard variant="concept" title="The Architecture Mental Model" icon="layers">
+  افهم كل Component حسب مسؤوليتها: الـAPI Server يستقبل API requests، والـetcd يخزّن الـstate، والـScheduler يختار Node، والـControllers تتابع الحالة، والـkubelet يدير الـPods على الـNode، والـRuntime يشغّل الـcontainers.
+</InfoCard>
+
+```mermaid
+flowchart TB
+    CP(["Control Plane"])
+
+    CP --> API(["kube-apiserver"])
+    CP --> ETCD(["etcd"])
+    CP --> SCH(["Scheduler"])
+    CP --> CTRL(["Controllers"])
+
+    API <--> ETCD
+
+    SCH --> N(["Selected Worker Node"])
+    CTRL --> API
+    N --> KL(["kubelet"])
+    KL --> CR(["Container Runtime"])
+    CR --> P(["Pods and Containers"])
+
+    classDef plane fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef workload fill:#eef3f1,stroke:#78968c,stroke-width:2px,color:#2f403a;
+
+    class CP plane
+    class API,ETCD,SCH,CTRL component
+    class N,KL,CR worker
+    class P workload
+
+```
+
+خلّي المسؤوليات دي ثابتة عندك:
+
+- **kube-apiserver:** Provides the Kubernetes API.
+- **etcd:** Stores persistent cluster data.
+- **kube-scheduler:** Selects a Node for an unscheduled Pod.
+- **Controllers:** Reconcile resources toward their desired state.
+- **kubelet:** Manages Pods assigned to its Node.
+- **Container Runtime:** Runs the containers.
+- **Worker Nodes:** Provide the environment where workloads run.
+
+## 16. Quick Reference
+
+<InfoCard variant="concept" title="Quick Reference" icon="layers">
+  استخدم الجدول ده كمراجعة سريعة قبل ما تدخل في تفاصيل كل Component.
+</InfoCard>
+
+| Component | Main Responsibility |
+|---|---|
+| `kube-apiserver` | Kubernetes API entry point |
+| `etcd` | Stores persistent cluster state |
+| `kube-scheduler` | Selects Nodes for unscheduled Pods |
+| `kube-controller-manager` | Runs core controllers |
+| Controllers | Reconcile resources toward desired state |
+| `kubelet` | Manages Pods on a Node |
+| Container Runtime | Runs and manages containers |
+| `kube-proxy` | Implements Service networking rules when used |
+| Worker Node | Provides compute resources for workloads |
+| Pod | Smallest deployable unit in Kubernetes |
+
+## 17. Final Mental Model
+
+<InfoCard variant="concept" title="Final Mental Model" icon="layers">
+  الـCluster هو منظومة متكاملة: الـControl Plane بيدير ويُنسّق، والـWorker Nodes بتشغّل الـworkloads، والـControllers بتحاول باستمرار تحافظ على الحالة المطلوبة.
+</InfoCard>
+
+```mermaid
+flowchart TB
+    CL(["Kubernetes Cluster"])
+
+    CL --> CP(["Control Plane"])
+    CL --> W(["Worker Nodes"])
+
+    CP --> API(["API Server"])
+    CP --> ETCD(["etcd"])
+    CP --> SCH(["Scheduler"])
+    CP --> CTRL(["Controllers"])
+
+    W --> KL(["kubelet"])
+    W --> CR(["Container Runtime"])
+    W --> P(["Pods"])
+    CR --> C(["Containers"])
+
+    classDef cluster fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef plane fill:#f3eef4,stroke:#9a7fa0,stroke-width:2px,color:#3e3342;
+    classDef worker fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+    classDef component fill:#f1eee8,stroke:#9b8f7e,stroke-width:2px,color:#3d3933;
+
+    class CL cluster
+    class CP plane
+    class W worker
+    class API,ETCD,SCH,CTRL,KL,CR,P,C component
+
+```
+
+**The core idea:**
+
+> **Kubernetes Cluster = Control Plane + Worker Nodes**
+
+> **Control Plane manages and coordinates.**
+
+> **Worker Nodes run the workloads.**
+
+> **Controllers continuously work toward the desired state.**
