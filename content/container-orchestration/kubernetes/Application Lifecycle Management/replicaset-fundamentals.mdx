@@ -1,0 +1,611 @@
+---
+title:  ReplicaSet Fundamentals
+description: Understand Kubernetes ReplicaSets, desired state, selectors, self-healing, scaling, reconciliation, and how ReplicaSets relate to Pods and Deployments.
+category: container-orchestration
+order: 10
+level: beginner
+draft: false
+tags:
+  - kubernetes
+language: ar
+---
+
+## Introduction
+
+بعد ما فهمنا الـ Pods والـ Pod Lifecycle، نقدر نبدأ نفهم إزاي Kubernetes بيحافظ على عدد معين من الـ Pods بدل ما نعتمد على إنشاء كل Pod وإدارتها يدويًا.
+
+هنا بيظهر دور الـ **ReplicaSet**.
+
+الـ ReplicaSet هو Kubernetes resource مسؤول عن الحفاظ على العدد المطلوب من الـ Pods المطابقة للـ selector الخاص به، عن طريق إنشاء Pods جديدة أو تقليل العدد حسب الحالة الفعلية.
+
+<Callout type="note">
+  الـ ReplicaSet مش بيشغّل الـ Containers بنفسه، ومش بيضمن إن الـ Application سليمة وظيفيًا. دوره الأساسي هو الحفاظ على عدد الـ matching Pods المطلوب.
+</Callout>
+
+## 1. What Is a ReplicaSet?
+
+افترض إن عندك Application محتاجة 3 Pod replicas.
+
+الـ Desired State عندك هي:
+
+```text
+Desired Replicas = 3
+```
+
+الـ ReplicaSet بيحاول يخلي العدد الفعلي من الـ Pods المطابقة يساوي العدد المطلوب.
+
+```mermaid
+flowchart TB
+    R(["ReplicaSet"])
+
+    R --> P1(["Pod 1"])
+    R --> P2(["Pod 2"])
+    R --> P3(["Pod 3"])
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef pod fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class R main
+    class P1,P2,P3 pod
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الفكرة الأساسية:
+
+> **A ReplicaSet maintains the desired number of matching Pod replicas.**
+
+كلمة *matching* مهمة، لأن الـ ReplicaSet مش بيحسب كل الـ Pods الموجودة في الـ Namespace، لكنه بيحسب الـ Pods اللي بتطابق الـ selector الخاص به.
+
+## 2. Why Do We Need ReplicaSets?
+
+لو شغّلت Application داخل Pod واحدة من غير Controller مسؤول عن تعويضها، وحصل إن الـ Pod اتمسحت أو انتهت، مش هيكون عندك ReplicaSet يعيد إنشاء Pod بديلة تلقائيًا.
+
+```mermaid
+flowchart TD
+    A(["Application"])
+    P(["Single Pod"])
+    X(["Pod Deleted"])
+
+    A --> P --> X
+
+    classDef app fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef pod fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef warning fill:#f0dfd6,stroke:#b47760,color:#492d24,stroke-width:2px
+
+    class A app
+    class P pod
+    class X warning
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+أما لو الـ Pod بتديرها ReplicaSet، فالـ controller بيلاحظ إن العدد الفعلي أقل من العدد المطلوب، وبيحاول إنشاء Pod بديلة.
+
+```mermaid
+flowchart TD
+    R(["ReplicaSet"])
+
+    P1(["Pod 1"])
+    P2(["Pod 2"])
+    X(["One Pod disappears"])
+
+    D(["Current = 2"])
+    C(["Create replacement Pod"])
+    P3(["New Pod"])
+
+    R --> P1
+    R --> P2
+    R --> X
+
+    X --> D --> C --> P3
+    C --> R
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef pod fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+    classDef action fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+
+    class R main
+    class P1,P2,P3 pod
+    class X,D,C action
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الـ ReplicaSet مش محتاج منك تشغّل `kubectl run` كل مرة Pod تختفي؛ هو بيحاول يحافظ على الـ Desired State تلقائيًا.
+
+## 3. Desired State vs Current State
+
+دي أهم فكرة في ReplicaSet، وهي جزء أساسي من طريقة عمل Kubernetes Controllers عمومًا.
+
+- **Desired State:** الحالة اللي إنت طالب من Kubernetes يحافظ عليها.
+- **Current State:** الحالة الفعلية اللي الـ controller بيلاحظها.
+
+مثلًا، لو المطلوب 3 Pods لكن الموجود حاليًا 2:
+
+```mermaid
+flowchart TD
+    D(["Desired State: 3 Pods"])
+    C(["Current State: 2 Pods"])
+    Q{"Do they match?"}
+    A(["Create a Pod"])
+    F(["Current State: 3 Pods"])
+
+    D --> Q
+    C --> Q
+    Q -->|No| A --> F
+
+    classDef desired fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef current fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef result fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class D desired
+    class C,A current
+    class Q current
+    class F result
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الهدف إن الـ controller يقلل الفرق بين الحالة المطلوبة والحالة الفعلية.
+
+وده مش معناه إن الوصول للحالة المطلوبة مضمون فورًا؛ ممكن توجد مشاكل في الـ scheduling أو الموارد أو تحميل الـ image أو تشغيل الـ containers.
+
+## 4. ReplicaSet as a Controller
+
+الـ ReplicaSet مش مجرد resource بيخزن قيمة `replicas`.
+
+هو جزء من Kubernetes control plane، والـ ReplicaSet controller بيعمل reconciliation بصورة مستمرة.
+
+الـ mental model المبسط:
+
+```mermaid
+flowchart TD
+    A(["Observe"])
+    B(["Compare Desired and Current State"])
+    C(["Reconcile"])
+    D(["Create or Remove Pods if Needed"])
+
+    A --> B
+    B --> C
+    C --> D
+    D --> A
+
+    classDef process fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef action fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+
+    class A,B process
+    class C,D action
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+مثلًا:
+
+| Desired | Current | Expected action |
+|---:|---:|---|
+| 3 | 2 | Create a Pod |
+| 3 | 3 | No replica-count adjustment needed |
+| 3 | 4 | Remove an excess Pod |
+
+الـ controller مش بيشغّل الخطوات دي مرة واحدة فقط؛ بيستمر في مراقبة الحالة ومحاولة تصحيح الاختلافات.
+
+## 5. How ReplicaSet Identifies Pods
+
+الـ ReplicaSet بيستخدم **Labels and Selectors** علشان يحدد الـ Pods المطابقة له.
+
+افترض إن الـ selector بتاعه هو:
+
+```text
+app=nginx
+```
+
+والـ Namespace فيها الـ Pods التالية:
+
+```text
+Pod A: app=nginx
+Pod B: app=nginx
+Pod C: app=nginx
+Pod D: app=redis
+```
+
+الـ ReplicaSet هيعتبر أول 3 Pods مطابقة، لكن `Pod D` مش هتطابق الـ selector.
+
+```mermaid
+flowchart TB
+    R(["ReplicaSet"])
+    S(["Selector: app=nginx"])
+
+    R --> S
+
+    S --> P1(["Pod A: app=nginx"])
+    S --> P2(["Pod B: app=nginx"])
+    S --> P3(["Pod C: app=nginx"])
+
+    S -. "Does not match" .-> P4(["Pod D: app=redis"])
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef match fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+    classDef other fill:#f0dfd6,stroke:#b47760,color:#492d24,stroke-width:2px
+
+    class R main
+    class S,P1,P2,P3 match
+    class P4 other
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الـ ReplicaSet مش بيهتم باسم Pod بعينها؛ هو بيهتم بعدد الـ matching Pods.
+
+لو Pod اختفت، مش مطلوب يرجّع نفس الاسم أو نفس الـ UID. المطلوب إنه يحاول يوفّر Pod بديلة تحقق شروط الـ selector.
+
+<Callout type="warning">
+  لازم تكون حذر مع الـ selectors المتداخلة. الـ ReplicaSet ممكن يطابق Pods موجودة بالفعل لو labels بتاعتها حققت شروطه، حتى لو مش هو اللي أنشأها. تجنّب استخدام selector واسع ممكن يطابق Pods تابعة لـ workload تاني.
+</Callout>
+
+## 6. ReplicaSet and Pods
+
+الـ ReplicaSet بيدير الـ Pods، والـ Pods هي اللي بتحتوي على الـ Containers.
+
+```mermaid
+flowchart TD
+    R(["ReplicaSet"])
+
+    P1(["Pod 1"])
+    P2(["Pod 2"])
+    P3(["Pod 3"])
+
+    C1(["Container"])
+    C2(["Container"])
+    C3(["Container"])
+
+    R --> P1
+    R --> P2
+    R --> P3
+
+    P1 --> C1
+    P2 --> C2
+    P3 --> C3
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef pod fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef container fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class R main
+    class P1,P2,P3 pod
+    class C1,C2,C3 container
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+العلاقة الأساسية:
+
+- ReplicaSet: يحافظ على عدد الـ matching Pods.
+- Pod: وحدة تشغيل تحتوي على Container واحدة أو أكثر.
+- Container: يشغّل التطبيق أو العملية المطلوبة.
+
+الـ ReplicaSet مش مسؤول مباشرة عن تشغيل الـ Container runtime؛ ده جزء من الـ node-level container execution stack.
+
+## 7. Self-Healing
+
+واحدة من أهم فوائد ReplicaSet هي **Self-Healing** بمعنى تعويض الـ Pods الناقصة.
+
+لو الـ Desired State هي 3، ثم انخفض عدد الـ Pods المطابقة إلى 2، الـ controller هيحاول إنشاء Pod جديدة.
+
+```mermaid
+flowchart TD
+    D(["Desired = 3"])
+    C(["Current = 2"])
+    R(["ReplicaSet Reconciliation"])
+    A(["Create a replacement Pod"])
+    F(["Current returns to 3"])
+
+    D --> R
+    C --> R
+    R --> A
+    A --> F
+
+    classDef desired fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef process fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef result fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class D desired
+    class C,R,A process
+    class F result
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+لكن الـ Self-Healing هنا مش معناه إن الـ ReplicaSet هيصلح الـ Application نفسها، أو هيعيد نفس الـ Pod القديمة. هو بيحاول يحافظ على عدد الـ matching Pods.
+
+## 8. ReplicaSet Does Not Guarantee Application Health
+
+ممكن الـ ReplicaSet يكون عنده 3 Pods، ومع ذلك الـ Application مش بتخدم requests بشكل صحيح.
+
+وجود Pods مش معناه بالضرورة إن الـ Application سليمة أو جاهزة لاستقبال traffic.
+
+```mermaid
+flowchart TD
+    R(["ReplicaSet: Desired = 3"])
+    P1(["Pod 1: Running"])
+    P2(["Pod 2: Running"])
+    P3(["Pod 3: Running"])
+    H(["Application health must be checked separately"])
+
+    R --> P1
+    R --> P2
+    R --> P3
+    P1 --> H
+    P2 --> H
+    P3 --> H
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef pod fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef health fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class R main
+    class P1,P2,P3 pod
+    class H health
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+علشان تراقب صحة الـ Application، Kubernetes بيوفّر mechanisms زي:
+
+- `readinessProbe`: بتحدد إذا كان الـ Container جاهز لاستقبال traffic.
+- `livenessProbe`: بتساعد على اكتشاف حالات فشل تستدعي إعادة تشغيل الـ Container.
+- `startupProbe`: بتدي التطبيق وقت كافي يبدأ قبل تفعيل فحوصات الـ liveness والـ readiness وفق إعداداتها.
+
+الـ readiness failure لوحده مش بيؤدي لإعادة تشغيل الـ Container، بينما فشل الـ liveness أو startup probe بعد تجاوز عدد المحاولات المسموح ممكن يؤدي لإعادة تشغيله.
+
+## 9. Scaling
+
+الـ Scaling هو تغيير العدد المطلوب من الـ replicas.
+
+### I. Scale up
+
+لو العدد المطلوب زاد من 3 إلى 5، الـ ReplicaSet هيحاول إنشاء Podين إضافيين.
+
+```mermaid
+flowchart LR
+    A(["3 Replicas"])
+    B(["Scale Up"])
+    C(["5 Replicas"])
+
+    A --> B --> C
+
+    classDef state fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef action fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+
+    class A,C state
+    class B action
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+### II. Scale down
+
+لو العدد المطلوب انخفض من 5 إلى 2، الـ ReplicaSet هيحاول إنهاء الـ Pods الزائدة للوصول للعدد الجديد.
+
+الـ Scaling مش معناه إن الـ Application هتستجيب أسرع بالضرورة؛ الأداء بيعتمد على طبيعة الـ workload والموارد والـ application architecture.
+
+## 10. ReplicaSet Does Not Choose the Node
+
+لازم نفرق بين دور الـ ReplicaSet ودور الـ kube-scheduler.
+
+الـ ReplicaSet بيطلب الحفاظ على عدد الـ Pods المطلوب، لكن الـ **kube-scheduler** مسؤول عن اختيار الـ Node المناسبة للـ Pods اللي محتاجة scheduling.
+
+```mermaid
+flowchart TD
+    R(["ReplicaSet Controller"])
+    P(["Pod Created"])
+    S(["kube-scheduler"])
+    N(["Selected Node"])
+    K(["kubelet"])
+    C(["Container Runtime"])
+
+    R --> P
+    P --> S
+    S --> N
+    N --> K
+    K --> C
+
+    classDef controller fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef process fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef runtime fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class R controller
+    class P,S,N process
+    class K,C runtime
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+باختصار:
+
+- **ReplicaSet controller:** يحافظ على العدد المطلوب من الـ Pods.
+- **kube-scheduler:** يختار الـ Node للـ Pod اللي محتاجة scheduling.
+- **kubelet:** يتولى إدارة الـ Pod على الـ Node.
+- **Container runtime:** مسؤول عن تشغيل الـ Containers.
+
+## 11. ReplicaSet and Deployment
+
+في التطبيقات المعتادة، بنستخدم **Deployment** لإدارة الـ application workload بدل ما ندير ReplicaSet بشكل مباشر.
+
+الـ Deployment بيستخدم ReplicaSets تحت الـ hood، وبيوفّر capabilities أعلى مستوى، زي rolling updates وrollback لإصدارات الـ Deployment.
+
+```mermaid
+flowchart TD
+    D(["Deployment"])
+    R1(["Current ReplicaSet"])
+    R2(["Previous ReplicaSet"])
+    P1(["Current Pods"])
+    P2(["Previous Pods"])
+
+    D --> R1
+    D -. "Revision History" .-> R2
+    R1 --> P1
+    R2 --> P2
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef resource fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef pods fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class D main
+    class R1,R2 resource
+    class P1,P2 pods
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الفرق الأساسي:
+
+| Feature | ReplicaSet | Deployment |
+|---|---|---|
+| Maintain desired Pod count | Yes | Yes, through ReplicaSets |
+| Replace missing Pods | Yes | Yes, through ReplicaSets |
+| Manage rolling updates | No built-in rollout workflow | Yes |
+| Roll back Deployment revisions | No Deployment rollout history | Yes |
+| Typical application workload | Usually managed indirectly | Recommended |
+
+الـ ReplicaSet مهم لفهم الـ Controllers والـ reconciliation، لكن الـ Deployment هو الاختيار المعتاد لما تحتاج إدارة lifecycle وتحديثات منظمة للتطبيق.
+
+## 12. ReplicaSet Control Loop
+
+ده ملخص للـ behavior كله:
+
+```mermaid
+flowchart TD
+    A(["Desired Replicas = 3"])
+    B(["Observe Matching Pods"])
+    C(["Count Current Replicas"])
+    D{"Does Current Match Desired?"}
+    E(["Keep Monitoring"])
+    F(["Create Additional Pods"])
+    G(["Remove Excess Pods"])
+
+    A --> B --> C --> D
+    D -->|Yes| E --> B
+    D -->|Current is lower| F --> B
+    D -->|Current is higher| G --> B
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef process fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef result fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class A main
+    class B,C,D process
+    class E,F,G result
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الـ controller بيستمر في المحاولة، لكن نجاح الوصول للحالة المطلوبة بيعتمد على ظروف الـ cluster، مثل توافر الموارد وصحة إعدادات الـ workload.
+
+## 13. Practical Example
+
+افترض إن عندك ReplicaSet مطلوب منه 3 replicas، والـ selector هو:
+
+```text
+app=nginx
+```
+
+والـ Cluster فيه:
+
+```text
+Pod A: app=nginx
+Pod B: app=nginx
+Pod C: app=redis
+```
+
+الـ ReplicaSet هيلاقي Podين مطابقين فقط، لأن `Pod C` مش بتطابق الـ selector.
+
+```mermaid
+flowchart TD
+    R(["ReplicaSet"])
+    S(["Selector: app=nginx"])
+    A(["Pod A: app=nginx"])
+    B(["Pod B: app=nginx"])
+    C(["Pod C: app=redis"])
+    D(["Desired = 3, Current = 2"])
+    E(["Create Another Matching Pod"])
+
+    R --> S
+    S --> A
+    S --> B
+    S -. "Not a Match" .-> C
+    A --> D
+    B --> D
+    D --> E
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef match fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+    classDef other fill:#f0dfd6,stroke:#b47760,color:#492d24,stroke-width:2px
+    classDef action fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+
+    class R main
+    class S,A,B match
+    class C other
+    class D,E action
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+الـ ReplicaSet هيحاول إنشاء Pod جديدة تحقق الـ selector، لحد ما العدد الفعلي من الـ matching Pods يوصل إلى العدد المطلوب، بشرط إن الـ cluster يقدر يشغّلها.
+
+## 14. Key Takeaways
+
+<CardGrid>
+  <InfoCard title="Desired State" icon="flag">
+    الـ ReplicaSet بيحاول يحافظ على عدد الـ replicas اللي إنت محدده.
+  </InfoCard>
+  <InfoCard title="Selectors" icon="tag">
+    الـ Selector بيحدد الـ Pods المطابقة بناءً على الـ labels.
+  </InfoCard>
+  <InfoCard title="Self-Healing" icon="cycle">
+    لو العدد الفعلي قل، الـ controller بيحاول إنشاء Pods بديلة.
+  </InfoCard>
+  <InfoCard title="Scaling" icon="layers">
+    زيادة أو تقليل `replicas` بيغيّر العدد المطلوب من الـ Pods.
+  </InfoCard>
+  <InfoCard title="Scheduling" icon="network">
+    الـ kube-scheduler هو اللي بيختار الـ Node، مش الـ ReplicaSet.
+  </InfoCard>
+  <InfoCard title="Deployment" icon="branch">
+    الـ Deployment بيدير ReplicaSets وبيوفر rollout وrollback.
+  </InfoCard>
+</CardGrid>
+
+## Summary
+
+الـ ReplicaSet هو Kubernetes resource بيحافظ على العدد المطلوب من الـ Pods المطابقة للـ selector. بيقارن باستمرار بين الـ Desired State والـ Current State، وبيحاول يصحح الفرق عن طريق إنشاء Pods جديدة أو تقليل العدد.
+
+أهم العلاقات اللي لازم تفضل فاكرها:
+
+```mermaid
+flowchart TB
+    D(["Deployment"])
+    R(["ReplicaSet"])
+    P(["Pods"])
+    C(["Containers"])
+
+    D --> R --> P --> C
+
+    classDef main fill:#e9d8bd,stroke:#96734c,color:#30261c,stroke-width:2px
+    classDef resource fill:#f5ecdd,stroke:#b39a76,color:#30261c,stroke-width:2px
+    classDef container fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class D main
+    class R,P resource
+    class C container
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
+```
+
+- **Deployment:** بيدير الـ rollout والـ ReplicaSets الخاصة بالتطبيق.
+- **ReplicaSet:** بيحافظ على عدد الـ matching Pods.
+- **Pod:** بتحتوي على الـ Containers.
+- **Scheduler:** بيختار الـ Node المناسبة.
+- **kubelet:** بيدير الـ Pods على الـ Node.
+
+الـ mental model النهائي: **Desired State + Selector + Reconciliation = ReplicaSet behavior**.
