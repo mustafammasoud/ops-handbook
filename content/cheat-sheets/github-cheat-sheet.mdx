@@ -1,0 +1,160 @@
+---
+title: GitHub Cheat Sheet
+description: Quick lookup reference for GitHub commands covered in the deep articles, with short Arabic descriptions and English commands.
+category: cheat-sheets
+order: 2
+level: beginner
+draft: false
+tags:
+  - github
+  - git
+  - cheat-sheet
+  - reference
+language: ar
+---
+
+## 1. Overview
+
+<Callout type="warning" title="أوامر خطرة على GitHub">
+- `git push --force` → يعيد كتابة تاريخ الـ remote ويخفي commits؛ البديل الآمن: `git push --force-with-lease` فقط بعد مراجعة `git fetch`.
+- `gh repo delete` / `gh repo archive` → عمليات لا يمكن التراجع عنها بسهولة؛ تأكد من اسم المستودع وأخذ نسخة احتياطية قبل التنفيذ.
+</Callout>
+
+## 2. Most Used
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git status` | يراجع حالة الملفات قبل أي عملية | `git status` |
+| `git add .` | يجهز التغييرات للالتزام | `git add .` |
+| `git commit -m "msg"` | يسجل تغييرًا برسالة واضحة | `git commit -m "feat: add health check"` |
+| `git push -u origin feature/x` | يرفع الفرع ويضبط التتبع | `git push -u origin feature/login` |
+| `git pull --ff-only` | يحدث الفرع المحلي بأمان | `git pull --ff-only` |
+| `gh auth status` | يتحقق من حالة المصادقة مع GitHub CLI | `gh auth status` |
+| `gh pr list` | يعرض Pull Requests | `gh pr list` |
+| `gh issue create` | ينشئ Issue جديدًا من الـ Terminal | `gh issue create --title "Bug" --body "..."` |
+
+---
+
+## 3. Auth and SSH
+<a href="/docs/version-control/git-and-github/authentication-and-access-control" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Authentication And Access Control <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/git-security-and-troubleshooting" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Git Security And Troubleshooting <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `ssh -T git@github.com` | يختبر اتصال SSH مع GitHub | `ssh -T git@github.com` |
+| `git remote set-url origin <url>` | يغيّر عنوان الـ remote (مثل التبديل إلى SSH) | `git remote set-url origin git@github.com:OWNER/REPO.git` |
+| `git remote add origin <url>` | يربط المستودع بـ remote جديد | `git remote add origin git@github.com:OWNER/REPO.git` |
+| `gh auth status` | يعرض حالة تسجيل الدخول لـ GitHub CLI | `gh auth status` |
+| `gh auth login` | يسجّل الدخول عبر GitHub CLI | `gh auth login` |
+
+---
+
+## 4. Repositories and Settings
+<a href="/docs/version-control/git-and-github/github-repositories-and-settings" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Github Repositories And Settings <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git remote -v` | يعرض عناوين الـ remotes المسجلة | `git remote -v` |
+| `git branch -M main` | يعيد تسمية الفرع المحلي إلى `main` | `git branch -M main` |
+| `git push -u origin main` | يرفع `main` ويضبط التتبع | `git push -u origin main` |
+| `git rm --cached <file>` | يزيل ملفًا من الـ Index مع الاحتفاظ به محليًا | `git rm --cached .env` |
+| `gh repo view` | يعرض معلومات المستودع الحالي | `gh repo view` |
+| `gh repo view --web` | يفتح المستودع في المتصفح | `gh repo view --web` |
+
+---
+
+## 5. Pull Requests
+<a href="/docs/version-control/git-and-github/pull-requests" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Pull Requests <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/end-to-end-git-github-workflows" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation End To End Git Github Workflows <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git switch -c feature/x` | ينشئ فرعًا جديدًا للميزة | `git switch -c feature/health-check` |
+| `git status` | يراجع التغييرات قبل إنشاء PR | `git status` |
+| `git diff` | يعرض التغييرات غير المجهّزة | `git diff` |
+| `git diff --check` | يكتشف أخطاء المسافات قبل الالتزام | `git diff --check` |
+| `git add path/to/file` | يجهز ملفًا محددًا للالتزام | `git add path/to/changed-file` |
+| `git commit -m "feat: ..."` | يسجل التغييرات برسالة واضحة | `git commit -m "feat: add health check"` |
+| `git push -u origin feature/x` | يرفع الفرع ويضبط التتبع للـ PR | `git push -u origin feature/health-check` |
+| `git fetch origin` | يجلب التحديثات من الـ remote قبل الدمج | `git fetch origin` |
+| `git merge origin/main` | يدمج تحديثات `main` في الفرع الحالي | `git merge origin/main` |
+| `git branch -d feature/x` | يحذف الفرع المحلي بعد الدمج | `git branch -d feature/health-check` |
+| `gh pr create --draft` | ينشئ PR في حالة Draft | `gh pr create --draft` |
+| `gh pr view` | يعرض تفاصيل PR من الـ Terminal | `gh pr view` |
+| `gh pr merge --squash` | يدمج PR باستخدام Squash Merge | `gh pr merge --squash` |
+
+---
+
+## 6. Forks and Open Source
+<a href="/docs/version-control/git-and-github/forks-and-open-source-contributions" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Forks And Open Source Contributions <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git clone <fork-url>` | ينسخ الـ Fork الخاص بك محليًا | `git clone git@github.com:YOUR_USERNAME/PROJECT.git` |
+| `git remote add upstream <url>` | يربط بالمشروع الأصلي كـ upstream | `git remote add upstream https://github.com/ORIGINAL/PROJECT.git` |
+| `git fetch upstream` | يجلب آخر تحديثات المشروع الأصلي | `git fetch upstream` |
+| `git merge --ff-only upstream/main` | يحدث `main` من upstream بسرعة | `git merge --ff-only upstream/main` |
+| `git push origin main` | يرفع `main` المحدّثة إلى الـ Fork | `git push origin main` |
+| `git push origin my-feature` | يرفع فرع الميزة إلى الـ Fork | `git push origin my-feature` |
+
+---
+
+## 7. Issues and Tasks
+<a href="/docs/version-control/git-and-github/github-issues-and-projects" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Github Issues And Projects <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `gh issue list --state open` | يعرض Issues المفتوحة | `gh issue list --state open` |
+| `gh issue create --title "..."` | ينشئ Issue جديدًا من الـ Terminal | `gh issue create --title "Bug" --body "Details"` |
+| `git commit -m "Fix ... (#42)"` | يربط الـ Commit بـ Issue لإغلاقه تلقائيًا عند الدمج | `git commit -m "Fix container startup (#42)"` |
+
+---
+
+## 8. GitHub CLI and Maintenance
+<a href="/docs/version-control/git-and-github/github-tools-and-maintenance" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Github Tools And Maintenance <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `gh --version` | يتحقق من تثبيت GitHub CLI | `gh --version` |
+| `gh repo clone OWNER/REPO` | ينسخ مستودعًا باستخدام CLI | `gh repo clone OWNER/REPO` |
+| `gh release list` | يعرض الإصدارات المنشورة | `gh release list` |
+| `gh release create v1.2.0` | ينشئ إصدارًا جديدًا مع ملاحظات | `gh release create v1.2.0 --notes "Bug fixes"` |
+| `gh status` | يعرض ملخصًا لحالة النشاط المرتبط بحسابك | `gh status` |
+| `gh repo archive OWNER/REPO` | يؤرشف مستودعًا (لا يحذفه) | `gh repo archive OWNER/REPO` |
+| `gh repo delete OWNER/REPO` | يحذف مستودعًا بشكل دائم (خطير) | `gh repo delete OWNER/REPO` |
+
+---
+
+## 9. Code Reviews and Safe Merge
+<a href="/docs/version-control/git-and-github/code-reviews" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Code Reviews <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/pull-requests" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Pull Requests <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git diff` | يراجع التغييرات قبل مراجعة الكود | `git diff` |
+| `git log --oneline --graph --decorate --all` | يفهم تسلسل الـ commits أثناء المراجعة | `git log --oneline --graph --decorate --all -15` |
+| `git fetch origin` | يجلب التحديثات من الـ remote قبل الدمج | `git fetch origin` |
+| `git merge origin/main` | يدمج التحديثات في الفرع المحلي قبل الدفع | `git merge origin/main` |
+| `gh pr diff` | يعرض Diff لـ PR من الـ Terminal | `gh pr diff` |
+| `gh pr checks` | يعرض حالة الفحوصات المرتبطة بـ PR | `gh pr checks` |
+
+---
+
+## 10. Workflows and Recovery
+<a href="/docs/version-control/git-and-github/end-to-end-git-github-workflows" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation End To End Git Github Workflows <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/troubleshooting-and-decision-making" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Troubleshooting And Decision Making <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git status` | يفحص الحالة قبل أي قرار تصحيحي | `git status` |
+| `git diff --cached` | يراجع ما تم تجهيزه قبل الالتزام | `git diff --cached` |
+| `git reflog -10` | يستعيد موقع HEAD المفقود | `git reflog -10` |
+| `git branch --show-current` | يعرض اسم الفرع الحالي بدقة | `git branch --show-current` |
+| `git switch -c recovery/my-work` | ينشئ فرعًا مؤقتًا للاستعادة | `git switch -c recovery/my-work` |
+| `git branch recovery/previous-state <hash>` | يحفظ نقطة استرجاع من reflog | `git branch recovery/previous-state d4e5f6a` |
+| `git push --force-with-lease` | يرفع بأمان بعد Rebase | `git push --force-with-lease origin feature/login` |

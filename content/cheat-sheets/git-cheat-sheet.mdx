@@ -1,0 +1,212 @@
+---
+title: Git Cheat Sheet
+description: Quick lookup reference for Git commands covered in the deep articles, with short Arabic descriptions and English commands.
+category: cheat-sheets
+order: 1
+level: beginner
+draft: false
+tags:
+  - git
+  - cheat-sheet
+  - reference
+language: ar
+---
+
+## 1. Overview
+
+<Callout type="warning" title="أوامر خطرة">
+- `git reset --hard` → يمسح التغييرات المحلية ويعيد الـ branch؛ البديل الآمن: `git revert` للتاريخ المشترك أو `git reset --mixed` للحفاظ على الملفات.
+- `git push --force` → بيعيد كتابة تاريخ الـ remote ويخفي commits؛ البديل: `git push --force-with-lease` فقط بعد مراجعة `git fetch`.
+- `git clean -fd` / `git clean -fdx` → يحذف ملفات ومجلدات غير متتبعة؛ افحص بـ `git clean -nd` أولًا ولا تستخدمه بدون نسخة احتياطية.
+</Callout>
+
+## 2. Most Used
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git status` | يعرض حالة الـ Working Tree والـ Staging Area | `git status` |
+| `git diff` | يعرض التغييرات غير المجهّزة | `git diff` |
+| `git add .` | يجهز كل التغييرات في المسار الحالي | `git add .` |
+| `git commit -m "msg"` | يسجل Snapshot جديدة برسالة | `git commit -m "fix: handle empty input"` |
+| `git log --oneline` | يعرض تاريخ مختصر | `git log --oneline -10` |
+| `git switch -c feature/x` | ينشئ Branch جديد وينتقل إليه | `git switch -c feature/login` |
+| `git push -u origin feature/x` | يرفع الفرع ويضبط التتبع | `git push -u origin feature/login` |
+| `git pull --ff-only` | يجلب ويحدث باستخدام Fast-forward فقط | `git pull --ff-only` |
+
+---
+
+## 3. Setup and Configuration
+<a href="/docs/version-control/git-and-github/git-setup-and-configuration" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Git Setup And Configuration <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git --version` | يتحقق من تثبيت Git | `git --version` |
+| `git config --global user.name` | يعرض أو يضبط الاسم | `git config --global user.name "Your Name"` |
+| `git config --global user.email` | يعرض أو يضبط البريد | `git config --global user.email "you@example.com"` |
+| `git init` | يبدأ Repository محلي جديد | `mkdir my-project && cd my-project && git init` |
+| `git clone <url>` | ينسخ Repository موجود محليًا | `git clone https://github.com/user/repo.git` |
+
+---
+
+## 4. Creating and Cloning
+<a href="/docs/version-control/git-and-github/git-setup-and-configuration" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Git Setup And Configuration <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git init` | يجهز `.git` لمشروع موجود | `git init` |
+| `git clone <url>` | ينزل نسخة كاملة مع التاريخ | `git clone git@github.com:OWNER/REPO.git` |
+
+---
+
+## 5. Staging and Committing
+<a href="/docs/version-control/git-and-github/basic-git-workflow" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Basic Git Workflow <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git status` | يوضح حالة الملفات والـ Staging Area | `git status` |
+| `git diff` | يعرض التغييرات غير المجهّزة | `git diff` |
+| `git diff --cached` | يعرض التغييرات المجهّزة فقط | `git diff --cached` |
+| `git add <file>` | يجهز ملفًا محددًا | `git add src/app.js` |
+| `git add .` | يجهز كل التغييرات في المسار الحالي | `git add .` |
+| `git commit -m "msg"` | يسجل Snapshot جديدة | `git commit -m "feat: add health check"` |
+
+---
+
+## 6. Viewing History and Diffs
+<a href="/docs/version-control/git-and-github/basic-git-workflow" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Basic Git Workflow <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/commits-and-history" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Commits And History <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git log` | يعرض تاريخ الـ Commits | `git log --oneline --graph --decorate -10` |
+| `git log --oneline` | تاريخ مختصر بسطر واحد لكل commit | `git log --oneline` |
+| `git show <commit>` | يفحص محتوى commit معين | `git show v1.0.0` |
+| `git diff HEAD` | يقارن Working Tree مع HEAD | `git diff HEAD` |
+| `git diff --check` | يكتشف أخطاء المسافات البيضاء | `git diff --check` |
+
+---
+
+## 7. Branching and Merging
+<a href="/docs/version-control/git-and-github/branching-and-merging" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Branching And Merging <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git branch` | يعرض الفروع المحلية | `git branch` |
+| `git branch <name>` | ينشئ فرعًا جديدًا | `git branch feature/auth` |
+| `git switch <branch>` | ينتقل إلى فرع موجود | `git switch main` |
+| `git switch -c <name>` | ينشئ فرعًا جديدًا وينتقل إليه | `git switch -c fix/login` |
+| `git merge <branch>` | يدمج الفرع المحدد في الحالي | `git merge feature/auth` |
+| `git merge --abort` | يلغي عملية الدمج الجارية | `git merge --abort` |
+| `git branch -d <name>` | يحذف فرعًا بآمان نسبي | `git branch -d feature/auth` |
+
+---
+
+## 8. Rebase
+<a href="/docs/version-control/git-and-github/advanced-git-history" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Advanced Git History <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git rebase <branch>` | يعيد تطبيق commits فوق base جديد | `git rebase origin/main` |
+| `git rebase -i HEAD~3` | يعيد ترتيب/دمج آخر 3 commits تفاعليًا | `git rebase -i HEAD~3` |
+| `git rebase --abort` | يلغي عملية rebase الحالية | `git rebase --abort` |
+| `git cherry-pick <hash>` | يطبّق تغيير commit محدد على الفرع الحالي | `git cherry-pick a1b2c3d` |
+
+---
+
+## 9. Undoing Changes
+<a href="/docs/version-control/git-and-github/undoing-changes" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Undoing Changes <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git restore <file>` | يلغي تعديلات غير معمولة لها commit في الملف | `git restore src/app.js` |
+| `git restore --staged <file>` | يزيل الملف من الـ Staging مع الاحتفاظ بتعديلاته | `git restore --staged src/app.js` |
+| `git reset --soft HEAD~1` | يحرك الـ branch ويحتفظ بالتغييرات staged | `git reset --soft HEAD~1` |
+| `git reset --mixed HEAD~1` | يحرك الـ branch ويعيد التغييرات إلى unstaged (افتراضي) | `git reset --mixed HEAD~1` |
+| `git reset --hard HEAD~1` | يحرك الـ branch ويعيد ضبط Index وWorking Tree (خطير) | `git reset --hard HEAD~1` |
+| `git revert <commit>` | ينشئ commit جديد يعكس تغييرًا سابقًا بأمان | `git revert a1b2c3d` |
+| `git reflog` | يعرض سجل تحركات HEAD لاستعادة commits | `git reflog -10` |
+| `git commit --amend` | يستبدل آخر commit برسالة أو ملفات جديدة | `git commit --amend -m "docs: clarify recovery"` |
+
+---
+
+## 10. Remotes and Sync
+<a href="/docs/version-control/git-and-github/remote-repositories" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Remote Repositories <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git remote -v` | يعرض أسماء وعناوين الـ remotes | `git remote -v` |
+| `git remote add origin <url>` | يربط المستودع المحلي ببعيد جديد | `git remote add origin git@github.com:OWNER/REPO.git` |
+| `git fetch origin` | يجلب التحديثات من البعيد بدون دمجها | `git fetch origin` |
+| `git pull` | يجلب ويقوم بدمج أو Rebase حسب الإعدادات | `git pull` |
+| `git pull --rebase` | يجلب ويعيد تطبيق التغييرات المحلية فوق البعيد | `git pull --rebase origin main` |
+| `git pull --ff-only` | يجلب ويحدث فقط إذا كان Fast-forward ممكنًا | `git pull --ff-only` |
+| `git push` | يرفع الـ commits إلى الـ remote | `git push` |
+| `git push -u origin <branch>` | يرفع الفرع ويضبط التتبع تلقائيًا | `git push -u origin feature/login` |
+| `git push --force` | يستبدل تاريخ الـ remote بالكامل (خطير) | `git push --force` |
+| `git push --force-with-lease` | نسخة أكثر أمانًا من Force Push تفحص الحركة أولًا | `git push --force-with-lease` |
+
+---
+
+## 11. Stashing
+<a href="/docs/version-control/git-and-github/troubleshooting-and-decision-making" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Troubleshooting And Decision Making <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git stash` | يحفظ التغييرات غير المحفوظة مؤقتًا ويعيد Working Tree نظيفًا | `git stash` |
+| `git stash pop` | يسترجع آخر stash ويحذفه من القائمة | `git stash pop` |
+| `git stash apply` | يطبّق آخر stash بدون حذفه | `git stash apply` |
+
+---
+
+## 12. Tags and Releases
+<a href="/docs/version-control/git-and-github/tags-and-releases" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Tags And Releases <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git tag v1.0.0` | ينشئ lightweight tag عند HEAD | `git tag v1.0.0` |
+| `git tag -a v1.0.0 -m "msg"` | ينشئ annotated tag مع رسالة | `git tag -a v1.0.0 -m "Release version 1.0.0"` |
+| `git tag -s v1.2.0 -m "msg"` | ينشئ signed tag موقّع تشفيريًا | `git tag -s v1.2.0 -m "Release v1.2.0"` |
+| `git tag --list` | يعرض كل الـ tags | `git tag --list` |
+| `git show v1.0.0` | يفحص تفاصيل tag ومحتواه | `git show v1.0.0` |
+| `git push origin v1.2.0` | يرفع tag محدد إلى الـ remote | `git push origin v1.2.0` |
+| `git push origin --tags` | يرفع كل الـ tags المحلية إلى الـ remote | `git push origin --tags` |
+
+---
+
+## 13. Advanced History and Troubleshooting
+<a href="/docs/version-control/git-and-github/advanced-git-history" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Advanced Git History <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/troubleshooting-and-decision-making" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Troubleshooting And Decision Making <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git log --oneline --graph --decorate --all` | يعرض تاريخًا بصريًا لكل الفروع | `git log --oneline --graph --decorate --all -15` |
+| `git blame <file>` | يحدد آخر commit غيّر كل سطر في الملف | `git blame src/app.js` |
+| `git bisect start` | يبدأ بحثًا ثنائيًا عن commit أدخل regression | `git bisect start` |
+| `git reflog -10` | يعرض آخر 10 تحركات لـ HEAD لاستعادة commits مفقودة | `git reflog -10` |
+| `git clean -nd` | يعرض الملفات التي سيحذفها `clean` بدون تنفيذ (فحص جاف) | `git clean -nd` |
+| `git clean -fd` | يحذف الملفات غير المتتبعة والمجلدات الفارغة (خطير) | `git clean -fd` |
+
+---
+
+## 14. Workflows
+<a href="/docs/version-control/git-and-github/git-workflows" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation Git Workflows <span aria-hidden="true" style="font-size:1.4rem;">→</span></a> | <a href="/docs/version-control/git-and-github/end-to-end-git-github-workflows" class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm hover:border-accent/50 transition-colors">Full explanation End To End Git Github Workflows <span aria-hidden="true" style="font-size:1.4rem;">→</span></a>
+
+
+| Command | What it does | Quick example |
+|---|---|---|
+| `git switch -c feature/user-profile` | ينشئ فرعًا للميزة ويبدأ العمل | `git switch -c feature/user-profile` |
+| `git add .` | يجهز كل التغييرات للالتزام | `git add .` |
+| `git commit -m "feat: ..."` | يسجل التغيير برسالة واضحة | `git commit -m "feat: add user profile"` |
+| `git push -u origin feature/user-profile` | يرفع الفرع ويضبط التتبع | `git push -u origin feature/user-profile` |
+| `git pull --ff-only` | يحدث الفرع المحلي إذا كان التحديث متوافقًا فقط | `git pull --ff-only` |
+| `git merge --continue` | يكمل عملية الدمج بعد حل النزاعات | `git merge --continue` |
