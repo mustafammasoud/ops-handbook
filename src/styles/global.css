@@ -1033,6 +1033,19 @@ pre.astro-code {
   margin-block: 0;
 }
 
+/* Subfolder collapsible groups in sidebar ----------------------------- */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Rotation keeps pointing down when expanded in both directions. */
+.group-open\/sub > summary > span:first-child {
+  transform: rotate(90deg);
+}
+
 /* ------------------------------------------------------------------ */
 /* Documentation sidebar: collapsible + resizable (desktop)           */
 /* Width lives in --docs-sidebar-w (px), restored from localStorage   */

@@ -5,6 +5,7 @@ import {
   categoryLabel,
 } from '../data/categories';
 import { toolLabel } from '../utils/tools';
+import { subfolderLabel, compareSubfolders } from '../utils/subfolders';
 import { docCategory, docPath, docTool, sortedDocs } from '../utils/docs';
 
 interface Props {
@@ -49,11 +50,42 @@ const groups = orderedIds
       }
     }
 
-    const toolGroups = [...byTool.entries()].map(([toolId, entries]) => ({
-      id: toolId,
-      label: toolLabel(toolId, id),
-      entries,
-    }));
+    const toolGroups = [...byTool.entries()].map(([toolId, entries]) => {
+      const directEntries: typeof docs = [];
+      const subfolderMap = new Map<string, typeof docs>();
+      for (const doc of entries) {
+        const parts = doc.id.split('/');
+        if (parts.length === 3) {
+          directEntries.push(doc);
+        } else if (parts.length >= 4) {
+          const subId = parts[2];
+          const group = subfolderMap.get(subId) ?? [];
+          group.push(doc);
+          subfolderMap.set(subId, group);
+        } else {
+          directEntries.push(doc);
+        }
+      }
+      const subfolderIds = [...subfolderMap.keys()].sort((a, b) =>
+        compareSubfolders(id, toolId, a, b),
+      );
+      const subfolderGroups = subfolderIds.map((subId) => {
+        const subEntries = subfolderMap.get(subId)!;
+        const containsCurrent = subEntries.some((d) => d.id === currentId);
+        return {
+          subfolderId: subId,
+          label: subfolderLabel(id, toolId, subId),
+          entries: subEntries,
+          open: containsCurrent,
+        };
+      });
+      return {
+        id: toolId,
+        label: toolLabel(toolId, id),
+        directEntries,
+        subfolderGroups,
+      };
+    });
 
     return {
       id,
@@ -103,32 +135,154 @@ const groups = orderedIds
 
             {group.toolGroups.map((toolGroup) => (
               <div class="space-y-1">
-                <span
-                  class="block px-2 text-xs font-medium text-muted"
-                  lang="en"
-                >
-                  {toolGroup.label}
-                </span>
-                <ul class="space-y-0.5 border-s border-border/60 ps-2 ms-1">
-                  {toolGroup.entries.map((entry) => {
-                    const active = entry.id === currentId;
-                    return (
-                      <li>
-                        <a
-                          href={docPath(entry.id)}
-                          aria-current={active ? 'page' : undefined}
-                          class={
-                            active
-                              ? 'sb-active sb-active-nested block rounded-md px-2 py-1.5 font-medium'
-                              : 'block rounded-md px-2 py-1.5 text-text/80 transition-colors hover:bg-surface hover:text-text'
-                          }
-                        >
-                          {entry.data.title}
-                        </a>
-                      </li>
+                {toolGroup.subfolderGroups.length === 0 ? (
+                  /* Section with only one level of folders (e.g. Networking,
+                     Version Control, Linux) — make the group itself collapsible. */
+                  (() => {
+                    const allEntries = [
+                      ...toolGroup.directEntries,
+                      ...toolGroup.subfolderGroups.flatMap((sg) => sg.entries),
+                    ];
+                    const hasPages = allEntries.length > 0;
+                    const containsCurrent = allEntries.some(
+                      (d) => d.id === currentId,
                     );
-                  })}
-                </ul>
+                    return (
+                      <details
+                        class="group/sub"
+                        open={containsCurrent ? true : undefined}
+                      >
+                        <summary
+                          class="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface hover:text-text select-none list-none"
+                          lang="en"
+                        >
+                          <span class="inline-block transition-transform duration-150 group-open/sub:rotate-90">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="h-3.5 w-3.5 shrink-0 text-muted/70"
+                              aria-hidden="true"
+                            >
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </span>
+                          <span class="flex-1">{toolGroup.label}</span>
+                        </summary>
+                        <ul class="mt-0.5 space-y-0.5 border-s border-border/60 ps-2 ms-1">
+                          {allEntries.map((entry) => {
+                            const active = entry.id === currentId;
+                            return (
+                              <li>
+                                <a
+                                  href={docPath(entry.id)}
+                                  aria-current={
+                                    active ? 'page' : undefined
+                                  }
+                                  class={
+                                    active
+                                      ? 'sb-active sb-active-nested block rounded-md px-2 py-1.5 font-medium'
+                                      : 'block rounded-md px-2 py-1.5 text-text/80 transition-colors hover:bg-surface hover:text-text'
+                                  }
+                                >
+                                  {entry.data.title}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </details>
+                    );
+                  })()
+                ) : (
+                  /* Deep nesting (e.g. Kubernetes) — keep header + collapsible sub-subfolders. */
+                  <>
+                    <span
+                      class="block px-2 text-xs font-medium text-muted"
+                      lang="en"
+                    >
+                      {toolGroup.label}
+                    </span>
+                    {/* Direct pages under the tool */}
+                    {toolGroup.directEntries.length > 0 && (
+                      <ul class="space-y-0.5 border-s border-border/60 ps-2 ms-1">
+                        {toolGroup.directEntries.map((entry) => {
+                          const active = entry.id === currentId;
+                          return (
+                            <li>
+                              <a
+                                href={docPath(entry.id)}
+                                aria-current={
+                                  active ? 'page' : undefined
+                                }
+                                class={
+                                  active
+                                    ? 'sb-active sb-active-nested block rounded-md px-2 py-1.5 font-medium'
+                                    : 'block rounded-md px-2 py-1.5 text-text/80 transition-colors hover:bg-surface hover:text-text'
+                                }
+                              >
+                                {entry.data.title}
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                    {/* Collapsible subfolder groups */}
+                    {toolGroup.subfolderGroups.map((subGroup) => (
+                      <details
+                        class="group/sub"
+                        open={subGroup.open ? true : undefined}
+                      >
+                        <summary
+                          class="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface hover:text-text select-none list-none"
+                          lang="en"
+                        >
+                          <span class="inline-block transition-transform duration-150 group-open/sub:rotate-90">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="h-3.5 w-3.5 shrink-0 text-muted/70"
+                              aria-hidden="true"
+                            >
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </span>
+                          <span class="flex-1">{subGroup.label}</span>
+                        </summary>
+                        <ul class="mt-0.5 space-y-0.5 border-s border-border/60 ps-2 ms-1">
+                          {subGroup.entries.map((entry) => {
+                            const active = entry.id === currentId;
+                            return (
+                              <li>
+                                <a
+                                  href={docPath(entry.id)}
+                                  aria-current={
+                                    active ? 'page' : undefined
+                                  }
+                                  class={
+                                    active
+                                      ? 'sb-active sb-active-nested block rounded-md px-2 py-1.5 font-medium'
+                                      : 'block rounded-md px-2 py-1.5 text-text/80 transition-colors hover:bg-surface hover:text-text'
+                                  }
+                                >
+                                  {entry.data.title}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </details>
+                    ))}
+                  </>
+                )}
               </div>
             ))}
           </div>
