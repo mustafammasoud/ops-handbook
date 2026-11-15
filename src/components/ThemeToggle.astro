@@ -226,7 +226,7 @@
       const dark = mode === 'dark' || (mode === 'system' && systemQuery.matches);
       document.documentElement.classList.toggle('dark', dark);
 
-      const themeColor = dark ? '#0b0e13' : '#e9dfce';
+      const themeColor = dark ? '#10140f' : '#e9dfce';
       document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
         meta.setAttribute('content', themeColor);
       });

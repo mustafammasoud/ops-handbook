@@ -81,7 +81,7 @@ const structuredData = {
     <meta name="apple-mobile-web-app-title" content={siteName} />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="theme-color" content="#e9dfce" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0e13" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#10140f" media="(prefers-color-scheme: dark)" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
@@ -129,7 +129,7 @@ const structuredData = {
               window.matchMedia('(prefers-color-scheme: dark)').matches);
           document.documentElement.classList.toggle('dark', dark);
 
-          var themeColor = dark ? '#0b0e13' : '#e9dfce';
+          var themeColor = dark ? '#10140f' : '#e9dfce';
           var metas = document.querySelectorAll('meta[name="theme-color"]');
           for (var i = 0; i < metas.length; i++) {
             metas[i].setAttribute('content', themeColor);

@@ -13,9 +13,9 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Warm Coffee & Beige (light) / Monkeytype Midnight (dark)            */
-/* Printed-manual beige paper (light) / blue-slate midnight (dark).    */
-/* One muted coffee accent (light) / slate-blue accent (dark).         */
+/* Warm Coffee & Beige (light) / Warm Amber & Deep Green (dark)        */
+/* Printed-manual beige paper (light) / deep-green midnight (dark).    */
+/* One muted coffee accent (light) / amber accent (dark).              */
 /* No pure white, no cold gray, no neon, no gradients.                 */
 /* Every value below is a design token — adjust the palette here, not  */
 /* in individual components.                                           */
@@ -44,8 +44,9 @@
   --c-accent: #8a674b; /* (--accent)                                        */
   --c-accent-ink: #7a5940; /* 5.5:1 on #f4ecdf                                 */
   --c-accent-hover: #7a5a41; /* hover state                    (--accent-hover)  */
-  --c-accent-soft: #ede2ce; /* tinted fills              (--accent-soft)    */
-  --c-accent-contrast: #faf4e9; /* text on accent fills                           */
+  --c-accent-soft: #efe4d2; /* tinted fills              (--accent-soft)    */
+  --c-accent-soft-light: #f7f0e4; /* lighter accent tint                           */
+  --c-accent-contrast: #7a5940; /* text on accent fills                           */
   --c-accent-fill: #8a674b; /* accent for text-bearing fills (buttons)          */
 
   /* Code blocks stay dark in both themes — terminal/editor surfaces. */
@@ -77,46 +78,54 @@
 
 .dark {
   color-scheme: dark;
-  --c-bg: #0b0e13;
-  --c-surface: #141a24;
-  --c-surface-alt: #141a24; /* same as surface — keeps dark tables unchanged */
-  --c-surface-2: #1c2430;
-  --c-border: #2a3444;
-  --c-border-light: #232c3a;
-  --c-text: #9fadc6;
-  --c-text-body: #9fadc6;
-  --c-muted: #7d8ea8; /* 5.2:1 on #141a24 */
-  --c-secondary: #394760; /* UI/border tone (Monkeytype secondary), not text */
-  --c-accent: #60759f;
-  --c-accent-ink: #7d91b8; /* accent lightened for text on dark surfaces */
-  --c-accent-hover: #8ba0c9;
-  --c-accent-soft: #1c2430;
-  --c-accent-contrast: #0b0e13; /* dark ink on slate-blue accent fills */
-  /* Spec accent #60759f + near-black ink is 4.18:1 — just under AA for
-     button text. Text-bearing fills use a barely-lightened accent;
-     #0b0e13 ink on this is 4.53:1. Marks/borders keep --c-accent. */
-  --c-accent-fill: #667ba3;
-  /* Code chrome in dark mode mirrors the current surface/border tokens. */
-  --c-code-bg: #282828; /* gruvbox-dark background, unchanged */
-  --c-code-border: #2a3444;
+
+  /* Surfaces — deep green midnight. */
+  --c-bg: #10140f; /* page background                    */
+  --c-surface: #171d18; /* cards, panels, nav surfaces        */
+  --c-surface-alt: #171d18; /* nested panels, table headers       */
+  --c-surface-2: #1e2620; /* hover fills, inline code           */
+  --c-border: #29342c; /* hairline borders                   */
+  --c-border-light: #232a1e; /* softest hairlines (tables, hr)     */
+
+  /* Text. */
+  --c-text: #e7ece7; /* headings + strong                  */
+  --c-text-body: #c8c5be; /* body copy                          */
+  --c-muted: #8fa098; /* metadata, captions                 */
+  --c-secondary: #5a7d5f; /* calm secondary / sidebar accents   */
+
+  /* Accent — amber. */
+  --c-accent: #f2a93c; /* borders, bars, icons, fills        */
+  --c-accent-ink: #f2a93c; /* accent for text on dark surfaces   */
+  --c-accent-hover: #f5b84a; /* hover state                        */
+  --c-accent-soft: #332616; /* tinted fills                       */
+  --c-accent-soft-light: #3d2e1a; /* lighter amber tint                 */
+  --c-accent-contrast: #241a08; /* dark ink on amber fills (buttons)  */
+  --c-accent-fill: #f2a93c; /* accent for text-bearing fills      */
+
+  /* Code chrome in dark mode — complement the deep green surface. */
+  --c-code-bg: #0e1210; /* slightly deeper than --c-bg        */
+  --c-code-border: #29342c;
   --c-code-fg: #ebdbb2;
-  --c-code-muted: #a79c8a;
-  --c-code-chrome-bg: #141a24;
-  --c-code-chrome-border: #2a3444;
+  --c-code-muted: #8fa098;
+  --c-code-chrome-bg: #171d18;
+  --c-code-chrome-border: #29342c;
+
   --c-shadow-card: none;
   --c-shadow-code: none;
-  --c-note-bg: #161d29;
-  --c-note-border: #2a3444;
-  --c-note-fg: #a8b4c8;
-  --c-tip-bg: #15201a;
-  --c-tip-border: #2e4033;
-  --c-tip-fg: #9db77c;
-  --c-warning-bg: #241a15;
-  --c-warning-border: #4a3328;
-  --c-warning-fg: #cf8a63;
-  --c-lab-bg: #1d1822;
-  --c-lab-border: #3c3044;
-  --c-lab-fg: #c295a6;
+
+  /* Callouts — warm amber/green tints on the deep green surface. */
+  --c-note-bg: #141b15;
+  --c-note-border: #29342c;
+  --c-note-fg: #c8c5be;
+  --c-tip-bg: #152016;
+  --c-tip-border: #2a4030;
+  --c-tip-fg: #7ab87f;
+  --c-warning-bg: #1e1508;
+  --c-warning-border: #4a3010;
+  --c-warning-fg: #f2a93c;
+  --c-lab-bg: #181d14;
+  --c-lab-border: #303d28;
+  --c-lab-fg: #9db87a;
 }
 
 @theme inline {
@@ -127,6 +136,7 @@
   --color-border: var(--c-border);
   --color-border-light: var(--c-border-light);
   --color-text: var(--c-text);
+  --color-text-body: var(--c-text-body);
   --color-muted: var(--c-muted);
   --color-secondary: var(--c-secondary);
   --color-accent: var(--c-accent);
@@ -210,9 +220,9 @@
 }
 
 .dark {
-  --nav-link: #9fadc6; /* 8.5:1 on #0b0e13 */
-  --nav-link-hover: #c3cede; /* 12.2:1 */
-  --nav-link-active: #8ba0c9; /* 7.3:1 */
+  --nav-link: #c8c5be; /* readable on #10140f */
+  --nav-link-hover: #e7ece7; /* high contrast hover */
+  --nav-link-active: #f2a93c; /* amber accent for active */
 }
 
 .nav-link {
@@ -918,7 +928,7 @@ pre.astro-code span {
   color: var(--c-text);
   padding: 0;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgb(74 56 43 / 0.22);
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--c-text) 18%, transparent);
 }
 
 .search-dialog::backdrop {

@@ -51,18 +51,18 @@
     };
 
     const DARK_FILLS = {
-      warm: '#1c2430', // tan / cream / brown pastels → surface-2
-      green: '#15201a', // sage / mint pastels → tip-family
-      blue: '#161d29', // sky / steel pastels → note-family
-      purple: '#1d1822', // lavender / plum pastels → lab-family
-      red: '#241a15', // peach / rose / brick pastels → warning-family
+      warm: '#1e2620', // tan / cream / brown pastels → surface-2 (deep green)
+      green: '#152016', // sage / mint pastels → tip-family
+      blue: '#141b15', // sky / steel pastels → note-family
+      purple: '#181d14', // lavender / plum pastels → lab-family
+      red: '#1e1508', // peach / rose / brick pastels → warning-family
     };
     const DARK_INK = {
-      warm: '#9fadc6', // muted browns → primary text
-      green: '#9db77c',
-      blue: '#a8b4c8',
-      purple: '#c295a6',
-      red: '#cf8a63',
+      warm: '#c8c5be', // muted browns → body text
+      green: '#7ab87f',
+      blue: '#c8c5be',
+      purple: '#9db87a',
+      red: '#f2a93c',
     };
 
     const hueFamily = (h: number, s: number): keyof typeof DARK_FILLS => {
@@ -143,7 +143,7 @@
     // themeVariables, so diagrams always match the site palette — the
     // named `dark` theme ships its own fixed colors that ignore parts of
     // themeVariables. Light = Warm Coffee & Beige (beige panels, coffee
-    // accents); dark = Monkeytype Midnight (blue-slate panels, slate-blue
+    // accents); dark = Warm Amber & Deep Green (deep-green panels, amber
     // accents). No default blues/purples/greens/neons in either mode.
     const lightThemeVariables = {
       fontFamily:
@@ -235,89 +235,89 @@
         'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       fontSize: '14px',
 
-      // Panels / nodes
-      primaryColor: '#1C2430',
-      mainBkg: '#1C2430',
-      nodeBorder: '#60759F',
-      clusterBkg: '#141A24',
-      clusterBorder: '#60759F',
-      titleColor: '#9FADC6',
-      background: '#141A24',
+      // Panels / nodes — deep green surfaces
+      primaryColor: '#1E2620',
+      mainBkg: '#1E2620',
+      nodeBorder: '#F2A93C',
+      clusterBkg: '#171D18',
+      clusterBorder: '#29342C',
+      titleColor: '#E7ECE7',
+      background: '#171D18',
 
-      // Text and lines
-      primaryTextColor: '#9FADC6',
-      textColor: '#9FADC6',
-      lineColor: '#6E7F9C',
-      defaultLinkColor: '#6E7F9C',
-      arrowheadColor: '#6E7F9C',
-      secondaryColor: '#1C2430',
-      tertiaryColor: '#0B0E13',
-      edgeLabelBackground: '#232C3A',
+      // Text and lines — warm light text, amber accent lines
+      primaryTextColor: '#C8C5BE',
+      textColor: '#C8C5BE',
+      lineColor: '#8FA098',
+      defaultLinkColor: '#F2A93C',
+      arrowheadColor: '#8FA098',
+      secondaryColor: '#1E2620',
+      tertiaryColor: '#10140F',
+      edgeLabelBackground: '#232A1E',
 
       // Sequence diagrams
-      actorBkg: '#1C2430',
-      actorBorder: '#60759F',
-      actorTextColor: '#9FADC6',
-      actorLineColor: '#6E7F9C',
-      signalColor: '#9FADC6',
-      signalTextColor: '#9FADC6',
-      labelBoxBkgColor: '#1C2430',
-      labelBoxBorderColor: '#60759F',
-      labelTextColor: '#9FADC6',
-      loopTextColor: '#9FADC6',
-      activationBkgColor: '#1C2430',
-      activationBorderColor: '#60759F',
-      sequenceNumberColor: '#0B0E13',
-      noteBkgColor: '#1C2430',
-      noteBorderColor: '#60759F',
-      noteTextColor: '#9FADC6',
+      actorBkg: '#1E2620',
+      actorBorder: '#F2A93C',
+      actorTextColor: '#C8C5BE',
+      actorLineColor: '#8FA098',
+      signalColor: '#C8C5BE',
+      signalTextColor: '#C8C5BE',
+      labelBoxBkgColor: '#1E2620',
+      labelBoxBorderColor: '#29342C',
+      labelTextColor: '#C8C5BE',
+      loopTextColor: '#C8C5BE',
+      activationBkgColor: '#1E2620',
+      activationBorderColor: '#F2A93C',
+      sequenceNumberColor: '#10140F',
+      noteBkgColor: '#1E2620',
+      noteBorderColor: '#29342C',
+      noteTextColor: '#C8C5BE',
 
       // State / class / misc
-      forkBkgColor: '#1C2430',
-      joinBkgColor: '#1C2430',
-      classBkgColor: '#1C2430',
-      classBorder: '#60759F',
-      fillType0: '#1C2430',
-      fillType1: '#141A24',
-      fillType2: '#0B0E13',
+      forkBkgColor: '#1E2620',
+      joinBkgColor: '#1E2620',
+      classBkgColor: '#1E2620',
+      classBorder: '#29342C',
+      fillType0: '#1E2620',
+      fillType1: '#171D18',
+      fillType2: '#10140F',
 
-      // Categorical palettes — slate-blue accents and blue-gray neutrals
-      // only; no default purples/greens/neons.
-      git0: '#2A3444',
-      git1: '#6E7F9C',
-      git2: '#394760',
-      git3: '#7D91B8',
-      cScaleLabel0: '#9FADC6',
-      cScaleLabel1: '#9FADC6',
-      cScaleLabel2: '#9FADC6',
-      cScaleLabel3: '#9FADC6',
-      cScaleLabel4: '#0B0E13',
-      cScaleLabel5: '#9FADC6',
-      cScaleLabel6: '#9FADC6',
-      cScale0: '#2A3444',
-      cScale1: '#1C2430',
-      cScale2: '#2A3444',
-      cScale3: '#313E53',
-      cScale4: '#7D91B8',
-      cScale5: '#2D394D',
-      cScale6: '#232C3A',
-      pie1: '#60759F',
-      pie2: '#1C2430',
-      pie3: '#2A3444',
-      pie4: '#394760',
-      pie5: '#7D91B8',
-      pie6: '#6E7F9C',
-      pie7: '#232C3A',
-      pie8: '#8BA0C9',
-      pie9: '#161D29',
-      pie10: '#4A5B78',
-      pie11: '#6E7F9C',
-      pie12: '#1C2430',
-      pieTitleTextColor: '#9FADC6',
-      pieSectionTextColor: '#9FADC6',
-      pieOuterStrokeColor: '#2A3444',
-      pieStrokeColor: '#141A24',
-      pieChartBackground: '#141A24',
+      // Categorical palettes — amber accents and deep-green neutrals only;
+      // no default blues/purples/neons.
+      git0: '#29342C',
+      git1: '#8FA098',
+      git2: '#5A7D5F',
+      git3: '#F2A93C',
+      cScaleLabel0: '#C8C5BE',
+      cScaleLabel1: '#C8C5BE',
+      cScaleLabel2: '#C8C5BE',
+      cScaleLabel3: '#C8C5BE',
+      cScaleLabel4: '#10140F',
+      cScaleLabel5: '#C8C5BE',
+      cScaleLabel6: '#C8C5BE',
+      cScale0: '#29342C',
+      cScale1: '#1E2620',
+      cScale2: '#29342C',
+      cScale3: '#2E3D30',
+      cScale4: '#F2A93C',
+      cScale5: '#2A3D2D',
+      cScale6: '#232A1E',
+      pie1: '#F2A93C',
+      pie2: '#1E2620',
+      pie3: '#29342C',
+      pie4: '#5A7D5F',
+      pie5: '#F5B84A',
+      pie6: '#8FA098',
+      pie7: '#232A1E',
+      pie8: '#F2A93C',
+      pie9: '#141B15',
+      pie10: '#3D5A40',
+      pie11: '#8FA098',
+      pie12: '#1E2620',
+      pieTitleTextColor: '#E7ECE7',
+      pieSectionTextColor: '#C8C5BE',
+      pieOuterStrokeColor: '#29342C',
+      pieStrokeColor: '#171D18',
+      pieChartBackground: '#171D18',
     };
 
     mermaid.initialize({
