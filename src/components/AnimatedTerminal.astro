@@ -1,0 +1,388 @@
+---
+/**
+ * AnimatedTerminal.astro
+ *
+ * A prominent, multi-line engineering terminal component for the Ops Handbook hero.
+ * Simulates complete engineering sessions with multiple commands and outputs
+ * visible simultaneously, demonstrating Kubernetes, Linux, Docker, Git, Terraform,
+ * and the actual Ops Handbook knowledge base architecture.
+ */
+---
+
+<div
+  class="terminal-wrapper relative w-full select-none"
+  dir="ltr"
+  role="region"
+  aria-label="Interactive DevOps terminal session"
+>
+  <!-- Ambient backdrop glow matching Ops Handbook theme -->
+  <div
+    class="pointer-events-none absolute -inset-2 rounded-3xl bg-accent/15 opacity-60 blur-2xl dark:bg-accent/10"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Terminal Window -->
+  <div
+    class="terminal-window relative overflow-hidden rounded-2xl border border-[#273a32] bg-[#0c120f] dark:bg-[#080d0b] text-[#e1ece6] shadow-2xl shadow-black/25 dark:shadow-black/60"
+  >
+    <!-- Terminal Header Bar -->
+    <div
+      class="flex h-11 items-center justify-between border-b border-[#1f2e27] bg-[#141c18] dark:bg-[#0d1411] px-4 sm:px-5"
+    >
+      <!-- Window Controls -->
+      <div class="flex items-center gap-2" aria-hidden="true">
+        <span class="h-3 w-3 rounded-full bg-[#e05f4e] shadow-xs"></span>
+        <span class="h-3 w-3 rounded-full bg-[#e5a93b] shadow-xs"></span>
+        <span class="h-3 w-3 rounded-full bg-[#4ca868] shadow-xs"></span>
+      </div>
+
+      <!-- Title / Shell context -->
+      <div class="flex items-center gap-2 font-mono text-xs font-medium text-[#9ab3a7]">
+        <svg class="h-3.5 w-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span class="terminal-session-title">ops-handbook ~ zsh</span>
+      </div>
+
+      <!-- Right terminal badge -->
+      <div class="flex items-center gap-2 text-[11px] font-mono text-[#6c8579]">
+        <span class="hidden sm:inline-block rounded border border-[#263830] bg-[#101714] px-2 py-0.5">
+          xterm-256color
+        </span>
+      </div>
+    </div>
+
+    <!-- Terminal Screen: Substantial 410-450px height allows multiple commands + outputs -->
+    <div
+      id="terminal-screen"
+      class="terminal-screen h-[340px] sm:h-[380px] lg:h-[400px] p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-y-auto overflow-x-auto no-scrollbar scroll-smooth"
+    >
+      <!-- Session History: Retains all executed commands & outputs for the active session -->
+      <div id="terminal-history" class="space-y-4"></div>
+
+      <!-- Active Typing Command Line -->
+      <div id="terminal-active-line" class="mt-3 flex items-start gap-2">
+        <span class="terminal-prompt text-accent font-bold select-none">$</span>
+        <span id="terminal-active-input" class="text-white font-semibold tracking-wide"></span>
+        <span class="terminal-cursor inline-block w-2 h-4.5 bg-accent align-middle ml-0.5" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .terminal-cursor {
+    animation: terminal-blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes terminal-blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Custom scrollbar for terminal if needed */
+  .no-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .no-scrollbar::-webkit-scrollbar-thumb {
+    background: #1f3028;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .terminal-cursor {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  interface TerminalCommand {
+    cmd: string;
+    output: string[];
+    outputClass?: string;
+  }
+
+  interface TerminalSession {
+    title: string;
+    commands: TerminalCommand[];
+  }
+
+  // 4 Curated Multi-Command Engineering Sessions
+  const SESSIONS: TerminalSession[] = [
+    {
+      title: 'ops-handbook ~ k8s-cluster',
+      commands: [
+        {
+          cmd: 'kubectl get nodes',
+          output: [
+            'NAME                   STATUS   ROLES           AGE   VERSION',
+            'k8s-control-plane-01   Ready    control-plane   42d   v1.30.0',
+            'k8s-worker-node-01     Ready    worker          42d   v1.30.0',
+            'k8s-worker-node-02     Ready    worker          42d   v1.30.0',
+          ],
+          outputClass: 'text-emerald-400/90',
+        },
+        {
+          cmd: 'kubectl get pods -n kube-system',
+          output: [
+            'NAME                                   READY   STATUS    RESTARTS   AGE',
+            'coredns-5dd5756b68-2kxnf               1/1     Running   0          42d',
+            'etcd-k8s-control-plane-01              1/1     Running   0          42d',
+            'kube-apiserver-k8s-control-plane-01    1/1     Running   0          42d',
+          ],
+          outputClass: 'text-[#d6dfd9]',
+        },
+        {
+          cmd: 'kubectl get svc --all-namespaces',
+          output: [
+            'NAMESPACE     NAME         TYPE        CLUSTER-IP   PORT(S)',
+            'default       kubernetes   ClusterIP   10.96.0.1    443/TCP',
+            'kube-system   kube-dns     ClusterIP   10.96.0.10   53/UDP,53/TCP',
+          ],
+          outputClass: 'text-amber-400/90',
+        },
+      ],
+    },
+    {
+      title: 'ops-handbook ~ knowledge-hub',
+      commands: [
+        {
+          cmd: 'ls -F content/cheat-sheets/',
+          output: [
+            'git/      github/      kubernetes/',
+          ],
+          outputClass: 'text-[#8ee3b0]',
+        },
+        {
+          cmd: 'find content/cheat-sheets -mindepth 1 -maxdepth 1 -type d',
+          output: [
+            'content/cheat-sheets/git         (9 topics)',
+            'content/cheat-sheets/github      (7 topics)',
+            'content/cheat-sheets/kubernetes  (3 topics)',
+          ],
+          outputClass: 'text-[#d6dfd9]',
+        },
+        {
+          cmd: 'find content/interview-questions -mindepth 1 -maxdepth 1 -type d',
+          output: [
+            'content/interview-questions/kubernetes  (7 topics · 18 Qs)',
+            'content/interview-questions/linux       (6 topics · 12 Qs)',
+            'content/interview-questions/git         (4 topics ·  8 Qs)',
+          ],
+          outputClass: 'text-amber-400/90',
+        },
+      ],
+    },
+    {
+      title: 'ops-handbook ~ linux-runtime',
+      commands: [
+        {
+          cmd: 'docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"',
+          output: [
+            'NAMES             STATUS          PORTS',
+            'ingress-proxy     Up 4 days       80/tcp, 443/tcp',
+            'redis-cache       Up 18 days      6379/tcp',
+            'metrics-exporter  Up 18 days      9100/tcp',
+          ],
+          outputClass: 'text-[#d6dfd9]',
+        },
+        {
+          cmd: 'systemctl is-active docker containerd',
+          output: ['active', 'active'],
+          outputClass: 'text-emerald-400 font-semibold',
+        },
+        {
+          cmd: 'free -h',
+          output: [
+            '              total        used        free      available',
+            'Mem:           15Gi       4.2Gi       7.1Gi         10.5Gi',
+            'Swap:         4.0Gi          0B       4.0Gi          4.0Gi',
+          ],
+          outputClass: 'text-[#8ee3b0]',
+        },
+      ],
+    },
+    {
+      title: 'ops-handbook ~ terraform-iac',
+      commands: [
+        {
+          cmd: 'terraform validate',
+          output: ['Success! The configuration is valid.'],
+          outputClass: 'text-emerald-400 font-semibold',
+        },
+        {
+          cmd: 'terraform plan -compact-warnings',
+          output: [
+            'Terraform will perform the following actions:',
+            '  + module.vpc.aws_subnet.private["zone-a"]',
+            '  + module.eks.aws_eks_node_group.workers',
+            'Plan: 2 to add, 0 to change, 0 to destroy.',
+          ],
+          outputClass: 'text-amber-400/90',
+        },
+        {
+          cmd: 'terraform show -json tfplan | jq \'.resource_changes | length\'',
+          output: ['2'],
+          outputClass: 'text-emerald-400 font-semibold',
+        },
+      ],
+    },
+  ];
+
+  (function initSessionTerminal() {
+    const screenEl = document.getElementById('terminal-screen');
+    const historyEl = document.getElementById('terminal-history');
+    const activeLineEl = document.getElementById('terminal-active-line');
+    const activeInputEl = document.getElementById('terminal-active-input');
+    const titleEl = document.querySelector<HTMLElement>('.terminal-session-title');
+
+    if (!screenEl || !historyEl || !activeLineEl || !activeInputEl) return;
+
+    let sessionIdx = 0;
+    let cmdIdx = 0;
+    let charIdx = 0;
+    let activeTimer: number | undefined;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function renderStaticFallback() {
+      const session = SESSIONS[0];
+      if (titleEl) titleEl.textContent = session.title;
+      historyEl!.replaceChildren();
+      session.commands.forEach((item) => {
+        const block = createCompletedCommandBlock(item.cmd, item.output, item.outputClass);
+        historyEl!.append(block);
+      });
+      activeInputEl!.textContent = '';
+    }
+
+    if (motionQuery.matches) {
+      renderStaticFallback();
+      return;
+    }
+
+    function createCompletedCommandBlock(cmd: string, outputLines: string[], outputClass?: string): HTMLElement {
+      const container = document.createElement('div');
+      container.className = 'terminal-command-block space-y-1';
+
+      // Command row
+      const cmdRow = document.createElement('div');
+      cmdRow.className = 'flex items-center gap-2';
+
+      const prompt = document.createElement('span');
+      prompt.className = 'text-accent font-bold select-none';
+      prompt.textContent = '$';
+
+      const cmdText = document.createElement('span');
+      cmdText.className = 'text-white font-semibold tracking-wide';
+      cmdText.textContent = cmd;
+
+      cmdRow.append(prompt, cmdText);
+      container.append(cmdRow);
+
+      // Output rows
+      if (outputLines.length > 0) {
+        const outContainer = document.createElement('div');
+        outContainer.className = `mt-1 space-y-0.5 text-xs ${outputClass ?? 'text-[#d6dfd9]'}`;
+
+        outputLines.forEach((line) => {
+          const lineEl = document.createElement('div');
+          lineEl.textContent = line;
+          outContainer.append(lineEl);
+        });
+
+        container.append(outContainer);
+      }
+
+      return container;
+    }
+
+    function scrollScreenToBottom() {
+      screenEl!.scrollTop = screenEl!.scrollHeight;
+    }
+
+    function step() {
+      const currentSession = SESSIONS[sessionIdx];
+      if (titleEl && charIdx === 0 && cmdIdx === 0) {
+        titleEl.textContent = currentSession.title;
+      }
+
+      const currentCommand = currentSession.commands[cmdIdx];
+
+      // Typing phase
+      if (charIdx < currentCommand.cmd.length) {
+        charIdx++;
+        activeInputEl!.textContent = currentCommand.cmd.slice(0, charIdx);
+        scrollScreenToBottom();
+
+        // Typing cadence: 32ms per character
+        activeTimer = window.setTimeout(step, 32);
+        return;
+      }
+
+      // Command typing completed: brief execution pause before output
+      activeTimer = window.setTimeout(() => {
+        // Append completed command and its output into session history
+        const block = createCompletedCommandBlock(
+          currentCommand.cmd,
+          currentCommand.output,
+          currentCommand.outputClass
+        );
+        historyEl!.append(block);
+
+        // Reset active line
+        charIdx = 0;
+        activeInputEl!.textContent = '';
+        scrollScreenToBottom();
+
+        cmdIdx++;
+
+        if (cmdIdx < currentSession.commands.length) {
+          // Pause between commands in same session
+          activeTimer = window.setTimeout(step, 380);
+        } else {
+          // Entire session completed: hold session visible for comfortable reading
+          activeTimer = window.setTimeout(() => {
+            // Smoothly clear session
+            historyEl!.style.opacity = '0';
+            historyEl!.style.transition = 'opacity 250ms ease';
+
+            activeTimer = window.setTimeout(() => {
+              historyEl!.replaceChildren();
+              historyEl!.style.opacity = '1';
+              historyEl!.style.transition = '';
+
+              cmdIdx = 0;
+              charIdx = 0;
+              sessionIdx = (sessionIdx + 1) % SESSIONS.length;
+              scrollScreenToBottom();
+
+              // Delay before starting next session
+              activeTimer = window.setTimeout(step, 500);
+            }, 260);
+          }, 3600);
+        }
+      }, 300);
+    }
+
+    // Launch initial animation loop
+    activeTimer = window.setTimeout(step, 400);
+
+    // Cancel all timers on pagehide to prevent memory leaks
+    window.addEventListener(
+      'pagehide',
+      () => {
+        if (activeTimer) window.clearTimeout(activeTimer);
+      },
+      { once: true }
+    );
+  })();
+</script>
