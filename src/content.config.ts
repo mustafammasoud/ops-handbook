@@ -1,17 +1,15 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { TECHNOLOGY_IDS } from './data/technologies';
 
 /**
- * All educational content lives in the repository-level `content/` folder so
- * that Markdown/MDX sources stay clearly separated from application code.
+ * Technical documentation collection.
  *
- * Adding a new frontmatter field only requires extending the schema below —
- * no routing or layout restructuring.
+ * Scans `./content` while explicitly excluding the dedicated collections
+ * for cheat sheets (`content/cheat-sheets`) and interview questions (`content/interview-questions`).
  */
 const docs = defineCollection({
-  // `content/README.md` is the authoring guide, `content/_template/` holds the
-  // copy-me article template — neither is documentation content.
   loader: glob({
     pattern: [
       '**/*.md',
@@ -19,6 +17,8 @@ const docs = defineCollection({
       '!README.md',
       '!**/README.md',
       '!_template/**',
+      '!interview-questions/**',
+      '!cheat-sheets/**',
     ],
     base: './content',
   }),
@@ -46,4 +46,50 @@ const docs = defineCollection({
   }),
 });
 
-export const collections = { docs };
+/**
+ * Fast command reference and cheat sheets collection.
+ *
+ * Each entry represents a technology topic (e.g. `kubernetes/pods`, `git/branching`).
+ * The schema validates that `technology` strictly references a canonical ID
+ * from `src/data/technologies.ts`.
+ */
+const cheatSheets = defineCollection({
+  loader: glob({
+    pattern: ['*/**/*.{md,mdx}'],
+    base: './content/cheat-sheets',
+  }),
+  schema: z.object({
+    title: z.string(),
+    technology: z.enum(TECHNOLOGY_IDS),
+    topic: z.string(),
+    description: z.string().default(''),
+    order: z.number().default(0),
+    draft: z.boolean().default(false),
+    language: z.enum(['en', 'ar']).default('en'),
+  }),
+});
+
+/**
+ * Technical interview questions collection.
+ *
+ * Organizes scenario questions and conceptual assessments by technology and topic.
+ * Rich technical answers, diagrams, and code snippets are authored in MDX bodies.
+ */
+const interviewQuestions = defineCollection({
+  loader: glob({
+    pattern: ['**/*.{md,mdx}'],
+    base: './content/interview-questions',
+  }),
+  schema: z.object({
+    title: z.string(),
+    technology: z.enum(TECHNOLOGY_IDS),
+    topic: z.string(),
+    description: z.string().default(''),
+    order: z.number().default(0),
+    draft: z.boolean().default(false),
+    language: z.enum(['en', 'ar']).default('en'),
+  }),
+});
+
+export const collections = { docs, cheatSheets, interviewQuestions };
+
