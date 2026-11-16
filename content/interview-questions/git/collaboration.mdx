@@ -1,0 +1,71 @@
+---
+title: Git Remote Collaboration & Workflows Interview Questions
+technology: git
+topic: collaboration
+description: أسئلة مقابلات حول التعاون الجماعي في Git، الفرق بين Fetch وPull، خطورة Force Push وميزة force-with-lease، وقواعد حماية الفروع.
+order: 4
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="git-force-vs-force-with-lease"
+  number={1}
+  difficulty="intermediate"
+  tags={["git", "collaboration", "force-push", "safety"]}
+  question="لماذا يُعد git push --force-with-lease البديل الآمن الوحيد لـ git push --force بعد إعادة كتابة التاريخ؟"
+  directAnswer="يقوم git push --force الأعمى بالكتابة فوق الفرع البعيد بغض النظر عما إذا كان زميل لك في الفريق قد رفع التزامات جديدة متزامنة في نفس اللحظة، مما يؤدي إلى مسح كوده نهائيًا من السيرفر. بينما يتحقق --force-with-lease أولاً من أن مؤشر الفرع البعيد المحلي (origin/branch) يطابق بدقة الحالة الفعلية في الخادم؛ فإذا رفع شخص آخر التزامًا جديدًا لم تطلع عليه بعد، يرفض Git عملية الدفع ويطلب منك التحديث أولاً."
+  pitfalls={[
+    "استخدام git push --force-with-lease مباشرة بعد أمر git fetch دون مراجعة ما تم جلبه؛ لأن git fetch يحدث المؤشر المرجعي محليًا ويلغي الحماية الوقائية للـ lease.",
+    "الاعتماد على الدفع بالقوة كإجراء روتيني بدلاً من استخدام فروع ميزات منفصلة وقواعد حماية الفروع (Branch Protection Rules)."
+  ]}
+  followUps={[
+    "كيف يمكنك ضبط git config لفرض استخدام --force-with-lease افتراضيًا كبديل آمن؟",
+    "ما الإجراءات المتبعة في منصات مثل GitHub لمنع عمليات Force Push تمامًا على الفروع الحساسة؟"
+  ]}
+>
+المقارنة العملية:
+
+```bash
+# 1. الدفع القسري الخطير (قد يمسح كود زملائك دون علمك):
+git push --force origin feature/login
+
+# 2. الدفع القسري الآمن مع التحقق من عقد الإيجار (Lease):
+git push --force-with-lease origin feature/login
+```
+
+كيف تعمل الحماية؟
+- يفحص Git: هل يعرف جهازك كل الالتزامات الموجودة حالياً على `origin/feature/login`؟
+- إذا قام زميلك برفع التزام جديد: يرفض Git العملية بالرسالة:
+  `[remote rejected] feature/login -> feature/login (stale info)`
+- هذا يمنع فقدان البيانات ويجبرك على فحص ومراجعة كود زميلك قبل إعادة الدفع.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="git-fetch-vs-pull-ff-only"
+  number={2}
+  difficulty="beginner"
+  tags={["git", "collaboration", "fetch", "pull"]}
+  question="ما الفرق بين git fetch و git pull، ولماذا يُنصح بضبط pull.ff only في إعدادات Git؟"
+  directAnswer="يقوم git fetch بتنزيل الكائنات والمراجع الجديدة من المستودع البعيد وتحديث فروع التتبع (مثل origin/main) دون دمجها أو تعديل ملفاتك المحلية. أما git pull فينفذ خطوتين متتاليتين: fetch ثم دمج فوري (merge أو rebase) في فرعك الحالي. يُنصح بضبط pull.ff only لضمان أن التحديث لن ينشئ التزامات دمج غير مقصودة (Merge Commits) إذا تباعد فرعك المحلي عن الفرع البعيد، ويجبرك على اتخاذ قرار الدمج أو إعادة البناء يدويًا."
+  pitfalls={[
+    "استخدام git pull الأعمى أثناء وجود تعديلات محلية، مما ينشئ دمجًا تلقائيًا فوضويًا برؤوس التزام تلقائية مثل Merge branch 'main' of ... تشوه تاريخ المشروع.",
+    "الاعتقاد بأن git fetch يغير أي سطر في ملفات مجلد العمل؛ git fetch آمن تمامًا ولا يغير كودك الحالي مطلقًا."
+  ]}
+  followUps={[
+    "كيف يمكنك ضبط سياسة Fast-Forward Only عالميًا في Git؟",
+    "ما الفرق بين git pull --rebase و git pull --ff-only؟"
+  ]}
+>
+الصيغة المعمارية لـ `git pull`:
+```text
+git pull = git fetch + git merge (or git rebase)
+```
+
+**ضبط السلوك الآمن عالميًا:**
+```bash
+# منع إنشاء التزامات دمج غير متوقعة عند الجلب:
+git config --global pull.ff only
+```
+إذا تباعد الفرع المحلي عن الفرع البعيد، سيرفض Git عملية الـ pull ويعرض رسالة واضحة تنصحك إما بإعادة ترتيب التزاماتك عبر `git pull --rebase` أو دمجها صراحة، مما يحافظ على نظافة تاريخ المستودع.
+</InterviewQuestion>

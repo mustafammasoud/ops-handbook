@@ -1,0 +1,97 @@
+---
+title: Kubernetes Architecture & Control Plane Interview Questions
+technology: kubernetes
+topic: architecture
+description: أسئلة مقابلات معمقة حول بنية Kubernetes، مكونات Control Plane، خوارزمية إجماع etcd، وآليات عمل Kubelet وKube-Proxy.
+order: 2
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-etcd-quorum-split-brain"
+  number={1}
+  difficulty="advanced"
+  tags={["kubernetes", "architecture", "etcd", "high-availability"]}
+  question="كيف يعمل نظام النصاب القانوني (Quorum) في etcd استنادًا إلى خوارزمية Raft، ولماذا يجب دائمًا استخدام عدد فردي من العقد في بيئات الإنتاج؟"
+  directAnswer="يعتمد etcd على خوارزمية Raft Consensus التي تتطلب أغلبية مطلقة (N/2 + 1) لتأكيد أي عملية كتابة واختيار القائد (Leader). استخدام عدد فردي (3 أو 5) يوفر نفس درجة تحمل الأعطال لعدد زوجي أعلى منه (3 عقد تتحمل عطل عقدة واحدة مثل 4 عقد تمامًا)، ولكنه يتجنب استهلاك موارد إضافية ومخاطر انقسام الشبكة (Split-Brain)."
+  pitfalls={[
+    "الاعتقاد بأن زيادة عدد العقد إلى أرقام كبيرة (مثل 9 أو 11) يزيد من أداء الكتابة، بينما الحقيقة أن زيادة العقد تزيد من زمن تأكيد المعاملات عبر الشبكة.",
+    "تثبيت عقد etcd على أقراص بطيئة؛ حيث يتطلب etcd سرعات كتابة متزامنة (fsync) منخفضة جدًا دون تأخير."
+  ]}
+  followUps={[
+    "إذا انقطعت الشبكة وقسمت كتلة مكونة من 5 عقد إلى مجموعتين (3 عقد و2 عقدة)، أي مجموعة ستستمر في قبول عمليات الكتابة ولماذا؟",
+    "كيف يؤثر فقدان Quorum على تشغيل الـ Pods الحالية في الـ Worker Nodes؟"
+  ]}
+>
+معادلة حساب النصاب القانوني (Quorum) في Raft هي:
+```text
+Quorum = floor(N / 2) + 1
+```
+
+| عدد العقد (N) | النصاب القانوني (Quorum) | عدد الأعطال المسموح بها |
+|---|---|---|
+| 1 | 1 | 0 |
+| 3 | 2 | 1 |
+| 4 | 3 | 1 (غير مجدية مقارنة بـ 3) |
+| 5 | 3 | 2 |
+| 7 | 4 | 3 |
+
+إذا انقسمت الكتلة بسبب انقطاع الشبكة:
+- المجموعة التي تمتلك 3 عقد من أصل 5 تستوفي النصاب القانوني وتستمر في خدمة القراءة والكتابة.
+- المجموعة التي تمتلك عقدتين تفقد النصاب وترفض كل عمليات التعديل منعًا لحدوث **انقسام الذاكرة وتضارب البيانات (Split-Brain)**.
+
+إذا فقدت الكتلة النصاب بالكامل، يتوقف `kube-apiserver` عن قبول أي عمليات جديدة أو تحديثات، ولكن الـ Pods العاملة على الـ Worker Nodes تستمر في خدمة حركة المرور الحالية حتى يعود النصاب.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-scheduler-filtering-scoring"
+  number={2}
+  difficulty="intermediate"
+  tags={["kubernetes", "architecture", "scheduler"]}
+  question="اشرح المراحل التي يمر بها Kube-Scheduler لجدولة كبسولة عمل جديدة على عقدة مناسبة."
+  directAnswer="يمر Kube-Scheduler بمرحلتين أساسيتين: مرحلة التصفية (Filtering / Predicates) لاستبعاد العقد غير المؤهلة، ثم مرحلة التقييم والترتيب (Scoring / Priorities) لمنح العقد المتبقية درجات واختيار العقدة ذات النتيجة الأعلى."
+  pitfalls={[
+    "الاعتقاد بأن Kube-Scheduler يقوم بتشغيل الحاويات؛ Scheduler فقط يربط الـ Pod باسم العقدة عبر Binding API، بينما يقوم Kubelet على تلك العقدة باستدعاء CRI وتشغيل الحاويات.",
+    "تجاهل Taints and Tolerations و NodeAffinity أثناء حساب تصفية وجدولة الموارد."
+  ]}
+  followUps={[
+    "ماذا يحدث إذا تعادلت عدة عقد في مرحلة التقييم (Scoring) بأعلى درجة؟",
+    "ما دور ميزة Pod Preemption عندما لا تتسع أي عقدة لموارد الـ Pod المطلوب؟"
+  ]}
+>
+خطوات عمل الجدولة:
+
+1. **Filtering (التصفية / Predicates):**
+   - يفحص قيود الموارد: هل العقدة تملك كفاية من `requests.cpu` و `requests.memory`؟
+   - يفحص قيود التوافق: `nodeSelector` و `nodeAffinity`.
+   - يفحص قيود العزل: `Taints and Tolerations`، وإشغال المنافذ `PodFitsHostPorts`.
+2. **Scoring (التقييم والترتيب / Priorities):**
+   - تُمنح العقد المؤهلة درجات من 0 إلى 100 وفقًا لاستراتيجيات التوزيع (مثل تفضيل نشر الكبسولات على مناطق جغرافية مختلفة `TopologySpreadConstraints`، أو استراتيجيات استهلاك الموارد `NodeResourcesBalancedAllocation`).
+3. **Binding (الربط):**
+   - يكتب الـ Scheduler اسم العقدة الفائزة في حقل `spec.nodeName` للكائن في etcd عبر الـ API Server.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-kubelet-sync-loop"
+  number={3}
+  difficulty="intermediate"
+  tags={["kubernetes", "kubelet", "worker-nodes", "cri"]}
+  question="ما هي مسؤوليات Kubelet على الـ Worker Node وكيف يتواصل مع واجهة وقت تشغيل الحاويات (CRI)؟"
+  directAnswer="Kubelet هو العميل الأساسي (Agent) الذي يعمل على كل Worker Node؛ يراقب الـ PodSpecs المسندة لعقدته، ويطلب من واجهة تشغيل الحاويات (CRI مثل containerd) تشغيل أو إيقاف الحاويات، ويثبت وحدات التخزين، ويفحص صحة الحاويات عبر Probes، ويبلغ الـ API Server بحالة العقدة والكبسولات."
+  pitfalls={[
+    "الاعتقاد بأن Kubelet يعمل داخل حاوية مثل بقية مكونات Kubernetes؛ في معظم التوزيعات يعمل Kubelet كخدمة نظام أصلية (systemd service) مباشرة على نظام تشغيل العقدة المضيفة.",
+    "الاعتقاد بأن Kubelet يتحدث مع دوكر مباشرة؛ تم إلغاء Dockershim وأصبح Kubelet يتخاطب مع CRI عبر gRPC Unix Socket."
+  ]}
+  followUps={[
+    "ما الفرق بين gRPC RuntimeService و ImageService في واجهة CRI؟",
+    "ما هي الـ Static Pods وكيف يديرها Kubelet محليًا دون تدخل من Kube-Scheduler؟"
+  ]}
+>
+يتواصل Kubelet مع الـ Container Runtime عبر **CRI (Container Runtime Interface)** باستخدام بروتوكول gRPC فوق Unix Domain Socket (مثل `/run/containerd/containerd.sock`):
+
+- **Pod Lifecycle Management:** عند وصول PodSpec جديد، ينشئ مساحة العزل، ثم يستدعي CRI لإنشاء الـ Sandbox ثم تشغيل الحاويات الفرعية.
+- **Volume Mounting:** يجهز نقاط تثبيت وحدات التخزين (Persistent Volumes و Secrets و ConfigMaps) قبل بدء تشغيل الحاوية.
+- **Health Checking:** ينفذ فحوصات `livenessProbe` و `readinessProbe` و `startupProbe`.
+- **Status Reporting:** يرسل دوريًا Heartbeats إلى `kube-apiserver` (عبر Lease objects) لتأكيد أن العقدة لا تزال بحالة `Ready`.
+</InterviewQuestion>

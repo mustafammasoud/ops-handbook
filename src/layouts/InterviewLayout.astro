@@ -1,0 +1,441 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import DocEnhancements from '../components/DocEnhancements.astro';
+import CategoryIcon from '../components/CategoryIcon.astro';
+import type { Technology } from '../data/technologies';
+import { categoryLabel } from '../data/categories';
+import { extractQuestionCounts, difficultyLabel } from '../utils/interview';
+
+interface Props {
+  entry: CollectionEntry<'interviewQuestions'>;
+  technology: Technology;
+  topics: CollectionEntry<'interviewQuestions'>[];
+}
+
+const { entry, technology, topics } = Astro.props;
+const { title, description, language = 'ar' } = entry.data;
+const dir = language === 'ar' ? 'rtl' : 'ltr';
+const isAr = language === 'ar';
+
+// Question stats for current topic
+const currentCounts = extractQuestionCounts(entry.body);
+
+// Sorted topics
+const sortedTopics = [...topics].sort((a, b) => a.data.order - b.data.order);
+const currentIndex = sortedTopics.findIndex((t) => t.id === entry.id);
+const prevTopic = currentIndex > 0 ? sortedTopics[currentIndex - 1] : null;
+const nextTopic = currentIndex >= 0 && currentIndex < sortedTopics.length - 1 ? sortedTopics[currentIndex + 1] : null;
+
+const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Handbook`;
+---
+
+<BaseLayout title={pageTitle} description={description} ogType="article" lang={language}>
+  <Header />
+
+  <div class="mx-auto flex w-full max-w-screen-2xl gap-8 px-4 py-6 lg:py-10">
+    <!-- Desktop Sidebar: Topics Rail -->
+    <aside class="hidden w-72 shrink-0 lg:block">
+      <div class="sticky top-20 flex max-h-[calc(100vh-6rem)] flex-col rounded-xl border border-border bg-surface p-4 shadow-2xs">
+        <!-- Technology Header -->
+        <div class="mb-4 border-b border-border pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-accent-ink border border-border">
+              <CategoryIcon name={technology.icon} class="h-5 w-5" />
+            </div>
+            <div class="min-w-0">
+              <a
+                href={`/interview-questions/${technology.id}`}
+                class="block truncate font-semibold text-text hover:text-accent-ink transition-colors"
+              >
+                {technology.name}
+              </a>
+              <span class="text-xs text-muted">Interview Topics</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Topics List -->
+        <nav aria-label={`${technology.name} Interview Topics`} class="flex-1 overflow-y-auto space-y-1 pr-1">
+          {sortedTopics.map((topicItem) => {
+            const isActive = topicItem.id === entry.id;
+            const topicQCounts = extractQuestionCounts(topicItem.body);
+            return (
+              <a
+                href={`/interview-questions/${technology.id}/${topicItem.data.topic}`}
+                class:list={[
+                  'group flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                  isActive
+                    ? 'bg-accent/15 text-accent-ink font-semibold shadow-xs'
+                    : 'text-muted hover:bg-surface-2 hover:text-text',
+                ]}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <span class="truncate">{topicItem.data.title}</span>
+                <span
+                  class:list={[
+                    'text-xs font-mono ml-2 shrink-0 rounded-full px-1.5 py-0.2',
+                    isActive ? 'bg-accent/20 text-accent-ink' : 'bg-surface-2 text-muted/70 group-hover:text-muted',
+                  ]}
+                >
+                  {topicQCounts.total}Q
+                </span>
+              </a>
+            );
+          })}
+        </nav>
+
+        <!-- Back to Interview Questions Hub -->
+        <div class="mt-4 border-t border-border pt-3">
+          <a
+            href="/interview-questions"
+            class="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-accent-ink transition-colors"
+          >
+            <span aria-hidden="true">&larr;</span>
+            <span>All Interview Questions</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main" class="min-w-0 flex-1">
+      <!-- Mobile Topics Accordion -->
+      <details class="mb-6 rounded-xl border border-border bg-surface lg:hidden">
+        <summary class="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium">
+          <span class="flex items-center gap-2">
+            <CategoryIcon name={technology.icon} class="h-4 w-4 text-accent-ink" />
+            <span>{technology.name} Topics ({sortedTopics.length})</span>
+          </span>
+          <span class="text-xs text-muted">Tap to switch</span>
+        </summary>
+        <div class="border-t border-border p-3 space-y-1">
+          {sortedTopics.map((topicItem) => {
+            const isActive = topicItem.id === entry.id;
+            const topicQCounts = extractQuestionCounts(topicItem.body);
+            return (
+              <a
+                href={`/interview-questions/${technology.id}/${topicItem.data.topic}`}
+                class:list={[
+                  'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                  isActive
+                    ? 'bg-accent/15 text-accent-ink font-medium'
+                    : 'text-muted hover:bg-surface-2 hover:text-text',
+                ]}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <span class="truncate">{topicItem.data.title}</span>
+                <span class="text-xs font-mono text-muted/60">{topicQCounts.total}Q</span>
+              </a>
+            );
+          })}
+          <div class="border-t border-border pt-2 mt-2">
+            <a href="/interview-questions" class="block text-xs font-medium text-muted hover:text-accent-ink px-3 py-1">
+              &larr; All Interview Questions
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <!-- Breadcrumbs -->
+      <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted">
+        <ol class="flex flex-wrap items-center gap-1.5">
+          <li>
+            <a href="/" class="hover:text-accent-ink transition-colors">Home</a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a href="/interview-questions" class="hover:text-accent-ink transition-colors">Interview Questions</a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a href={`/interview-questions/${technology.id}`} class="hover:text-accent-ink transition-colors">
+              {technology.name}
+            </a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" class="font-medium text-text truncate max-w-xs sm:max-w-md">
+            {title}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Topic Header -->
+      <header class="mb-6 border-b border-border pb-6">
+        <div class="mb-2 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-muted">
+            <CategoryIcon name={technology.icon} class="h-3.5 w-3.5 text-accent-ink" />
+            <span>{technology.name}</span>
+          </span>
+          <span class="text-xs text-muted">·</span>
+          <span class="text-xs text-muted">{categoryLabel(technology.category)}</span>
+          <span class="text-xs text-muted">·</span>
+          <span class="text-xs font-mono text-muted">Topic {entry.data.order} of {sortedTopics.length}</span>
+        </div>
+
+        <h1 class="text-2xl font-bold leading-snug tracking-tight text-text sm:text-3xl">{title}</h1>
+        {description && <p class="mt-3 text-muted leading-relaxed text-base">{description}</p>}
+
+        <!-- Stats Breakdown Badges -->
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <span class="rounded-md border border-border bg-surface px-2.5 py-1 font-semibold text-text">
+            {currentCounts.total} {isAr ? 'أسئلة' : 'Questions'}
+          </span>
+          {currentCounts.beginner > 0 && (
+            <span class="rounded-md border border-emerald-600/30 bg-emerald-500/10 px-2 py-1 font-medium text-emerald-700 dark:text-emerald-300">
+              {currentCounts.beginner} {difficultyLabel('beginner', language)}
+            </span>
+          )}
+          {currentCounts.intermediate > 0 && (
+            <span class="rounded-md border border-amber-600/30 bg-amber-500/10 px-2 py-1 font-medium text-amber-700 dark:text-amber-300">
+              {currentCounts.intermediate} {difficultyLabel('intermediate', language)}
+            </span>
+          )}
+          {currentCounts.advanced > 0 && (
+            <span class="rounded-md border border-rose-600/30 bg-rose-500/10 px-2 py-1 font-medium text-rose-700 dark:text-rose-300">
+              {currentCounts.advanced} {difficultyLabel('advanced', language)}
+            </span>
+          )}
+        </div>
+      </header>
+
+      <!-- Topic Interactive Controls: Difficulty Filters & Reveal All -->
+      <section
+        class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-3 sm:px-4"
+        aria-label="Interview question controls"
+        data-interview-toolbar
+      >
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by difficulty">
+          <button
+            type="button"
+            class="diff-filter-btn rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors bg-accent/15 text-accent-ink"
+            data-filter="all"
+            aria-pressed="true"
+          >
+            {isAr ? 'الكل' : 'All'} ({currentCounts.total})
+          </button>
+          {currentCounts.beginner > 0 && (
+            <button
+              type="button"
+              class="diff-filter-btn rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-2 hover:text-text transition-colors"
+              data-filter="beginner"
+              aria-pressed="false"
+            >
+              {difficultyLabel('beginner', language)} ({currentCounts.beginner})
+            </button>
+          )}
+          {currentCounts.intermediate > 0 && (
+            <button
+              type="button"
+              class="diff-filter-btn rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-2 hover:text-text transition-colors"
+              data-filter="intermediate"
+              aria-pressed="false"
+            >
+              {difficultyLabel('intermediate', language)} ({currentCounts.intermediate})
+            </button>
+          )}
+          {currentCounts.advanced > 0 && (
+            <button
+              type="button"
+              class="diff-filter-btn rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-2 hover:text-text transition-colors"
+              data-filter="advanced"
+              aria-pressed="false"
+            >
+              {difficultyLabel('advanced', language)} ({currentCounts.advanced})
+            </button>
+          )}
+        </div>
+
+        <!-- Global Reveal / Collapse All -->
+        <button
+          type="button"
+          class="reveal-all-btn inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-muted hover:text-accent-ink hover:border-accent/40 transition-colors"
+          data-state="collapsed"
+          data-label-reveal={isAr ? 'كشف جميع الإجابات' : 'Reveal All Answers'}
+          data-label-collapse={isAr ? 'إخفاء جميع الإجابات' : 'Collapse All'}
+        >
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="7 13 12 18 17 13"></polyline>
+            <polyline points="7 6 12 11 17 6"></polyline>
+          </svg>
+          <span class="reveal-all-text">{isAr ? 'كشف جميع الإجابات' : 'Reveal All Answers'}</span>
+        </button>
+      </section>
+
+      <!-- Questions List (Rendered via MDX slot) -->
+      <article class="interview-topic max-w-4xl" dir={dir} lang={language}>
+        <slot />
+      </article>
+
+      <!-- Topic Navigation Footer (Prev / Next) -->
+      <nav class="mt-12 border-t border-border pt-6" aria-label="Topic navigation">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {prevTopic ? (
+            <a
+              href={`/interview-questions/${technology.id}/${prevTopic.data.topic}`}
+              class="flex flex-col rounded-xl border border-border bg-surface p-4 transition-colors hover:border-accent/40 hover:bg-surface-2"
+            >
+              <span class="text-xs font-medium text-muted flex items-center gap-1">
+                <span aria-hidden="true">&larr;</span> Previous Topic
+              </span>
+              <span class="mt-1 text-sm font-semibold text-text">{prevTopic.data.title}</span>
+            </a>
+          ) : (
+            <div />
+          )}
+
+          {nextTopic ? (
+            <a
+              href={`/interview-questions/${technology.id}/${nextTopic.data.topic}`}
+              class="flex flex-col items-end text-right rounded-xl border border-border bg-surface p-4 transition-colors hover:border-accent/40 hover:bg-surface-2 sm:col-start-2"
+            >
+              <span class="text-xs font-medium text-muted flex items-center gap-1">
+                Next Topic <span aria-hidden="true">&rarr;</span>
+              </span>
+              <span class="mt-1 text-sm font-semibold text-text">{nextTopic.data.title}</span>
+            </a>
+          ) : (
+            <div />
+          )}
+        </div>
+      </nav>
+    </main>
+  </div>
+
+  <DocEnhancements />
+
+  <!-- Client Interaction Script: Answer Reveal & Difficulty Filter -->
+  <script is:inline>
+    (function () {
+      function initInterviewInteractions() {
+        var qCards = document.querySelectorAll('.interview-q');
+        if (!qCards.length) return;
+
+        // 1. Individual Question Reveal/Hide
+        qCards.forEach(function (card) {
+          var btn = card.querySelector('.q-reveal-btn');
+          var panel = card.querySelector('.q-answer-panel');
+          if (!btn || !panel) return;
+
+          btn.onclick = function () {
+            var isExpanded = btn.getAttribute('aria-expanded') === 'true';
+            var nextState = !isExpanded;
+
+            btn.setAttribute('aria-expanded', String(nextState));
+            panel.classList.toggle('hidden', !nextState);
+            panel.setAttribute('aria-hidden', String(!nextState));
+
+            var iconReveal = btn.querySelector('.q-icon-reveal');
+            var iconHide = btn.querySelector('.q-icon-hide');
+            var textSpan = btn.querySelector('.q-btn-text');
+
+            if (iconReveal) iconReveal.classList.toggle('hidden', nextState);
+            if (iconHide) iconHide.classList.toggle('hidden', !nextState);
+            if (textSpan) {
+              textSpan.textContent = nextState
+                ? btn.getAttribute('data-label-hide')
+                : btn.getAttribute('data-label-reveal');
+            }
+          };
+        });
+
+        // 2. Global Reveal/Collapse All
+        var revealAllBtn = document.querySelector('.reveal-all-btn');
+        if (revealAllBtn) {
+          revealAllBtn.onclick = function () {
+            var currentState = revealAllBtn.getAttribute('data-state');
+            var shouldOpen = currentState === 'collapsed';
+
+            qCards.forEach(function (card) {
+              var btn = card.querySelector('.q-reveal-btn');
+              var panel = card.querySelector('.q-answer-panel');
+              if (!btn || !panel) return;
+
+              btn.setAttribute('aria-expanded', String(shouldOpen));
+              panel.classList.toggle('hidden', !shouldOpen);
+              panel.setAttribute('aria-hidden', String(!shouldOpen));
+
+              var iconReveal = btn.querySelector('.q-icon-reveal');
+              var iconHide = btn.querySelector('.q-icon-hide');
+              var textSpan = btn.querySelector('.q-btn-text');
+
+              if (iconReveal) iconReveal.classList.toggle('hidden', shouldOpen);
+              if (iconHide) iconHide.classList.toggle('hidden', !shouldOpen);
+              if (textSpan) {
+                textSpan.textContent = shouldOpen
+                  ? btn.getAttribute('data-label-hide')
+                  : btn.getAttribute('data-label-reveal');
+              }
+            });
+
+            revealAllBtn.setAttribute('data-state', shouldOpen ? 'expanded' : 'collapsed');
+            var allText = revealAllBtn.querySelector('.reveal-all-text');
+            if (allText) {
+              allText.textContent = shouldOpen
+                ? revealAllBtn.getAttribute('data-label-collapse')
+                : revealAllBtn.getAttribute('data-label-reveal');
+            }
+          };
+        }
+
+        // 3. Difficulty Filter Tabs
+        var filterBtns = document.querySelectorAll('.diff-filter-btn');
+        filterBtns.forEach(function (filterBtn) {
+          filterBtn.onclick = function () {
+            var selectedDiff = filterBtn.getAttribute('data-filter');
+
+            filterBtns.forEach(function (b) {
+              var isCurrent = b === filterBtn;
+              b.setAttribute('aria-pressed', String(isCurrent));
+              b.classList.toggle('bg-accent/15', isCurrent);
+              b.classList.toggle('text-accent-ink', isCurrent);
+              b.classList.toggle('font-semibold', isCurrent);
+              b.classList.toggle('text-muted', !isCurrent);
+              b.classList.toggle('font-medium', !isCurrent);
+            });
+
+            qCards.forEach(function (card) {
+              var cardDiff = card.getAttribute('data-difficulty');
+              if (selectedDiff === 'all' || cardDiff === selectedDiff) {
+                card.style.display = '';
+              } else {
+                card.style.display = 'none';
+              }
+            });
+          };
+        });
+
+        // 4. URL Hash Deep Linking
+        function activateHashTarget() {
+          if (!window.location.hash) return;
+          try {
+            var targetId = window.location.hash.substring(1);
+            var targetElem = document.getElementById(targetId);
+            if (targetElem && targetElem.classList.contains('interview-q')) {
+              var btn = targetElem.querySelector('.q-reveal-btn');
+              if (btn && btn.getAttribute('aria-expanded') !== 'true') {
+                btn.click();
+              }
+              var details = targetElem.querySelector('details.q-details');
+              if (details) {
+                details.open = true;
+              }
+              targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          } catch (e) {}
+        }
+
+        activateHashTarget();
+        window.addEventListener('hashchange', activateHashTarget);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initInterviewInteractions);
+      } else {
+        initInterviewInteractions();
+      }
+    })();
+  </script>
+</BaseLayout>

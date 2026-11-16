@@ -1,0 +1,68 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import InterviewLayout from '../../../layouts/InterviewLayout.astro';
+import InterviewQuestion from '../../../components/InterviewQuestion.astro';
+import Callout from '../../../components/Callout.astro';
+import CheatSheet from '../../../components/CheatSheet.astro';
+import Steps from '../../../components/Steps.astro';
+import Figure from '../../../components/Figure.astro';
+import InfoCard from '../../../components/InfoCard.astro';
+import CardGrid from '../../../components/CardGrid.astro';
+import TableCard from '../../../components/TableCard.astro';
+import ChecklistCard from '../../../components/ChecklistCard.astro';
+import { getTechnology, type Technology } from '../../../data/technologies';
+
+const mdxComponents = {
+  InterviewQuestion,
+  Callout,
+  CheatSheet,
+  Steps,
+  Figure,
+  InfoCard,
+  CardGrid,
+  TableCard,
+  ChecklistCard,
+};
+
+export async function getStaticPaths() {
+  const allEntries = await getCollection('interviewQuestions', ({ data }) => !data.draft);
+
+  return allEntries.map((entry) => {
+    const technology = getTechnology(entry.data.technology);
+    if (!technology) {
+      throw new Error(
+        `[interview-questions] Unknown technology "${entry.data.technology}" in entry "${entry.id}"`,
+      );
+    }
+
+    const techTopics = allEntries
+      .filter((e) => e.data.technology === entry.data.technology)
+      .sort((a, b) => a.data.order - b.data.order);
+
+    return {
+      params: {
+        technology: entry.data.technology,
+        topic: entry.data.topic,
+      },
+      props: {
+        entry,
+        technology,
+        topics: techTopics,
+      },
+    };
+  });
+}
+
+interface Props {
+  entry: CollectionEntry<'interviewQuestions'>;
+  technology: Technology;
+  topics: CollectionEntry<'interviewQuestions'>[];
+}
+
+const { entry, technology, topics } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<InterviewLayout entry={entry} technology={technology} topics={topics}>
+  <Content components={mdxComponents} />
+</InterviewLayout>

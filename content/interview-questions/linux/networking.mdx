@@ -1,0 +1,92 @@
+---
+title: Linux Networking & Sockets Interview Questions
+technology: linux
+topic: networking
+description: أسئلة مقابلات حول شبكات خوادم لينكس، فحص المقابس (Sockets)، مسار حل أسماء النطاقات (DNS Resolution)، وتشخيص الحزم بأداة tcpdump.
+order: 4
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="linux-ss-vs-netstat-sockets"
+  number={1}
+  difficulty="intermediate"
+  tags={["linux", "networking", "ss", "sockets"]}
+  question="لماذا استُبدلت أداة netstat بأداة ss في توزيعات لينكس الحديثة، وما هو الأمر المفضل لفحص المنافذ المفتوحة والمستمعة؟"
+  directAnswer="أداة netstat تقرأ تفاصيل الشبكة ببطء شديد عبر التكرار في ملفات /proc/net/ النصية؛ في الخوادم عالية الحمل التي تحتوي على مئات آلاف الاتصالات المفتوحة، قد يتجمد أمر netstat أو يستغرق دقائق. بينما تستخدم أداة ss واجهة Netlink السريعة داخل النواة مباشرة مما يمنحها استجابة فورية. الأمر القياسي هو: ss -tulpn (t=TCP, u=UDP, l=Listening, p=Process, n=Numeric IPs)."
+  pitfalls={[
+    "نسيان استخدام العلم -n، مما يجبر الأمر على إجراء استعلامات DNS بطيئة لترجمة كل عنوان IP ورقم منفذ إلى اسم نصي، مسببًا تأخيرًا كبيرًا.",
+    "الاعتقاد بأن عدم ظهور اسم العملية (Process Name) في العمود الأخير يعني خللاً؛ يجب تشغيل الأمر بصلاحيات sudo لعرض العمليات المملوكة لمستخدمين آخرين."
+  ]}
+  followUps={[
+    "ماذا تعني حالة TIME_WAIT في اتصالات TCP وكيف تؤثر على استنزاف المنافذ سريعة الزوال (Ephemeral Ports)؟",
+    "كيف يمكنك تصفية مخرجات ss لعرض اتصالات TCP المرتبطة بمنفذ محدد مثل 443 فقط؟"
+  ]}
+>
+المقارنة واستخدام الأمر القياسي:
+
+```bash
+# فحص جميع المنافذ المستمعة (Listening) مع رقم الـ PID واسم البرنامج
+sudo ss -tulpn
+
+# تصفية المقابس المستمعة على منفذ الويب 443 فقط
+sudo ss -tulpn '( sport = :443 )'
+
+# فحص عدد الاتصالات في حالة التأسيس (ESTABLISHED)
+ss -t -a state established
+```
+
+دلالات الأعلام في `ss -tulpn`:
+- `-t`: حصر الفحص في بروتوكول **TCP**.
+- `-u`: حصر الفحص في بروتوكول **UDP**.
+- `-l`: عرض المقابس المستمعة فقط (**Listening**) وتجاهل الاتصالات المنتهية.
+- `-p`: إظهار معرف العملية (**PID**) واسم التطبيق المرتبط بالمنفذ.
+- `-n`: عرض العناوين والمنافذ كأرقام مجردة (**Numeric**) دون إضاعة الوقت في استعلامات DNS.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="linux-dns-resolution-flow"
+  number={2}
+  difficulty="intermediate"
+  tags={["linux", "networking", "dns", "nsswitch"]}
+  question="اشرح المسار الكامل لعملية حل أسماء النطاقات (DNS Resolution) عند تنفيذ أمر مثل curl https://api.stripe.com على خادم لينكس."
+  directAnswer="تبدأ العملية باستدعاء دالة مكتبة C القياسية getaddrinfo(). أولاً يقرأ النظام ملف التوجيه /etc/nsswitch.conf للتحقق من ترتيب المصادر (عادة hosts: files dns). يفحص النظام أولاً ملف /etc/hosts المحلي؛ إذا لم يجد الاسم، يوجه الاستعلام إلى خادم الأسماء المسجل في /etc/resolv.conf (أو خدمة systemd-resolved المحلية عبر 127.0.0.53) الذي يرسل طلب DNS متكرر (Recursive Query) إلى ملقم DNS الخارجي."
+  pitfalls={[
+    "تعديل ملف /etc/resolv.conf يدويًا في الأنظمة الحديثة التي تعتمد على systemd-resolved أو NetworkManager؛ حيث يتم الكتابة فوق الملف وإلغاء التعديلات تلقائيًا عند إعادة تشغيل الخدمة أو تجديد إيجار DHCP.",
+    "تجاهل وجود إدخال قديم أو خاطئ في ملف /etc/hosts يتجاوز نتائج خوادم الـ DNS الحقيقية ويضلل عمليات التشخيص."
+  ]}
+  followUps={[
+    "ما الأمر الموصى به لإدارة وتعديل إعدادات DNS مع خدمة systemd-resolved؟",
+    "كيف تستخدم أداة dig لفحص سجلات A و CNAME وتتبع مسار التفويض عبر علم +trace؟"
+  ]}
+>
+مسار التحليل في لينكس:
+
+```
+[Application: curl] ──> getaddrinfo()
+                             │
+                             ▼
+                   [/etc/nsswitch.conf]
+                             │
+              ┌──────────────┴──────────────┐
+              ▼                             ▼
+       1. files                        2. dns
+     [/etc/hosts]                [/etc/resolv.conf]
+              │                             │
+    (Found? Return IP)               (Systemd-resolved)
+                                            │
+                                            ▼
+                                  Upstream DNS Server
+                                  (e.g., 8.8.8.8, 1.1.1.1)
+```
+
+لتعديل إعدادات الـ DNS بشكل دائم في الأنظمة الحديثة:
+```bash
+# استخدام resolvectl للتحقق من خوادم DNS لكل واجهة شبكة
+resolvectl status
+
+# فحص استجابة DNS بالتفصيل
+dig @1.1.1.1 api.stripe.com +trace
+```
+</InterviewQuestion>

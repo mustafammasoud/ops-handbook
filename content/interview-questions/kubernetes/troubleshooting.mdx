@@ -1,0 +1,69 @@
+---
+title: Kubernetes Troubleshooting Interview Questions
+technology: kubernetes
+topic: troubleshooting
+description: "أسئلة مقابلات حول تشخيص أعطال Kubernetes الشائعة في الإنتاج: CrashLoopBackOff، كبسولات Pending، انهيارات OOMKilled، وحالات Node NotReady."
+order: 7
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-debug-crashloopbackoff"
+  number={1}
+  difficulty="intermediate"
+  tags={["kubernetes", "troubleshooting", "crashloopbackoff", "production"]}
+  question="دخلت كبسولة في حالة CrashLoopBackOff فور نشرها. ما هي خطواتك المنظمة لتحديد السبب الجذري للمشكلة وحلها؟"
+  directAnswer="أبدأ بتنفيذ kubectl describe pod لفحص قسم Events ورؤية كود الخروج (Exit Code) ورسالة الخطأ الأخيرة. ثم أقرأ سجلات الحاوية السابقة التي انهارت عبر kubectl logs <pod> --previous. إذا كان سبب الانهيار نقص إعدادات أو أسرار، أراجع الـ ConfigMaps/Secrets، وأخيرًا أتحقق من قيود الذاكرة OOMKilled أو فشل فحص livenessProbe."
+  pitfalls={[
+    "استخدام kubectl logs دون العلم -p / --previous، مما يعرض سجلات الحاوية الجديدة التي قد تكون فارغة أو لم تبدأ بعد، بينما الخطأ الحقيقي مسجل في الحاوية السابقة التي انهارت.",
+    "الافتراض الدائم بأن CrashLoopBackOff مشكلة في الكود، بينما تكون غالبًا بسبب غياب متغير بيئة إلزامي (Missing Env Var) أو فشل الاتصال بقاعدة بيانات غير متاحة."
+  ]}
+  followUps={[
+    "ما الفرق بين Exit Code 0 و Exit Code 1 و Exit Code 137 و Exit Code 143 في فحص الحاويات المنهارة؟",
+    "كيف يمكن استخدام أمر kubectl debug لفتح حاوية تشخيص مؤقتة (Ephemeral Container) داخل نفس الـ Pod؟"
+  ]}
+>
+منهجية التشخيص السريعة والمحترفة:
+
+1. **فحص الـ Events وحالة الحاوية:**
+   ```bash
+   kubectl describe pod <pod-name> -n <ns>
+   ```
+   ابحث في مخرجات قسم `State: Waiting` وقسم `Last State: Terminated`:
+   - `Exit Code 137`: مقتل الحاوية بسبب نفاد الذاكرة (`OOMKilled: true`).
+   - `Exit Code 1` أو `2`: خطأ برمجي في كود التطبيق أو عدم العثور على ملف التكوين.
+   - `Exit Code 0`: انتهى كود الحاوية بنجاح لأنه لا يحتوي على عملية خلفية دائمة (مثل سكربت انتهى تنفيذه وأغلق).
+2. **قراءة سجل الحاوية السابقة المنتهية:**
+   ```bash
+   kubectl logs <pod-name> -c <container-name> -p -n <ns>
+   ```
+3. **فحص إعدادات مجسات الصحة (Probes):**
+   إذا كان التطبيق يستغرق وقتاً طويلاً للإقلاع (مثل Java Spring Boot)، قد يقوم `livenessProbe` بقتله قبل اكتمال التهيئة. الحل إضافة `startupProbe` مع `failureThreshold` كافٍ.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-debug-pending-pods"
+  number={2}
+  difficulty="intermediate"
+  tags={["kubernetes", "troubleshooting", "pending-pods", "scheduler"]}
+  question="كبسولة عمل جديدة عالقة في حالة Pending ولا تبدأ بالعمل. ما هي الأسباب المحتملة وكيف تؤكد السبب؟"
+  directAnswer="حالة Pending تعني أن Kube-Scheduler عجز عن إيجاد عقدة مؤهلة تستوفي متطلبات الكبسولة. يتم تأكيد السبب فورًا عبر تشغيل kubectl describe pod والنظر في قسم Events، ومن أشهر الأسباب: عدم كفاية موارد المعالج أو الذاكرة (0/N nodes available: Insufficient cpu/memory)، أو وجود قيود تآلف (NodeAffinity)، أو وسوم حظر (Taints) بدون سماحيات (Tolerations)، أو انتظار ربط قرص تخزين (VolumeBinding)."
+  pitfalls={[
+    "محاولة إعادة تشغيل الكبسولة أو حذفها على أمل حل المشكلة؛ الكبسولة ستعود للحالة Pending فورًا لأن قيود الموارد أو العقد لم تتغير.",
+    "الخلط بين طلب الموارد requests واستهلاك الموارد الفعلي limits؛ الجدولة تعتمد حصرًا على requests."
+  ]}
+  followUps={[
+    "كيف تعالج مشكلة 0/5 nodes available: Insufficient memory في بيئة سحابية تدعم Cluster Autoscaler؟",
+    "كيف يؤثر وجود قرص RWO مرتبط بـ Zone محددة على حصر جدولة الـ Pod في تلك الـ Zone فقط؟"
+  ]}
+>
+جدول أسباب حالة **Pending** وإجراءات الحل:
+
+| رسالة الـ Event في `kubectl describe pod` | المعنى التقني | الحل العملي |
+|---|---|---|
+| `0/6 nodes available: Insufficient cpu` | مجموع `requests.cpu` للكبسولات يتجاوز سعة العقد الحالية | تقليص الـ requests، أو تفعيل Cluster Autoscaler لإضافة خوادم جديدة |
+| `0/6 nodes available: 3 node(s) had untolerated taint` | العقد تحتوي على وسوم Taint والكبسولة لا تمتلك toleration | إضافة `tolerations` مطابقة أو إزالة الـ taint غير المقصود من العقدة |
+| `pod has unbound immediate PersistentVolumeClaims` | الـ PVC غير قادر على إيجاد أو حجز قرص PV مطابق | فحص الـ StorageClass ومطابقة سعة القرص و AccessMode المطلوب |
+| `0/6 nodes available: 6 node(s) didn't match PodTopologySpread` | قيود التوزيع الجغرافي تمنع وضع كبسولات إضافية في هذه المنطقة | مراجعة `topologySpreadConstraints` وتعديل `maxSkew` |
+</InterviewQuestion>

@@ -1,0 +1,106 @@
+---
+title: Kubernetes Pods & Workloads Interview Questions
+technology: kubernetes
+topic: pods-workloads
+description: أسئلة مقابلات حول دورة حياة الكبسولات، فئات جودة الخدمة (QoS Classes)، الفرق بين Deployments وStatefulSets، وآليات إدارة الموارد.
+order: 3
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-pod-termination-lifecycle"
+  number={1}
+  difficulty="advanced"
+  tags={["kubernetes", "pods", "lifecycle", "zero-downtime"]}
+  question="اشرح بالتفصيل التسلسل الزمني لعملية إيقاف وحذف الـ Pod (Termination Lifecycle) وما الخطوات اللازمة لتحقيق Zero-Downtime؟"
+  directAnswer="عند إصدار أمر حذف الـ Pod، يحدد الـ API Server وقت الحذف (deletionTimestamp) وتبدأ عمليتان متوازيتان: الأولى قيام Endpoints Controller بإزالة IP الكبسولة من الـ Service ومسار التوجيه في Kube-Proxy/Ingress، والثانية قيام Kubelet بتنفيذ خطاف preStop ثم إرسال إشارة SIGTERM، ثم الانتظار لمدة terminationGracePeriodSeconds، وأخيرًا إرسال إشارة SIGKILL إذا لم تغلق الحاوية."
+  pitfalls={[
+    "الاعتقاد بأن إزالة الـ Pod من Service Endpoints تحدث فورًا قبل إرسال SIGTERM؛ هناك تأخير لنشر التغيير عبر الشبكة مما يتطلب وضع sleep قصير في خطاف preStop لتفادي أخطاء 502/504.",
+    "عدم معالجة إشارة SIGTERM داخل كود التطبيق، مما يؤدي إلى قطع الاتصالات المفتوحة بقواعد البيانات."
+  ]}
+  followUps={[
+    "ما هي القيمة الافتراضية لحقل terminationGracePeriodSeconds؟",
+    "كيف يؤثر وضع sleep 5 داخل preStop hook على تفادي انقطاع طلبات المستخدمين الجارية؟"
+  ]}
+>
+التسلسل الزمني الدقيق لعملية الإغلاق السلس (Graceful Shutdown):
+
+1. يقوم المستخدم بتنفيذ أمر الحذف أو يقوم الـ Deployment بتحديث تدريجي.
+2. يسجل `kube-apiserver` حقل `deletionTimestamp` وحالة `Terminating`.
+3. **المسار المتوازي الأول (إدارة الشبكة):**
+   - يكتشف الـ EndpointSlice controller حالة الحذف ويزيل عنوان IP الخاص بالكبسولة من نقاط النهاية.
+   - تقوم مكونات `kube-proxy` و Ingress Controllers بتحديث جداول iptables/IPVS أو تكوين NGINX لإيقاف توجيه طلبات جديدة إليها.
+4. **المسار المتوازي الثاني (Kubelet على العقدة):**
+   - ينفذ Kubelet خطاف `preStop` (إن وجد).
+   - بعد اكتمال `preStop`، يرسل إشارة `SIGTERM` (Signal 15) إلى المعرف PID 1 داخل الحاوية.
+   - ينتظر النظام انتهاء المهلة المحددة في `terminationGracePeriodSeconds` (الافتراضي 30 ثانية).
+   - إذا لم تغلق الحاوية تلقائيًا، يرسل Kubelet إشارة `SIGKILL` (Signal 9) لإنهاء العملية قسريًا.
+
+```yaml
+spec:
+  terminationGracePeriodSeconds: 45
+  containers:
+  - name: api
+    lifecycle:
+      preStop:
+        exec:
+          # منح الشبكة 10 ثوانٍ لحذف الكبسولة من موازنات الحمل قبل إنهاء التطبيق
+          command: ["/bin/sh", "-c", "sleep 10"]
+```
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-qos-classes"
+  number={2}
+  difficulty="intermediate"
+  tags={["kubernetes", "resources", "qos", "oom"]}
+  question="ما هي فئات جودة الخدمة (QoS Classes) في Kubernetes، وكيف تؤثر على ترتيب طرد الكبسولات (Eviction) عند نفاد موارد العقدة؟"
+  directAnswer="تنقسم الكبسولات إلى ثلاث فئات: Guaranteed (عند تطابق requests مع limits للذاكرة والمعالج في كل الحاويات)، وBurstable (عند تعيين requests أقل من limits)، وBestEffort (عدم تعيين أي requests أو limits). عند نفاد الذاكرة، يتم طرد كبسولات BestEffort أولاً، ثم Burstable، وتكون كبسولات Guaranteed آخر من يُطرد."
+  pitfalls={[
+    "عدم تعيين requests على الإطلاق، مما يجعل الكبسولة تلقائيًا في فئة BestEffort ومعرضة للقتل الفوري بواسطة OOM Killer عند أي ضغط على الخادم.",
+    "تحديد limits مرتفعة جدًا بدون requests واقعية، مما يربك نظام الجدولة ويسبب تكدسًا على العقدة."
+  ]}
+  followUps={[
+    "كيف يتم حساب قيمة oom_score_adj في نواة لينكس بناءً على فئة الـ QoS للـ Pod؟",
+    "ما الفرق بين قتل الحاوية بسبب OOMKilled (Exit Code 137) وبين طرد الـ Pod كاملاً (Eviction) بواسطة Kubelet؟"
+  ]}
+>
+تحدد Kubernetes فئة الـ **QoS** تلقائيًا دون حقل صريح، بناءً على قيم `resources`:
+
+1. **Guaranteed:**
+   - كل حاوية داخل الكبسولة تمتلك `requests.cpu == limits.cpu` و `requests.memory == limits.memory`.
+   - يتم تعيين `oom_score_adj = -997` (أعلى حماية من القتل).
+2. **Burstable:**
+   - الحاوية تمتلك `requests` محددة، ولكنها أقل من `limits`، أو أحد الموارد محدد دون الآخر.
+   - تحسب النواة `oom_score_adj` نسبيًا حسب نسبة استهلاك الذاكرة مقارنة بالحدود المطلوبة.
+3. **BestEffort:**
+   - لا توجد أي `requests` أو `limits` محددة للذاكرة أو المعالج.
+   - يتم تعيين `oom_score_adj = 1000`، وتكون الكبسولة هي الضحية الأولى لـ OOM Killer عند تعرض العقدة لضغط الذاكرة (Node MemoryPressure).
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-deployments-vs-statefulsets"
+  number={3}
+  difficulty="intermediate"
+  tags={["kubernetes", "workloads", "deployments", "statefulsets"]}
+  question="متى يجب استخدام StatefulSet بدلاً من Deployment، وما الخصائص الفريدة التي يقدمها لتطبيقات الحالة (Stateful Applications)؟"
+  directAnswer="يُستخدم StatefulSet للتطبيقات التي تتطلب هوية شبكية مستقرة لا تتغير، وتخزينًا دائمًا مخصصًا لكل نسخة، وترتيبًا محددًا في التشغيل والتحديث والإيقاف (مثل قواعد البيانات الموزعة Kafka وElasticsearch وPostgreSQL)، بينما يُستخدم Deployment للتطبيقات عديمة الحالة (Stateless) التي تكون فيها النسخ متماثلة وقابلة للاستبدال دون ترتيب."
+  pitfalls={[
+    "استخدام Deployment مع PersistentVolumeClaim مشتركة بنمط ReadWriteOnce لقاعدة بيانات موزعة، مما يؤدي إلى فشل تثبيت القرص عند نقل الكبسولة لعقدة أخرى.",
+    "نسيان إنشاء Headless Service (التي تملك clusterIP: None) عند تعريف StatefulSet، وهي ضرورية لإنشاء سجلات DNS الفريدة لكل كبسولة."
+  ]}
+  followUps={[
+    "كيف يتم تسمية كبسولات StatefulSet وأقراصها (PVC Templates)؟",
+    "ما الفرق بين استراتيجية التحديث RollingUpdate و OnDelete في StatefulSet؟"
+  ]}
+>
+الفروق الجوهرية بين Deployment و StatefulSet:
+
+| الميزة | Deployment (Stateless) | StatefulSet (Stateful) |
+|---|---|---|
+| **تسمية الكبسولات** | عشوائية غير متوقعة (`web-79bb8f-xyz`) | متسلسلة مستقرة تبدأ من الصفر (`db-0, db-1, db-2`) |
+| **هوية الشبكة** | IP عشوائي يخدمه Service عشوائي | اسم نطاق DNS فريد لكل كبسولة عبر Headless Service (`db-0.db-service.ns.svc.cluster.local`) |
+| **التخزين الدائم** | أقراص عامة أو مشتركة | قالب `volumeClaimTemplates` يربط كل كبسولة بقرص PV مخصص ودائم لا يُحذف بحذف الكبسولة |
+| **ترتيب النشر** | متوازي وسريع | تسلسلي صارم (لا يبدأ `db-1` إلا بعد أن يصبح `db-0` بحالة `Running & Ready`) |
+</InterviewQuestion>

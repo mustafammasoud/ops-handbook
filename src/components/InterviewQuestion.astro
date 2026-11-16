@@ -1,0 +1,224 @@
+---
+import type { DifficultyLevel } from '../utils/interview';
+import { difficultyLabel } from '../utils/interview';
+
+interface Props {
+  /** Stable unique identifier (e.g. "k8s-pod-lifecycle") */
+  id: string;
+  /** Sequential question number within the topic (e.g. 1) */
+  number: number;
+  /** Difficulty level */
+  difficulty: DifficultyLevel;
+  /** Question text */
+  question: string;
+  /** Concise direct answer for quick revision */
+  directAnswer: string;
+  /** Relevant technical tags */
+  tags?: string[];
+  /** Common mistakes, anti-patterns, or interview pitfalls */
+  pitfalls?: string[];
+  /** Common follow-up questions asked by interviewers */
+  followUps?: string[];
+  /** Language override (defaults to ar) */
+  lang?: 'en' | 'ar';
+}
+
+const {
+  id,
+  number,
+  difficulty,
+  question,
+  directAnswer,
+  tags = [],
+  pitfalls = [],
+  followUps = [],
+  lang = 'ar',
+} = Astro.props;
+
+const isAr = lang === 'ar';
+const diffText = difficultyLabel(difficulty, lang);
+const panelId = `answer-panel-${id}`;
+
+// Difficulty badge styling
+const diffStyles: Record<DifficultyLevel, { badge: string; dot: string }> = {
+  beginner: {
+    badge: 'border-emerald-600/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+    dot: 'bg-emerald-500',
+  },
+  intermediate: {
+    badge: 'border-amber-600/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    dot: 'bg-amber-500',
+  },
+  advanced: {
+    badge: 'border-rose-600/30 bg-rose-500/10 text-rose-700 dark:text-rose-300',
+    dot: 'bg-rose-500',
+  },
+};
+
+const dStyle = diffStyles[difficulty];
+---
+
+<div
+  id={id}
+  class="interview-q group relative my-6 scroll-mt-24 rounded-2xl border border-border bg-surface p-5 sm:p-7 shadow-xs transition-colors hover:border-accent/40"
+  data-difficulty={difficulty}
+  data-qid={id}
+>
+  <!-- Question Meta Header -->
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Question Number -->
+      <span class="inline-flex items-center rounded-md border border-border bg-surface-2 px-2.5 py-0.5 text-xs font-mono font-semibold text-text">
+        {isAr ? `سؤال #${number}` : `Q #${number}`}
+      </span>
+
+      <!-- Difficulty Badge -->
+      <span class:list={['inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium', dStyle.badge]}>
+        <span class:list={['h-1.5 w-1.5 rounded-full', dStyle.dot]} aria-hidden="true"></span>
+        <span>{diffText}</span>
+      </span>
+
+      <!-- Tags -->
+      {tags.map((tag) => (
+        <span class="hidden rounded-full border border-border/60 bg-surface-2/40 px-2 py-0.5 text-xs text-muted font-mono sm:inline-block">
+          #{tag}
+        </span>
+      ))}
+    </div>
+
+    <!-- Direct Permalink Anchor -->
+    <a
+      href={`#${id}`}
+      class="text-xs text-muted hover:text-accent-ink transition-colors flex items-center gap-1 opacity-60 hover:opacity-100"
+      title={isAr ? 'رابط مباشر للسؤال' : 'Direct link to question'}
+      aria-label={isAr ? `رابط مباشر لسؤال ${number}` : `Direct link to question ${number}`}
+    >
+      <span class="font-mono">#{id}</span>
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Question Heading -->
+  <div class="mt-4">
+    <h3 class="text-lg font-bold leading-snug text-text sm:text-xl">
+      {question}
+    </h3>
+  </div>
+
+  <!-- Reveal / Hide Toggle Action -->
+  <div class="mt-5 flex items-center justify-between pt-2">
+    <button
+      type="button"
+      class="q-reveal-btn inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2 text-xs sm:text-sm font-semibold text-accent-ink shadow-2xs transition-all hover:bg-accent hover:text-white dark:hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      aria-expanded="false"
+      aria-controls={panelId}
+      data-label-reveal={isAr ? 'عرض الإجابة' : 'Reveal Answer'}
+      data-label-hide={isAr ? 'إخفاء الإجابة' : 'Hide Answer'}
+    >
+      <!-- Eye / Reveal Icon -->
+      <svg class="q-icon-reveal h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+      <!-- Eye Off / Hide Icon -->
+      <svg class="q-icon-hide hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+        <line x1="2" x2="22" y1="2" y2="22"></line>
+      </svg>
+      <span class="q-btn-text">{isAr ? 'عرض الإجابة' : 'Reveal Answer'}</span>
+    </button>
+
+    <span class="text-xs text-muted italic">
+      {isAr ? 'فكّر في الإجابة أولاً قبل كشفها' : 'Think through your answer before revealing'}
+    </span>
+  </div>
+
+  <!-- Expandable Answer Panel -->
+  <div
+    id={panelId}
+    class="q-answer-panel mt-6 space-y-5 border-t border-border/80 pt-6 hidden transition-opacity duration-200"
+    aria-hidden="true"
+  >
+    <!-- 1. Direct Answer Highlight Card -->
+    <div class="rounded-xl border border-accent/30 bg-accent/5 p-4 sm:p-5">
+      <div class="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-wider text-accent-ink">
+        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="7.5" cy="15.5" r="5.5"></circle>
+          <path d="m21 2-9.6 9.6"></path>
+          <path d="m15.5 7.5 3 3L22 7l-3-3"></path>
+        </svg>
+        <span>{isAr ? 'الإجابة المباشرة (Direct Answer)' : 'Direct Answer'}</span>
+      </div>
+      <p class="text-sm sm:text-base font-medium leading-relaxed text-text">
+        {directAnswer}
+      </p>
+    </div>
+
+    <!-- 2. Detailed Technical Explanation (Slot) -->
+    <details class="q-details group/details rounded-xl border border-border/70 bg-surface-2/30 p-4 sm:p-5 transition-all">
+      <summary class="flex cursor-pointer list-none items-center justify-between text-xs font-bold uppercase tracking-wider text-muted hover:text-accent-ink focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+        <div class="flex items-center gap-2">
+          <svg class="h-4 w-4 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>{isAr ? 'الشرح التقني المفصل والتطبيق العملي' : 'Detailed Technical Explanation & Practice'}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-accent-ink text-xs font-semibold">
+          <span class="group-open/details:hidden">{isAr ? 'توسيع الشرح' : 'Expand Details'}</span>
+          <span class="hidden group-open/details:inline">{isAr ? 'طي الشرح' : 'Collapse Details'}</span>
+          <svg class="h-3.5 w-3.5 transition-transform duration-200 group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </summary>
+      <div class="mt-4 border-t border-border/60 pt-4 prose max-w-none text-sm sm:text-base leading-relaxed">
+        <slot />
+      </div>
+    </details>
+
+    <!-- 3. Common Pitfalls & Mistakes -->
+    {pitfalls.length > 0 && (
+      <div class="rounded-xl border border-warning-border/60 bg-warning-bg/40 p-4 sm:p-5">
+        <div class="flex items-center gap-2 mb-2.5 text-xs font-bold uppercase tracking-wider text-warning-fg">
+          <svg class="h-4 w-4 shrink-0 text-warning-fg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>{isAr ? 'أخطاء شائعة يقع فيها المرشحون (Common Pitfalls)' : 'Common Pitfalls & Mistakes'}</span>
+        </div>
+        <ul class="space-y-1.5 text-sm leading-relaxed text-text-body list-disc ps-5">
+          {pitfalls.map((pitfall) => (
+            <li>{pitfall}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- 4. Follow-up Interviewer Questions -->
+    {followUps.length > 0 && (
+      <div class="rounded-xl border border-border bg-surface-2/60 p-4 sm:p-5">
+        <div class="flex items-center gap-2 mb-2.5 text-xs font-bold uppercase tracking-wider text-muted">
+          <svg class="h-4 w-4 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>{isAr ? 'أسئلة تعقيبية متوقعة من المقابِل (Follow-up Questions)' : 'Interviewer Follow-ups'}</span>
+        </div>
+        <ul class="space-y-1.5 text-sm leading-relaxed text-text-body list-disc ps-5">
+          {followUps.map((followUp) => (
+            <li>{followUp}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</div>

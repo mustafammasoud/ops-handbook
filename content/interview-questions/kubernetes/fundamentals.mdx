@@ -1,0 +1,122 @@
+---
+title: Kubernetes Fundamentals Interview Questions
+technology: kubernetes
+topic: fundamentals
+description: أسئلة مقابلات حول المبادئ الأساسية لـ Kubernetes، دورة المزامنة التصريحية (Reconciliation Loop)، وحلقة المقارنة بين الحالة الفعلية والحالة المنشودة.
+order: 1
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-declarative-vs-imperative"
+  number={1}
+  difficulty="beginner"
+  tags={["kubernetes", "core-concepts", "declarative"]}
+  question="ما الفرق بين النمط التصريحي (Declarative) والنمط الإجرائي (Imperative) في Kubernetes، ولماذا يُفضل النمط التصريحي في بيئات الإنتاج؟"
+  directAnswer="النمط الإجرائي (Imperative) يحدد الأوامر والخطوات الدقيقة لكيفية الوصول إلى الهدف (مثل: أنشئ، عدّل، احذف)، بينما النمط التصريحي (Declarative) يحدد الحالة النهائية المنشودة (Desired State) في ملفات تكوين (YAML) ويترك لـ Kubernetes مهمة مطابقة الحالة الفعلية معها باستمرار."
+  pitfalls={[
+    "الاعتماد على أوامر kubectl run أو kubectl expose مباشرة في الإنتاج بدلاً من تتبع ملفات الـ YAML في مستودع Git (GitOps).",
+    "الخلط بين kubectl apply (تصريحي) و kubectl create (إجرائي)."
+  ]}
+  followUps={[
+    "كيف يتعامل kubectl apply مع الدمج الثلاثي (Three-Way Merge) عند تعديل كائن موجود بالفعل؟",
+    "أين يتم تخزين الحالة الأخيرة المطبقة (last-applied-configuration) في الكائن؟"
+  ]}
+>
+في النمط **الإجرائي (Imperative)**، تخبر النظام **بما يجب فعله خطوة بخطوة**:
+```bash
+# Imperative approach
+kubectl create deployment web --image=nginx:1.25
+kubectl scale deployment web --replicas=3
+```
+إذا انهار أحد الخوادم أو أعدت تشغيل الأمر، قد يفشل بسبب وجود المورد مسبقًا أو لا يعود إلى حالته تلقائيًا عند حدوث انحراف (Configuration Drift).
+
+بينما في النمط **التصريحي (Declarative)**، تُعرف **الحالة المنشودة (Desired State)** داخل ملف manifest:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+```
+ثم تطبقه باستخدام:
+```bash
+kubectl apply -f web-deployment.yaml
+```
+يقوم الـ Control Plane بحفظ التكوين في `etcd`، وتعمل **حلقات التحكم (Reconciliation Loops)** باستمرار على قياس الفرق بين الحالة الفعلية (Actual State) والحالة المنشودة (Desired State) واتخاذ الإجراءات التصحيحية آليًا.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-reconciliation-loop"
+  number={2}
+  difficulty="intermediate"
+  tags={["kubernetes", "control-plane", "controllers"]}
+  question="اشرح آلية عمل حلقة المطابقة والتسوية (Reconciliation Loop) في Kubernetes Controller Manager."
+  directAnswer="حلقة التسوية هي حلقة تكرارية غير منتهية تعمل بنموذج Observe -> Analyze/Diff -> Act؛ حيث تراقب وحدات التحكم (Controllers) الحالة الفعلية للكتلة عبر الـ API Server، وتقارنها بالحالة المنشودة المخزنة في etcd، وتنفذ العمليات المطلوبة لإلغاء أي انحراف."
+  pitfalls={[
+    "الاعتقاد بأن الـ Controllers تتصل مباشرة بقاعدة بيانات etcd، بينما كل الاتصالات تمر حصرًا عبر kube-apiserver.",
+    "تجاهل مفهوم Event-Driven Control، حيث يعتمد Kubernetes على Informers و Watch mechanisms لتجنب فحص الموارد عبر polling مكلف."
+  ]}
+  followUps={[
+    "ما دور SharedInformer ومخزن العمليات المؤقت (Lister Cache) في تحسين أداء وحدات التحكم؟",
+    "ماذا يحدث إذا تعطل الـ Controller Manager مؤقتًا؟ هل تتوقف الحاويات الشغالة؟"
+  ]}
+>
+تعتمد بنية Kubernetes على فلسفة **Level-Triggered** وليست فقط **Edge-Triggered**. هذا يعني أن النظام لا يكتفي بالتفاعل مع أحداث التغيير لحظة وقوعها، بل يتحقق بانتظام من مطابقة المستوى الحالي مع المستوى المطلوب:
+
+1. **Observe (المراقبة):** يستمع الـ Controller لتغييرات الكائنات المسجلة لديه عبر `Watch API` المتاحة من `kube-apiserver`.
+2. **Analyze / Diff (التحليل واكتشاف الفروقات):** يقارن `spec` (الحالة المنشودة) مع `status` (الحالة الفعلية المبلغ عنها).
+3. **Act (التنفيذ):** إذا وُجد فرق (على سبيل المثال: Deployment يطلب 5 كبسولات والمتاح 3 فقط)، يرسل الـ Controller طلبات إلى `kube-apiserver` لإنشاء الكبسولات المتبقية.
+
+```
+       ┌──────────────────────────────┐
+       │   kube-apiserver (etcd)      │
+       └───────┬──────────────▲───────┘
+               │ Watch        │ Create/Update
+               ▼              │
+       ┌──────────────────────────────┐
+       │     Controller Manager       │
+       │  Observe ──> Diff ──> Act    │
+       └──────────────────────────────┘
+```
+
+إذا تعطل `kube-controller-manager`، تظل الحاويات الحالية قيد التشغيل على الـ Worker Nodes دون انقطاع، ولكن الكتلة تفقد قدرتها على الشفاء الذاتي (Self-Healing) وإعادة جدولة الكبسولات المنهارة حتى يعود الـ Controller Manager للعمل.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-pod-abstraction-purpose"
+  number={3}
+  difficulty="intermediate"
+  tags={["kubernetes", "pods", "containers"]}
+  question="لماذا اختارت Kubernetes استخدام كبسولة العمل (Pod) كوحدة تشغيل ذرية أصغر بدلاً من تشغيل الحاوية (Container) مباشرة؟"
+  directAnswer="لأن الـ Pod يسمح بتجميع حاويات متكاملة تشترك في نفس مساحة أسماء الشبكة (Network Namespace / IP) ونفس وحدات التخزين المشتركة وتعمل متزامنة على نفس العقدة المادية، مما يمكن أنماطًا معمارية متقدمة مثل Sidecar و Init Containers و Ambassador."
+  pitfalls={[
+    "وضع تطبيقات مستقلة وغير مرتبطة وظيفيًا داخل نفس الـ Pod بدلاً من فصلها في Deployments مستقلة.",
+    "الاعتقاد بأن الحاويات داخل نفس الـ Pod تتخاطب عبر عنوان شبكة خارجي، بينما تتواصل عبر localhost بسرعة فائقة."
+  ]}
+  followUps={[
+    "ما دور حاوية التوقف (pause container أو infra container) في تهيئة مساحات أسماء الـ Pod؟",
+    "كيف تتشارك الحاويات داخل الـ Pod الذاكرة المشتركة (IPC Shared Memory) ومساحة التخزين؟"
+  ]}
+>
+الـ **Pod** هو غلاف تجريدي يجمع حاوية واحدة أو أكثر:
+
+- **مساحة شبكية واحدة (Shared Network Namespace):** تشترك جميع حاويات الـ Pod في عنوان IP وحيد ومنفذ محلي واحد. الحاوية الأساسية وتطبيق المراقبة (Sidecar) يتواصلان مباشرة عبر `localhost:PORT`.
+- **مساحات تخزين مشتركة (Shared Storage Volumes):** يمكن لحاوية أن تكتب سجلات أو ملفات تكوين في `emptyDir` وتقوم حاوية أخرى بقراءتها أو شحنها مباشرة إلى خادم السجلات.
+- **التنسيق المشترك لدورة الحياة:** يتم جدولة كافة حاويات الـ Pod معًا على العقدة ذاتها (Atomic Co-scheduling)، ولا يمكن أن تنفصل حاويتان من نفس الـ Pod على عقدتين مختلفتين.
+
+تقوم تقنية CRI بإنشاء **حاوية بنية تحتية (Pause Container)** أولاً لحجز الـ Network Namespace وعنوان الـ IP، ثم تنضم حاويات التطبيق إلى هذه المساحة المشتركة عبر ميزة Linux Namespaces.
+</InterviewQuestion>

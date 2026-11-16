@@ -1,0 +1,84 @@
+---
+title: Linux Fundamentals Interview Questions
+technology: linux
+topic: fundamentals
+description: أسئلة مقابلات حول المبادئ المعمارية لنظام لينكس، مراحل إقلاع النظام (Boot Process)، أهداف Systemd، ومسارات تدفق المدخلات والمخرجات القياسية.
+order: 1
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="linux-boot-process-stages"
+  number={1}
+  difficulty="intermediate"
+  tags={["linux", "boot-process", "systemd", "kernel"]}
+  question="اشرح بالتفصيل مراحل إقلاع نظام لينكس (Linux Boot Process) بدءًا من الضغط على زر التشغيل وحتى ظهور شاشة تسجيل الدخول."
+  directAnswer="يمر الإقلاع بست مراحل متتالية: 1. تشغيل البرامج الثابتة (BIOS / UEFI) وفحص العتاد (POST)، 2. محمل الإقلاع (GRUB2) واختيار النواة، 3. تحميل النواة (Kernel) ونظام الملفات المؤقت في الذاكرة (initramfs)، 4. تهيئة تعريفات العتاد وتثبيت نظام الملفات الجذري الحقيقي (Root FS)، 5. تشغيل مدير العمليات الأول (Systemd كمعرف PID 1)، 6. تفعيل أهداف الإقلاع (Default Target مثل multi-user.target أو graphical.target) وتشغيل خدمات النظام."
+  pitfalls={[
+    "الاعتقاد بأن النواة تقوم بتشغيل الخدمات مباشرة؛ النواة فقط تقوم بتهيئة العتاد ثم تسلم التحكم بالكامل إلى معالج النظام الأول PID 1 (/sbin/init أو systemd).",
+    "تجاهل دور initramfs (Initial RAM Filesystem) في تحميل تعريفات وحدات التخزين ومصفوفات RAID والتشفير LVM/LUKS قبل إمكانية قراءة القرص الصلب الحقيقي."
+  ]}
+  followUps={[
+    "ما دور ملف /boot/grub2/grub.cfg في تحديد معلمات تمرير النواة (Kernel Parameters)؟",
+    "ماذا يحدث إذا فشلت النواة في العثور على أو تشغيل ملف /sbin/init (Kernel Panic)؟"
+  ]}
+>
+المراحل الست لإقلاع لينكس:
+
+1. **BIOS / UEFI:**
+   - يفحص سلامة مكونات العتاد (POST - Power-On Self Test).
+   - يقرأ إعدادات ترتيب الإقلاع (Boot Order) من شريحة NVRAM ويحمل كود MBR أو ملف EFI من قسم ESP.
+2. **GRUB2 (Grand Unified Bootloader):**
+   - يعرض قائمة أنوية لينكس المتاحة وخيارات التمهيد.
+   - يحمل صورة النواة المضغوطة `vmlinuz` وصورة الذاكرة المؤقتة `initramfs` في الذاكرة العشوائية (RAM).
+3. **Kernel Initialization:**
+   - تفك النواة ضغط نفسها وتتحكم في المعالج والذاكرة.
+   - تهيئ مساحات النواة ومحركات الأجهزة الأساسية.
+4. **initramfs:**
+   - نظام ملفات مصغر مؤقت في الذاكرة يحتوي على وحدات النواة الضرورية للوصول إلى وحدة التخزين الرئيسية (مثل تعريفات NVMe أو iSCSI أو تشفير LUKS). بمجرد تثبيت القسم الجذري الحقيقي `/`، يُلغى تثبيت initramfs.
+5. **Systemd (PID 1):**
+   - أول عملية تبدأ في مساحة المستخدمين (User Space) برقم المعرف `PID 1`.
+   - تحلل شجرة الاعتماديات لملفات التكوين `.service` و `.mount`.
+6. **Default Target:**
+   - الوصول إلى الهدف الافتراضي (يقابل Runlevels القديمة)، مثل `multi-user.target` للخوادم أو `graphical.target` لمحطات العمل الرسومية.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="linux-standard-streams-redirection"
+  number={2}
+  difficulty="beginner"
+  tags={["linux", "shell", "redirection", "io"]}
+  question="ما هي مسارات الإدخال والإخراج القياسية الثلاثة (Standard Streams) في لينكس، وماذا يعني الرمز 2>&1؟"
+  directAnswer="المسارات الثلاثة وواصفات ملفاتها هي: stdin (المعرف 0 للمدخلات القياسية)، stdout (المعرف 1 للمخرجات القياسية)، و stderr (المعرف 2 لمخرجات الأخطاء القياسية). الرمز 2>&1 يوجه مخرجات الأخطاء (واصف 2) إلى نفس الوجهة التي يتجه إليها المخرج القياسي (واصف 1)، مما يدمج السجلات والأخطاء في ملف واحد."
+  pitfalls={[
+    "كتابة > file 2>&1 بترتيب معكوس مثل 2>&1 > file؛ الترتيب مهم جدًا لأن القشرة (Shell) تقيم عمليات إعادة التوجيه من اليسار إلى اليمين.",
+    "الاعتقاد بأن الأنبوب | ينقل الأخطاء القياسية (stderr)؛ الأنبوب يمرر stdout فقط بشكل افتراضي، إلا إذا دمجت القنوات باستخدام |& في قشرة Bash الحديثة."
+  ]}
+  followUps={[
+    "كيف يمكنك تجاهل مخرجات الأخطاء القياسية بالكامل في سطر الأوامر دون حفظها؟",
+    "ما الفرق بين عملية إعادة التوجيه الفردية > وعملية الإلحاق المزدوجة >>؟"
+  ]}
+>
+واصفات الملفات (File Descriptors) القياسية:
+
+| واصف الملف (FD) | الاسم | المصدر / الوجهة الافتراضية |
+|---|---|---|
+| `0` | `stdin` | لوحة المفاتيح (Keyboard) |
+| `1` | `stdout` | شاشة الطرفية (Terminal Screen) |
+| `2` | `stderr` | شاشة الطرفية (Terminal Screen) |
+
+أمثلة متكررة في مقابلات DevOps:
+```bash
+# 1. إرسال المخرجات الطبيعية لملف والأخطاء لملف آخر
+command > output.log 2> error.log
+
+# 2. دمج stdout و stderr في ملف واحد
+command > all.log 2>&1
+# أو بصيغة Bash المختصرة:
+command &> all.log
+
+# 3. إخفاء كافة المخرجات والأخطاء في سكربتات Cron
+command > /dev/null 2>&1
+```
+</InterviewQuestion>

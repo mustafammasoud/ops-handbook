@@ -1,0 +1,95 @@
+---
+title: Git Fundamentals & Internals Interview Questions
+technology: git
+topic: fundamentals
+description: أسئلة مقابلات حول البنية الداخلية لـ Git، كائنات التخزين الأساسية (Blobs وTrees وCommits)، الحالات الثلاث، وتشريح مجلد .git.
+order: 1
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="git-internal-object-model"
+  number={1}
+  difficulty="advanced"
+  tags={["git", "internals", "blobs", "trees", "commits"]}
+  question="اشرح نموذج الكائنات الأربعة الأساسية في بنية Git الداخلية (Object Model)، وكيف تمثل مستودعك كـ Directed Acyclic Graph (DAG)؟"
+  directAnswer="يقوم Git بتخزين كافة بيانات وتاريخ المشروع في أربعة أنواع من الكائنات غير القابلة للتغيير: 1. Blobs لتخزين محتوى الملفات الخام فقط دون الأسماء أو الصلاحيات، 2. Trees لتمثيل بنية المجلدات وربط أسماء الملفات وصلاحياتها بالـ Blobs أو مجلدات فرعية، 3. Commits لتوثيق لقطة شجرة المشروع العليا (Root Tree) مع اسم الكاتب والتاريخ ورسالة الالتزام والمؤشر للالتزام الأب، 4. Annotated Tags لتسمية التزام محدد وتوقيعه. تشكل هذه الالتزامات شبكة موجهة لا حلقية (DAG)."
+  pitfalls={[
+    "الاعتقاد بأن Git يخزن فروقات التعديل فقط (Diffs / Deltas) بين الالتزامات مثل أنظمة VCS القديمة؛ Git يخزن لقطات كاملة (Full Snapshots)، ويعيد استخدام نفس مؤشرات الـ Blobs للملفات التي لم تتغير.",
+    "الاعتقاد بأن اسم الملف مخزن داخل كائن الـ Blob؛ كائن الـ Blob يحتوي فقط على المحتوى الخام، واسم الملف مخزن حصراً في كائن الـ Tree الحاوي له."
+  ]}
+  followUps={[
+    "كيف يمكنك استكشاف نوع ومحتوى أي كائن داخل مجلد .git/objects باستخدام أمر git cat-file؟",
+    "كيف يتأكد Git من سلامة التاريخ المرجعي وعدم العبث به عبر دوال التجزئة (SHA-1 و SHA-256)؟"
+  ]}
+>
+الكائنات الأربعة الأساسية في مجلد `.git/objects`:
+
+1. **Blob (Binary Large Object):**
+   - يخزن المحتوى الثنائي أو النصي فقط. إذا كان لديك ملفان بنفس المحتوى واسمان مختلفان، ينشئ Git كائن `blob` وحيدًا لهما.
+2. **Tree:**
+   - يمثل الدليل (Directory). يحتوي على قائمة صفوف تشمل: نوع الكائن (`blob` أو `tree`)، واسم الملف، ورقم الصلاحية (مثل `100644` أو `100755`)، والـ SHA الخاص به.
+3. **Commit:**
+   - لقطة زمنية تشير إلى الـ Root Tree للمشروع، ومؤشر إلى الالتزام الأب (`parent hash`)، وهوية المؤلف وتاريخ التعديل.
+4. **Annotated Tag:**
+   - كائن دائم يشير إلى التزام، ويحتوي على رسالة الوسم واسم الموسِّم والتوقيع الإلكتروني.
+
+```
+       [ Commit Object ]
+         ├── Parent: a1b2c3d...
+         ├── Author: Mustafa ...
+         └── Tree: 8f9e2b1...
+               │
+       [ Tree Object (Root) ]
+         ├── 100644 blob 3e4f... (README.md)
+         └── 040000 tree d4c5... (src/)
+                     │
+             [ Tree Object (src/) ]
+               └── 100644 blob 7a8b... (main.go)
+```
+
+فحص الكائنات مباشرة من سطر الأوامر:
+```bash
+# معرفة نوع الكائن
+git cat-file -t <hash>
+
+# قراءة محتوى الكائن
+git cat-file -p <hash>
+```
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="git-three-states-architecture"
+  number={2}
+  difficulty="beginner"
+  tags={["git", "architecture", "staging-area", "index"]}
+  question="ما هي الحالات الثلاث (Three States) التي يمكن أن يتواجد فيها الملف في Git، وما دور الـ Staging Area (Index)؟"
+  directAnswer="الحالات الثلاث هي: 1. دليل العمل (Working Directory) حيث تعدل وتنشئ الملفات محليًا، 2. منطقة التجهيز (Staging Area / Index) وهي ملف ثنائي يسجل التغييرات التي ستدخل في الالتزام القادم بالضبط، 3. المستودع (Git Repository / HEAD) حيث تُحفظ التغييرات بشكل دائم في قاعدة بيانات الـ commits. تتيح منطقة التجهيز للمطور تنظيم وصياغة التزامات صغيرة ودقيقة دون الحاجة لتسجيل كل تعديلات مجلد العمل دفعة واحدة."
+  pitfalls={[
+    "الاعتقاد بأن Staging Area هي مجرد مفهوم وهمي؛ هي ملف فيزيائي حقيقي موجود في .git/index يتم تحديثه وتخزين بياناته مع كل أمر git add.",
+    "استخدام git commit -a دائمًا لتجاوز Staging Area، مما يؤدي إلى ارتكاب تعديلات تجريبية غير مرغوبة في تاريخ المشروع."
+  ]}
+  followUps={[
+    "ما الفرق بين أمر git diff وأمر git diff --cached (أو --staged)؟",
+    "كيف يمكنك تجهيز أجزاء محددة (Hunks) فقط من نفس الملف للالتزام دون بقية الملف؟"
+  ]}
+>
+تدفق الحالات الثلاث:
+
+```
+[ Working Directory ] ──(git add)──> [ Staging Area (Index) ] ──(git commit)──> [ Git Repository ]
+       │                                     │                                         │
+       └─── (git diff) ──────────────────────┘                                         │
+       │                                                                               │
+       └───────────────────────────── (git diff HEAD) ─────────────────────────────────┘
+```
+
+- **`git diff`:** يقارن التعديلات الحالية في **Working Directory** مع ما تم تجهيزه في **Staging Area**.
+- **`git diff --cached`:** يقارن التعديلات في **Staging Area** مع آخر التزام في **HEAD**.
+- **تجهيز أجزاء محددة (Interactive Staging):**
+  ```bash
+  git add -p file.txt
+  ```
+  هذا يتيح مراجعة كل فقرة كود (Hunk) على حدة وقبولها أو تأجيلها لتنظيم رسائل الالتزام بصورة احترافية.
+</InterviewQuestion>

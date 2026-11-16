@@ -1,0 +1,97 @@
+---
+title: Git Branching & Merging Interview Questions
+technology: git
+topic: branching-merging
+description: أسئلة مقابلات حول استراتيجيات الدمج (Merge Strategies)، الفرق بين Fast-Forward وThree-Way Merge، ومقارنة الدمج وإعادة البناء (Git Merge vs Git Rebase).
+order: 2
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="git-merge-vs-rebase-philosophies"
+  number={1}
+  difficulty="intermediate"
+  tags={["git", "branching", "merge", "rebase"]}
+  question="قارن بين Git Merge و Git Rebase من حيث بنية التاريخ، ومتى يُعد استخدام Rebase خطرًا كبيرًا؟"
+  directAnswer="يقوم Git Merge بإنشاء التزام دمج جديد (Merge Commit) يربط بين فرعين محتفظًا بالسياق التاريخي وترتيب الأحداث بدقة كما حدثت. بينما يقوم Git Rebase بنسخ التزامات فرعك وإعادة تطبيقها واحدة تلو الأخرى فوق قمة الفرع المستهدف، مما ينتج تاريخًا خطيًا نظيفًا وخاليًا من التزامات الدمج الزائدة. القاعدة الذهبية: لا تقم أبدًا بعمل Rebase على فروع عامة مشتركة (مثل main) تم رفعها إلى السيرفر؛ لأن Rebase يعيد كتابة قيم الـ Hashes ويكسر مسودات زملائك."
+  pitfalls={[
+    "تطبيق git rebase على فرع main أو فروع الإصدارات العامة المشتركة، مما يجبر الفريق بأكمله على حل تعارضات معقدة وتاريخ مشوه.",
+    "فقدان سياق وقت كتابة الالتزامات الحقيقي أثناء Rebase، مما يجعل معرفة تاريخ الدمج الفعلي أكثر صعوبة مقارنة بـ Merge Commit."
+  ]}
+  followUps={[
+    "ما هي استراتيجية Squash and Merge وكيف توازن بين نظافة تاريخ main وتفاصيل الفروع المحلية؟",
+    "كيف تتصرف إذا واجهت تعارضات متكررة في كل التزام أثناء Rebase تفاعلي (Interactive Rebase)؟"
+  ]}
+>
+المقارنة البصرية:
+
+- **بعد `git merge main`:**
+  ```
+  *   commit 9a8b (Merge branch 'main' into feature)
+  |\
+  | * commit 3e4f (main)
+  * | commit 1a2b (feature)
+  |/
+  *   commit c0d1
+  ```
+  - يحتفظ بالتاريخ الحقيقي لوقت التفرع والدمج.
+  - ينتج التزام دمج إضافي.
+
+- **بعد `git rebase main`:**
+  ```
+  * commit 5g6h' (feature - هاش جديد تماماً)
+  * commit 3e4f  (main)
+  * commit c0d1
+  ```
+  - تاريخ خطي منظم وسهل القراءة بـ `git log`.
+  - كل التزام في `feature` حصل على SHA-1 جديد تمامًا.
+
+**القاعدة الذهبية (The Golden Rule of Rebase):**
+> "Never rebase commits that exist outside your local repository and that other developers have based work on."
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="git-fast-forward-vs-three-way"
+  number={2}
+  difficulty="beginner"
+  tags={["git", "branching", "fast-forward", "three-way-merge"]}
+  question="ما الفرق بين Fast-Forward Merge والدمج الثلاثي (Three-Way Merge)، ومتى يفرض Git إنشاء Merge Commit؟"
+  directAnswer="يحدث Fast-Forward عندما لا توجد أي التزامات جديدة على الفرع المستهدف (مثل main) منذ لحظة تفرع فرعك؛ في هذه الحالة يكتفي Git بتقديم مؤشر main للأمام ليشير إلى آخر التزام في فرعك دون إنشاء أي commit جديد. أما الدمج الثلاثي (Three-Way Merge) فيحدث عندما يكون الفرع المستهدف قد استقبل التزامات جديدة متزامنة؛ فيقوم Git بمقارنة ثلاثة التزامات: السلف المشترك (Common Ancestor)، وقمتي الفرعين، لإنشاء Merge Commit يدمج المسارين."
+  pitfalls={[
+    "الاعتقاد بأن الدمج دائماً ينشئ commit جديد؛ في حالة Fast-Forward لا يُنشأ أي commit، مما قد يخفي تاريخ وجود فرع ميزة منفصل إلا إذا استخدمت العلم --no-ff.",
+    "فشل الدمج بسبب تعارضات في نفس السطور بين التزامات الفرعين، مما يتطلب حلاً يدويًا للتعارض."
+  ]}
+  followUps={[
+    "لماذا تفرض بعض المؤسسات استخدام العلم --no-ff عند دمج فروع الميزات؟",
+    "ما الفرق بين خوارزمية الدمج القديمة Recursive والخوارزمية الافتراضية الحديثة ORT في Git؟"
+  ]}
+>
+توضيح بالرسم:
+
+1. **Fast-Forward Merge:**
+   ```
+   قبل الدمج:
+   main:    A ─── B
+                   \
+   feature:         C ─── D
+
+   بعد git merge feature:
+   main:    A ─── B ─── C ─── D (feature)
+   ```
+   مؤشر `main` تحرك للأمام فقط.
+
+2. **Three-Way Merge (يحدث تباعد Divergence):**
+   ```
+   قبل الدمج:
+   main:    A ─── B ─── E (التزامات جديدة على main)
+                   \
+   feature:         C ─── D
+
+   بعد git merge feature:
+   main:    A ─── B ─── E ─────── M (Merge Commit الجديد)
+                   \             /
+   feature:         C ─── D ────┘
+   ```
+   يستخدم Git التزام السلف المشترك `B` مع `E` و `D` لحساب الدمج تلقائيًا.
+</InterviewQuestion>

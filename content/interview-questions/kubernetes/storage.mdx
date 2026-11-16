@@ -1,0 +1,78 @@
+---
+title: Kubernetes Storage & CSI Interview Questions
+technology: kubernetes
+topic: storage
+description: أسئلة مقابلات حول التخزين الدائم في Kubernetes، المفاهيم بين PV وPVC وStorageClass، أنماط الوصول (Access Modes)، ومحركات CSI.
+order: 5
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-pv-pvc-storageclass-flow"
+  number={1}
+  difficulty="intermediate"
+  tags={["kubernetes", "storage", "pv", "pvc", "storageclass"]}
+  question="اشرح العلاقة بين PersistentVolume (PV) و PersistentVolumeClaim (PVC) و StorageClass وكيف تعمل آلية التخصيص الديناميكي (Dynamic Provisioning)؟"
+  directAnswer="يمثل الـ PV قرص التخزين الفعلي الموجود في البنية التحتية. يمثل الـ PVC طلبًا يقدمه المطور لحجز مساحة تخزينية بمواصفات معينة (الحجم ونمط الوصول). الـ StorageClass هو القالب الذي يربط بينهما؛ فبدلاً من إنشاء أقراص PV يدويًا، تراقب وحدة التخزين إنشاء PVC وتستدعي الـ CSI Driver تلقائيًا لاقتطاع قرص فعلي جديد في السحابة وإنشاء PV مطابق وربطهما معًا (Bound)."
+  pitfalls={[
+    "الاعتقاد بأن حذف كبسولة التطبيق يؤدي بالضرورة لحذف بيانات الـ PV؛ سياسة الاسترداد (Reclaim Policy مثل Retain) تحمي القرص والبيانات حتى بعد حذف الـ PVC والـ Pod.",
+    "استخدام قرص RWO (ReadWriteOnce) ومحاولة ربطه بعدة كبسولات تعمل على عقد مختلفة."
+  ]}
+  followUps={[
+    "ما الفرق بين سياسات الاسترداد: Delete و Retain و Recycle؟",
+    "ما أهمية ضبط volumeBindingMode: WaitForFirstConsumer في الـ StorageClass؟"
+  ]}
+>
+تخيل العلاقة على النحو التالي:
+- **Node** يقابله في الحوسبة قرص **PersistentVolume (PV)**.
+- **Pod** يقابله في طلب التخزين طلب **PersistentVolumeClaim (PVC)**.
+- **StorageClass** هو الوسيط الآلي الذي يحقق **التخصيص الديناميكي (Dynamic Provisioning)**:
+
+```
+[Developer creates PVC]
+        │
+        ▼
+[Kubernetes detects StorageClass]
+        │
+        ▼
+[CSI Driver provisions Cloud Disk: AWS EBS / GCP PD]
+        │
+        ▼
+[Kubernetes auto-creates PV]
+        │
+        ▼
+[PVC & PV become Bound]
+        │
+        ▼
+[Kubelet attaches and mounts volume to Pod path]
+```
+
+ضبط `volumeBindingMode: WaitForFirstConsumer` هو أمر حاسم؛ فهو يؤجل إنشاء القرص الفعلي وحجزه حتى يتم تحديد العقدة التي ستستضيف الـ Pod بواسطة Kube-Scheduler، مما يضمن إنشاء القرص في نفس الـ Availability Zone (المنطقة الجغرافية) التي تتواجد فيها العقدة.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-access-modes-explained"
+  number={2}
+  difficulty="beginner"
+  tags={["kubernetes", "storage", "access-modes"]}
+  question="ما هي أنماط الوصول (Access Modes) المتاحة لأقراص التخزين في Kubernetes، وما الفارق الجوهري بينها؟"
+  directAnswer="أنماط الوصول هي: ReadWriteOnce (RWO - يمكن تثبيت القرص للقراءة والكتابة من قِبل عقدة واحدة فقط)، ReadOnlyMany (ROX - يمكن تثبيته للقراءة فقط بواسطة عدة عقد في نفس الوقت)، ReadWriteMany (RWX - يمكن تثبيته للقراءة والكتابة بواسطة عدة عقد متزامنة)، و ReadWriteOncePod (RWOP - حصر التثبيت لكبسولة واحدة فقط في الكتلة بأكملها)."
+  pitfalls={[
+    "الخلط بين مفهوم ReadWriteOnce (عقدة واحدة فقط) والاعتقاد بأنه يعني كبسولة واحدة؛ يمكن لعدة كبسولات داخل نفس العقدة القراءة والكتابة لنفس قرص RWO، لكن كبسولة على عقدة ثانية ستفشل في تثبيت القرص (Multi-Attach error).",
+    "محاولة استخدام قرص سحابي كتلي (مثل AWS EBS أو Azure Managed Disk) بنمط RWX؛ أقراص Block Storage لا تدعم بطبيعتها RWX، بل تتطلب أنظمة ملفات شبكية مثل NFS أو CephFS أو AWS EFS."
+  ]}
+  followUps={[
+    "ما رسالة الخطأ الشهيرة التي تظهر عند محاولة تشغيل Pod على خادم ثانٍ مرتبط بقرص RWO مثبت على خادم أول؟",
+    "كيف يعالج نمط الوصول الحديث ReadWriteOncePod ثغرة الأمان في قفل التخزين الحصري؟"
+  ]}
+>
+جدول أنماط الوصول في Kubernetes:
+
+| نمط الوصول | الاختصار | الوصف | أمثلة وسائط التخزين المتوافقة |
+|---|---|---|---|
+| **ReadWriteOnce** | `RWO` | قراءة وكتابة بواسطة **عقدة واحدة (Single Node)** | AWS EBS, GCP Persistent Disk, Azure Disk, iSCSI |
+| **ReadOnlyMany** | `ROX` | قراءة فقط بواسطة **عدة عقد (Multiple Nodes)** | NFS, Ceph, Cloud Storage Buckets |
+| **ReadWriteMany** | `RWX` | قراءة وكتابة متزامنة بواسطة **عدة عقد** | NFS, AWS EFS, GlusterFS, Azure Files |
+| **ReadWriteOncePod** | `RWOP` | قراءة وكتابة بواسطة **كبسولة واحدة حصرياً (Single Pod)** | CSI Plugins الحديثة (Kubernetes v1.22+) |
+</InterviewQuestion>

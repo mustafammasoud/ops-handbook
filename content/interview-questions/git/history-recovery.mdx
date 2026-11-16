@@ -1,0 +1,79 @@
+---
+title: Git History & Recovery Interview Questions
+technology: git
+topic: history-recovery
+description: أسئلة مقابلات حول استعادة التعديلات المفقودة في Git، حالات Detached HEAD، مقارنة أوامر Reset وRevert وRestore، وسجل النجاة Reflog.
+order: 3
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="git-reset-soft-mixed-hard-vs-revert"
+  number={1}
+  difficulty="intermediate"
+  tags={["git", "recovery", "reset", "revert"]}
+  question="قارن بين مستويات أمر git reset الثلاثة (--soft و --mixed و --hard)، وما الفرق الجوهري بين Reset و Revert؟"
+  directAnswer="يقوم git reset بتحريك مؤشر الفرع إلى التزام سابق مع اختلافات في مكان حفظ التغييرات: --soft ينقل التعديلات إلى Staging Area، و--mixed (الافتراضي) ينقل التعديلات إلى Working Directory ويلغي تجهيزها، و--hard يمسح التعديلات نهائيًا من كل الأماكن. الفارق الجوهري: Reset يعيد كتابة التاريخ بحذف الالتزامات ويصلح للفروع المحلية فقط، بينما Revert ينشئ التزامًا جديدًا يعكس ويلغي تأثير التزام سابق بشكل آمن تمامًا للفروع العامة المشتركة."
+  pitfalls={[
+    "استخدام git reset --hard على فرع تم رفعه إلى remote repository ثم محاولة عمل push بالقوة، مما قد يمسح عمل الفريق.",
+    "الاعتقاد بأن git reset --hard يحذف كل شيء بلا رجعة؛ يمكن استعادة الالتزامات المفقودة غالبًا عبر git reflog إذا لم يتم تنظيف المستودع عبر Garbage Collection."
+  ]}
+  followUps={[
+    "كيف تستخدم أمر git restore الحديث لإلغاء التعديلات على ملف محدد بدلاً من استخدام git checkout القديم؟",
+    "ماذا يحدث إذا قمت بعمل git revert لـ Merge Commit؟"
+  ]}
+>
+جدول مستويات `git reset`:
+
+| الأمر | مؤشر HEAD والفرع | منطقة التجهيز (Index / Stage) | مجلد العمل (Working Tree) |
+|---|---|---|---|
+| `git reset --soft <hash>` | يتحرك للخلف | **تظل التعديلات مجهزة** | تظل التعديلات موجودة |
+| `git reset --mixed <hash>` (الافتراضي) | يتحرك للخلف | **تُلغى التجهيزات (Unstaged)** | تظل التعديلات موجودة |
+| `git reset --hard <hash>` | يتحرك للخلف | **تُمسح التعديلات** | **تُمسح التعديلات بالكامل** |
+
+**متى تستخدم Revert مقابل Reset؟**
+- **الفروع المحلية (Local Feature Branch):** استخدم `git reset` إذا أردت إلغاء التزاماتك الأخيرة وإعادة صياغتها بنظافة.
+- **الفروع المشتركة (Shared `main` or Production):** استخدم `git revert <commit-hash>` حصرًا:
+  ```bash
+  # ينشئ commit جديد يلغي بدقة تغييرات الالتزام السابق دون لمس التاريخ القديم
+  git revert 3a4b5c6
+  ```
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="git-reflog-detached-head-rescue"
+  number={2}
+  difficulty="advanced"
+  tags={["git", "recovery", "reflog", "detached-head"]}
+  question="ما هي حالة Detached HEAD، وكيف يمكن لـ git reflog إنقاذ التزامات ضائعة بعد وقوع reset خاطئ؟"
+  directAnswer="حالة Detached HEAD تعني أن مؤشر HEAD يشير مباشرة إلى هاش التزام محدد بدلاً من الإشارة إلى اسم فرع (Branch Reference). إذا كتبت التزامات جديدة في هذه الحالة ثم انتقلت لفرع آخر، تصبح تلك الالتزامات معلقة (Orphaned / Unreachable). سجل git reflog يسجل كل حركة قام بها مؤشر HEAD محليًا، مما يمكنك من العثور على الهاش المفقود وإنشاء فرع جديد يثبته فورًا."
+  pitfalls={[
+    "الانتقال إلى فرع آخر (مثل git checkout main) بعد ارتكاب تعديلات في حالة Detached HEAD دون تسمية فرع، مما يجعل التعديلات غير مرئية في git log.",
+    "الاعتقاد بأن git reflog متاح على الخادم البعيد (Remote)؛ الـ reflog هو سجل شخصي محلي بحت ولا يُرفع إلى GitHub."
+  ]}
+  followUps={[
+    "ما هي المدة الافتراضية لبقاء السجلات في git reflog قبل أن يحذفها git gc؟",
+    "كيف يمكنك استرجاع فرع محلي تم حذفه بالخطأ عبر أمر git branch -D؟"
+  ]}
+>
+سيناريو الإنقاذ عبر `git reflog`:
+
+1. ارتكبت التزامًا مهمًا في حالة `Detached HEAD` أو قمت بعمل `git reset --hard` خاطئ.
+2. الالتزام اختفى من `git log`.
+3. شغل سجل الحركات المرجعية:
+   ```bash
+   git reflog -n 10
+   ```
+   المخرجات ستظهر حركات المؤشر السابقة:
+   ```
+   a1b2c3d HEAD@{0}: reset: moving to HEAD~3
+   f4e5d6c HEAD@{1}: commit: important emergency fix
+   9876543 HEAD@{2}: checkout: moving from main to detached HEAD
+   ```
+4. أنشئ فرعًا جديدًا يثبت هذا الالتزام فورًا قبل أن تحذفه أداة تنظيف الذاكرة:
+   ```bash
+   git branch recovery-branch f4e5d6c
+   ```
+الآن تم استرداد كافة الملفات والالتزامات بنجاح وأمان.
+</InterviewQuestion>

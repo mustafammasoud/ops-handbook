@@ -1,0 +1,109 @@
+---
+title: Kubernetes Networking & DNS Interview Questions
+technology: kubernetes
+topic: networking
+description: أسئلة مقابلات حول شبكات Kubernetes، مقارنة أنواع Services، ملحقات CNI (Calico وCilium)، حل أسماء CoreDNS، وسياسات NetworkPolicies.
+order: 4
+draft: false
+language: ar
+---
+
+<InterviewQuestion
+  id="k8s-service-types-comparison"
+  number={1}
+  difficulty="beginner"
+  tags={["kubernetes", "networking", "services"]}
+  question="قارن بين أنواع الخدمات (Service Types): ClusterIP و NodePort و LoadBalancer، ومتى تستخدم كلاً منها؟"
+  directAnswer="ClusterIP هو النوع الافتراضي الذي يعين عنوان IP داخلي للخدمة متاح حصرًا داخل الكتلة. NodePort يفتح منفذًا ثابتًا (في النطاق 30000-32767) على عنوان IP الخارجي لكل عقدة لتوجيه الطلبات إلى ClusterIP الداخلي. LoadBalancer يعتمد على مزود السحابة لإنشاء موازن أحمال مادي خارجي يوجه حركة المرور تلقائيًا إلى NodePort ومنه إلى الكبسولات."
+  pitfalls={[
+    "تعريض قواعد البيانات الحساسة عبر NodePort أو LoadBalancer بدلاً من إبقائها خلف ClusterIP داخلي آمن.",
+    "الاعتقاد بأن الخدمة (Service) هي خادم بروكسي أو حاوية وسيطة؛ الخدمة هي مجرد كائن تجريدي يُترجم إلى قواعد توجيه في iptables أو IPVS على كل عقدة."
+  ]}
+  followUps={[
+    "ما هي الـ Headless Service (التي تملك clusterIP: None) وما الغرض الأساسي منها؟",
+    "كيف يؤثر تعيين externalTrafficPolicy: Local على الحفاظ على عنوان IP الحقيقي للمستخدم العميل (Client IP)؟"
+  ]}
+>
+المستويات الهرمية لأنواع الخدمات في Kubernetes مبنية بتراكمية:
+
+1. **ClusterIP:**
+   - يوفر عنوان IP افتراضي مستقر داخل الشبكة الخاصة للكتلة.
+   - لا يمكن الوصول إليه من خارج الكتلة دون وسيط مثل Ingress Controller أو `kubectl port-forward`.
+2. **NodePort:**
+   - مبني فوق ClusterIP؛ يخصص منفذًا عشوائيًا أو محددًا (بين 30000 و 32767) على جميع عقد العمل (Nodes).
+   - إذا طلبت `<Node-IP>:<NodePort>`، يستقبل Kube-Proxy الطلب ويوجهه للكبسولات حتى لو كانت الكبسولة على عقدة أخرى.
+3. **LoadBalancer:**
+   - مبني فوق NodePort و ClusterIP؛ يرسل استدعاءً لـ Cloud Controller Manager (مثل AWS NLB أو GCP Cloud Load Balancing) لحجز عنوان IP عام خارجي مخصص.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-kube-proxy-iptables-vs-ipvs"
+  number={2}
+  difficulty="advanced"
+  tags={["kubernetes", "networking", "kube-proxy", "ipvs"]}
+  question="ما الفرق في الأداء والمعمارية بين وضع iptables ووضع IPVS في Kube-Proxy داخل الكتل الكبيرة؟"
+  directAnswer="وضع iptables يعتمد على فحص تسلسلي خطي (O(N))؛ مع زيادة عدد الخدمات والكبسولات إلى الآلاف، يتضخم جدول القواعد مما يسبب استهلاكًا عاليًا للذاكرة وزمن تأخير كبير في تحديث الحزم. بينما يستخدم IPVS جداول تجزئة (Hash Tables) ذات تعقيد زمني ثابت (O(1))، ويدعم خوارزميات موازنة أحمال متقدمة مثل Round-Robin و Least Connection مما يجعله الخيار القياسي للبيئات الضخمة."
+  pitfalls={[
+    "الاعتقاد بأن Kube-Proxy يمرر حزم الشبكة بنفسه كبروكسي حقيقي في وضع iptables/IPVS؛ في هذين الوضعين، يقوم Kube-Proxy ببرمجة قواعد توجيه في مساحة النواة (Kernel Space) فقط والحزم لا تمر عبر مساحة المستخدم.",
+    "تفعيل وضع IPVS بدون تحميل وحدات النواة (Kernel Modules) المطلوبة مسبقًا مثل ip_vs و ip_vs_rr على العقد."
+  ]}
+  followUps={[
+    "ما دور eBPF ومشاريع مثل Cilium في الاستغناء كليًا عن Kube-Proxy وجداول iptables؟",
+    "كيف يتعامل IPVS مع فحص صحة الوجهات (Connection Tracking & Health Checks)؟"
+  ]}
+>
+مقارنة بين الوضعين:
+
+```
++--------------------+------------------------+------------------------+
+| الخاصية            | iptables               | IPVS                   |
++--------------------+------------------------+------------------------+
+| تعقيد التوجيه      | O(N) خطي               | O(1) ثابت              |
+| الأداء في +5000 svc| تدهور ملحوظ وبطء sync  | استقرار وسرعة فائقة    |
+| خوارزمية التوزيع   | عشوائي (Random Prob)   | rr, lc, wrr, sed, ...  |
+| بنية البيانات      | سلاسل متتالية (Chains) | Hash Tables سريعة جداً |
++--------------------+------------------------+------------------------+
+```
+
+في الكتل الضخمة (التي تضم عشرات آلاف الـ Endpoints)، قد يستغرق تحديث قاعدة واحدة في iptables عدة ثوانٍ وتجميد معالجة الحزم، بينما يقوم IPVS بتحديث عناصر الـ Hash Map فوريًا بأقل من جزء من الميلي ثانية.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-coredns-resolution-flow"
+  number={3}
+  difficulty="intermediate"
+  tags={["kubernetes", "networking", "dns", "coredns"]}
+  question="كيف يعمل نظام CoreDNS داخل Kubernetes، وما هو التركيب الكامل لاسم النطاق المؤهل (FQDN) لخدمة ما؟"
+  directAnswer="يقوم CoreDNS بحل أسماء الخدمات إلى عناوين ClusterIP تلقائيًا. الصيغة الكاملة لاسم النطاق المؤهل (FQDN) هي: <service-name>.<namespace>.svc.cluster.local. في الكبسولات داخل نفس الـ Namespace، يكفي كتابة اسم الخدمة فقط؛ وإذا كانت في Namespace آخر يُكتب <service>.<namespace>."
+  pitfalls={[
+    "إرسال استعلامات DNS خارجية متكررة دون تفعيل NodeLocal DNSCache، مما يسبب ضغطًا واختناقات في شبكة CoreDNS المركزية.",
+    "مشكلة ndots:5 في ملف /etc/resolv.conf التي تتسبب في إرسال ما يصل إلى 4 استعلامات DNS محلية فاشلة قبل محاولة حل أي نطاق خارجي مثل google.com."
+  ]}
+  followUps={[
+    "ما محتويات ملف /etc/resolv.conf الافتراضي داخل كبسولة في Kubernetes؟",
+    "كيف يتم حل عنوان DNS لكبسولة محددة تابعة لـ StatefulSet عبر Headless Service؟"
+  ]}
+>
+تركيب النطاق الرسمي للخدمة:
+```
+my-service.production.svc.cluster.local
+│          │          │   └── Cluster Domain
+│          │          └────── Object type (Service)
+│          └───────────────── Namespace
+└──────────────────────────── Service Name
+```
+
+داخل كبسولة التطبيق، يحتوي `/etc/resolv.conf` على:
+```
+nameserver 10.96.0.10
+search production.svc.cluster.local svc.cluster.local cluster.local
+options ndots:5
+```
+بسبب `ndots:5`، إذا حاولت حاوية استدعاء `api.stripe.com` (الذي يحتوي نقطتين فقط أي أقل من 5 نقاط)، يقوم النظام بالبحث في لواحق search أولاً:
+1. `api.stripe.com.production.svc.cluster.local` (فشل NXDOMAIN)
+2. `api.stripe.com.svc.cluster.local` (فشل NXDOMAIN)
+3. `api.stripe.com.cluster.local` (فشل NXDOMAIN)
+4. وأخيرًا `api.stripe.com` (نجاح).
+
+تطبيق **NodeLocal DNSCache** يقلل هذا العبء بتثبيت مخزن DNS مؤقت محلي على كل خادم.
+</InterviewQuestion>
