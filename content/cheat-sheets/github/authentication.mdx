@@ -1,0 +1,57 @@
+---
+title: GitHub Authentication & SSH
+technology: github
+topic: authentication
+description: اختبار اتصال SSH مع GitHub، تبديل بروتوكول المستودع بين HTTPS وSSH، وتسجيل الدخول عبر GitHub CLI.
+order: 1
+draft: false
+language: ar
+---
+
+
+## 1. Authentication and SSH Configuration
+
+<Callout type="tip" title="تفضيل مفاتيح SSH">
+يوصى دائمًا باستخدام مفاتيح SSH (نوع Ed25519) لتفادي طلب كلمات المرور والتوكنات المتكررة عند الدفع والجلب.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'ssh -T git@github.com',
+      does: 'يختبر اتصال مفتاح SSH المحلي مع خوادم GitHub ويتأكد من التعرف على حسابك',
+      when: 'بعد توليد أو إضافة مفتاح SSH جديد في إعدادات GitHub',
+      example: 'ssh -T git@github.com',
+    },
+    {
+      command: 'git remote set-url origin <url>',
+      does: 'يغيّر عنوان الـ remote المسجل (مثل التبديل من HTTPS إلى SSH)',
+      when: 'للتحويل إلى مصادقة SSH وتفادي طلب Personal Access Token',
+      example: 'git remote set-url origin git@github.com:OWNER/REPO.git',
+    },
+    {
+      command: 'git remote add origin <url>',
+      does: 'يربط المستودع المحلي بمستودع بعيد جديد على GitHub',
+      when: 'عند رفع مستودع محلي جديد للمرة الأولى',
+      example: 'git remote add origin git@github.com:OWNER/REPO.git',
+    },
+    {
+      command: 'gh auth login',
+      does: 'يبدأ معالج تفاعلي لتسجيل الدخول إلى حساب GitHub عبر المتصفح أو التوكن',
+      when: 'عند إعداد أداة GitHub CLI لأول مرة على جهازك',
+      example: 'gh auth login',
+    },
+    {
+      command: 'gh auth status',
+      does: 'يعرض حالة تسجيل الدخول واسم المستخدم والبروتوكول المستخدم في GitHub CLI',
+      when: 'للتحقق من صلاحية الجلسة والحساب النشط حاليًا',
+      example: 'gh auth status',
+    },
+    {
+      command: 'gh auth refresh -s <scope>',
+      does: 'يحدث صلاحيات الجلسة لإضافة نطاقات جديدة (مثل صلاحية workflow أو write:packages)',
+      when: 'عند رفض أمر بسبب نقص في صلاحيات التوكن',
+      example: 'gh auth refresh -s workflow',
+    },
+  ]}
+/>

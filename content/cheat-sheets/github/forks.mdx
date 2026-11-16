@@ -1,0 +1,57 @@
+---
+title: GitHub Forks & Open Source
+technology: github
+topic: forks
+description: استنساخ الشُعَب (Forks)، ربط المستودع الأصلي (Upstream)، ومزامنة التحديثات للمساهمة في المشاريع مفتوحة المصدر.
+order: 4
+draft: false
+language: ar
+---
+
+
+## 1. Forking & Upstream Synchronization
+
+<Callout type="note" title="قاعدة الـ Fast-Forward مع Upstream">
+استخدم `git merge --ff-only upstream/main` على فرع `main` المحلي لضمان عدم وجود تباين أو التزامات محلية تعيق التحديث النظيف من المستودع الأصلي.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git clone <fork-url>',
+      does: 'ينسخ مستودع الـ Fork الخاص بحسابك إلى جهازك المحلي',
+      when: 'بعد عمل Fork لأي مشروع على GitHub والبدء في إعداده محليًا',
+      example: 'git clone git@github.com:YOUR_USERNAME/PROJECT.git',
+    },
+    {
+      command: 'git remote add upstream <url>',
+      does: 'يضيف رابط المستودع الأصلي للمشروع باسم upstream للرجوع إليه',
+      when: 'لمزامنة التغييرات القادمة من المشروع الأصلي مستقبلاً',
+      example: 'git remote add upstream https://github.com/ORIGINAL_OWNER/PROJECT.git',
+    },
+    {
+      command: 'git fetch upstream',
+      does: 'يجلب جميع الفروع والالتزامات الجديدة من المستودع الأصلي دون دمجها',
+      when: 'قبل البدء في عمل جديد أو قبل مزامنة الفرع الرئيسي',
+      example: 'git fetch upstream',
+    },
+    {
+      command: 'git merge --ff-only upstream/main',
+      does: 'يقدم مؤشر الفرع المحلي إلى أحدث التزام في المستودع الأصلي دون إنشاء commit دمج',
+      when: 'لتحديث فرع main المحلي ليتطابق تمامًا مع المستودع الأصلي',
+      example: 'git merge --ff-only upstream/main',
+    },
+    {
+      command: 'git push origin main',
+      does: 'يرفع التحديثات المأخوذة من upstream إلى مستودع الـ Fork الخاص بك على GitHub',
+      when: 'للحفاظ على تزامن فرع main في نسختك السحابية مع الأصل',
+      example: 'git push origin main',
+    },
+    {
+      command: 'git push origin feature-branch',
+      does: 'يرفع فرع التعديلات الجديد إلى الـ Fork تمهيدًا لفتح PR نحو المشروع الأصلي',
+      when: 'بعد الانتهاء من تجهيز ميزة أو إصلاح للمساهمة',
+      example: 'git push -u origin feature-fix-typo',
+    },
+  ]}
+/>

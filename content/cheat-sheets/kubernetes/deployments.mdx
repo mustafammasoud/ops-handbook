@@ -1,0 +1,69 @@
+---
+title: Kubernetes Deployments & Rollouts
+technology: kubernetes
+topic: deployments
+description: إدارة ونشر التوزيعات (Deployments)، تغيير الحجم (Scaling)، متابعة وتراجع التحديثات المتتابعة (Rollouts).
+order: 2
+draft: false
+language: ar
+---
+
+
+## 1. Deployment Management & Rollout Control
+
+<Callout type="note" title="سجل التحديثات">
+استخدم العلم `--record` مع الأوامر السابقة أو تأكد من مراجعة `kubectl rollout history` لتتبع التغييرات قبل تنفيذ أمر التراجع `undo`.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'kubectl create deployment <name> --image=<image>',
+      does: 'ينشئ Deployment جديدًا في مساحة الأسماء الحالية بالصورة المحددة',
+      when: 'لتشغيل خدمة جديدة بسرعة للاختبار دون كتابة ملف YAML كامل',
+      example: 'kubectl create deployment nginx-web --image=nginx:alpine',
+    },
+    {
+      command: 'kubectl get deployments -n <ns>',
+      does: 'يعرض حالة التوزيعات مع عدد النسخ الجاهزة والمطلوبة والمحدثة',
+      when: 'للتحقق من استقرار الخدمات وعدد النسخ المتطابقة المتوفرة',
+      example: 'kubectl get deployments -n production',
+    },
+    {
+      command: 'kubectl scale deployment/<name> --replicas=<num> -n <ns>',
+      does: 'يغير عدد نسخ الـ Pods المطلوبة للتوزيعة بشكل يدوي ومباشر',
+      when: 'للتعامل مع ارتفاع الحمل المفاجئ أو تقليص استهلاك الموارد في بيئات التطوير',
+      example: 'kubectl scale deployment/api-server --replicas=5 -n production',
+    },
+    {
+      command: 'kubectl set image deployment/<name> <container>=<new-image> -n <ns>',
+      does: 'يحدث صورة الحاوية في التوزيعة مما يبدأ عملية تحديث تدريجي (Rolling Update)',
+      when: 'عند إصدار وتطبيق نسخة برمجية جديدة للتطبيق',
+      example: 'kubectl set image deployment/frontend web=frontend:v2.1.0 -n production',
+    },
+    {
+      command: 'kubectl rollout status deployment/<name> -n <ns>',
+      does: 'يراقب تقدم عملية النشر التدريجي لحظيًا حتى تكتمل جميع الـ Pods بنجاح',
+      when: 'في سكربتات النشر والتكامل المستمر (CI/CD) للتأكد من نجاح النشر',
+      example: 'kubectl rollout status deployment/api-server -n production',
+    },
+    {
+      command: 'kubectl rollout history deployment/<name> -n <ns>',
+      does: 'يعرض تاريخ المراجعات والإصدارات السابقة للتوزيعة وأرقام الـ revisions',
+      when: 'لمعرفة التعديلات السابقة وتحديد رقم الإصدار الذي ترغب بالرجوع إليه',
+      example: 'kubectl rollout history deployment/api-server -n production',
+    },
+    {
+      command: 'kubectl rollout undo deployment/<name> -n <ns>',
+      does: 'يتراجع فورًا عن آخر تحديث ويعيد التوزيعة إلى الإصدار السابق المستقر',
+      when: 'عند اكتشاف خطأ حرج مباشرة بعد النشر في بيئة الإنتاج',
+      example: 'kubectl rollout undo deployment/api-server -n production',
+    },
+    {
+      command: 'kubectl rollout restart deployment/<name> -n <ns>',
+      does: 'يعيد تشغيل جميع كبسولات التوزيعة بالتناوب ودون أي انقطاع في الخدمة',
+      when: 'لتطبيق تغييرات ConfigMap أو Secret دون تعديل كود التطبيق نفسه',
+      example: 'kubectl rollout restart deployment/worker-queue -n production',
+    },
+  ]}
+/>

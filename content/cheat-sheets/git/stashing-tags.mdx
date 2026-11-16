@@ -1,0 +1,98 @@
+---
+title: Git Stashing & Tags
+technology: git
+topic: stashing-tags
+description: تخزين الأعمال غير المنتهية مؤقتًا (Stash)، إنشاء وإدارة وسوم الإصدارات (Tags)، والتوقيع الرقمي.
+order: 8
+draft: false
+language: ar
+---
+
+
+## 1. Stashing Commands
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git stash',
+      does: 'يحفظ التغييرات غير المجهزة مؤقتًا في الذاكرة ويعيد Working Tree نظيفًا',
+      when: 'عند الحاجة للانتقال لفرع آخر عاجلًا قبل إكمال الـ commit',
+      example: 'git stash',
+    },
+    {
+      command: 'git stash save "work in progress"',
+      does: 'يحفظ التغييرات مع رسالة توضيحية لسهولة تذكرها لاحقًا',
+      when: 'عند وجود عدة stashes وتريد تمييز كل منها',
+      example: 'git stash save "refactor auth logic"',
+    },
+    {
+      command: 'git stash list',
+      does: 'يعرض قائمة بجميع التعديلات المخزنة مؤقتًا ومؤشراتها',
+      when: 'لمراجعة ما قمت بتخزينه مسبقًا',
+      example: 'git stash list',
+    },
+    {
+      command: 'git stash pop',
+      does: 'يسترجع آخر stash محفوظ ويطبقه على الفرع ويحذفه من القائمة',
+      when: 'عند العودة لفرعك ورغبتك في استئناف عملك السابق',
+      example: 'git stash pop',
+    },
+    {
+      command: 'git stash apply',
+      does: 'يطبّق آخر stash على الملفات مع الاحتفاظ بنسخة منه في القائمة دون حذفه',
+      when: 'لتطبيق نفس التعديلات على أكثر من فرع للتجربة',
+      example: 'git stash apply',
+    },
+    {
+      command: 'git stash drop stash@{0}',
+      does: 'يحذف stash محدد يدويًا من القائمة دون تطبيقه',
+      when: 'للتخلص من أعمال تجريبية لم تعد بحاجة إليها',
+      example: 'git stash drop stash@{0}',
+    },
+  ]}
+/>
+
+---
+
+## 2. Tags and Releases
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git tag v1.0.0',
+      does: 'ينشئ وسمًا خفيفًا (Lightweight Tag) عند موقع HEAD الحالي',
+      when: 'للإشارة إلى علامة إصدار محددة داخليًا',
+      example: 'git tag v1.0.0',
+    },
+    {
+      command: 'git tag -a v1.0.0 -m "Release version 1.0.0"',
+      does: 'ينشئ وسمًا وصفيًا (Annotated Tag) يتضمن رسالة واسم صاحب الوسم وتاريخه',
+      when: 'لإطلاق إصدارات الإنتاج الرسمية (Production Releases)',
+      example: 'git tag -a v1.0.0 -m "Release v1.0.0"',
+    },
+    {
+      command: 'git tag -s v1.2.0 -m "Signed release"',
+      does: 'ينشئ وسمًا موقّعًا تشفيريًا باستخدام مفتاح GPG لضمان الهوية',
+      when: 'في مشاريع الحماية العالية مفتوحة المصدر والإنتاج',
+      example: 'git tag -s v1.2.0 -m "Signed release"',
+    },
+    {
+      command: 'git tag --list',
+      does: 'يعرض جميع الوسوم المحفوظة في المستودع',
+      when: 'للبحث عن الإصدارات السابقة',
+      example: 'git tag --list "v1.*"',
+    },
+    {
+      command: 'git push origin v1.0.0',
+      does: 'يرفع وسمًا محددًا إلى المستودع البعيد',
+      when: 'لنشر وسم إصدار جديد إلى GitHub',
+      example: 'git push origin v1.0.0',
+    },
+    {
+      command: 'git push origin --tags',
+      does: 'يرفع جميع الوسوم المحلية الجديدة إلى المستودع البعيد دفعة واحدة',
+      when: 'عند إنشاء عدة وسوم وتريد نشرها جميعًا',
+      example: 'git push origin --tags',
+    },
+  ]}
+/>

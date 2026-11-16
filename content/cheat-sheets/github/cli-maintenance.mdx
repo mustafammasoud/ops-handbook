@@ -1,0 +1,63 @@
+---
+title: GitHub CLI & Repository Maintenance
+technology: github
+topic: cli-maintenance
+description: أوامر الصيانة وأداة GitHub CLI، استنساخ المستودعات، إدارة الإصدارات (Releases)، والأرشفة والحذف الآمن.
+order: 6
+draft: false
+language: ar
+---
+
+
+## 1. CLI Tools & Maintenance
+
+<Callout type="warning" title="حذف المستودعات">
+أمر `gh repo delete` نهائي ولا يمكن التراجع عنه. استخدم `gh repo archive` إن كنت تريد فقط جعل المستودع للقراءة فقط مع الحفاظ على تاريخه.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'gh --version',
+      does: 'يتحقق من تثبيت أداة GitHub CLI ويعرض رقم الإصدار الحالي',
+      when: 'للتأكد من توفر الأداة قبل تنفيذ أوامر السكربتات',
+      example: 'gh --version',
+    },
+    {
+      command: 'gh repo clone OWNER/REPO',
+      does: 'ينسخ مستودعًا مباشرة باستخدام بروتوكول المصادقة المفضل لديك في CLI',
+      when: 'لاستنساخ المشاريع دون الحاجة لنسخ روابط URL يدويًا',
+      example: 'gh repo clone kubernetes/kubernetes',
+    },
+    {
+      command: 'gh release list',
+      does: 'يعرض قائمة الإصدارات المنشورة مع وسومها وتواريخ إطلاقها',
+      when: 'للاطلاع على الإصدارات السابقة وتاريخ التوزيع للمشروع',
+      example: 'gh release list --limit 10',
+    },
+    {
+      command: 'gh release create <tag>',
+      does: 'ينشئ إصدارًا جديدًا (Release) مع إضافة ملاحظات التغيير وإرفاق الملفات',
+      when: 'عند نشر إصدار جديد جاهز للإنتاج',
+      example: 'gh release create v1.2.0 --title "v1.2.0" --notes "Bug fixes and stability improvements"',
+    },
+    {
+      command: 'gh status',
+      does: 'يعرض ملخصًا لحالة الإشعارات وطلبات السحب والمشكلات المرتبطة بك',
+      when: 'في بداية يوم العمل لمعرفة ما يحتاج لاهتمامك المباشر',
+      example: 'gh status',
+    },
+    {
+      command: 'gh repo archive OWNER/REPO',
+      does: 'ينقل المستودع إلى وضع الأرشفة للقراءة فقط ويمنع أي تعديلات إضافية',
+      when: 'عند إيقاف صيانة المشروع مع الرغبة في الاحتفاظ به كمرجع تاريخي',
+      example: 'gh repo archive my-org/legacy-service --yes',
+    },
+    {
+      command: 'gh repo delete OWNER/REPO',
+      does: 'يحذف المستودع بالكامل من خوادم GitHub نهائيًا (يتطلب تأكيدًا يدويًا)',
+      when: 'للتخلص من مستودعات التجارب أو المستودعات غير المرغوبة نهائيًا',
+      example: 'gh repo delete my-org/temp-playground --yes',
+    },
+  ]}
+/>

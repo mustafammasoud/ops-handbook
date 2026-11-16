@@ -1,0 +1,68 @@
+---
+title: Git Staging & Commits
+technology: git
+topic: basic-workflow
+description: دورة العمل اليومية، تجهيز التغييرات (Staging)، وفحص الحالة وفروق التعديلات.
+order: 2
+draft: false
+language: ar
+---
+
+
+## 1. Most Used Commands
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git status',
+      does: 'يعرض حالة الـ Working Tree والـ Staging Area والملفات المعدلة',
+      when: 'قبل كل عملية commit أو بعد إجراء تعديلات',
+      example: 'git status',
+    },
+    {
+      command: 'git status -s',
+      does: 'يعرض حالة الملفات بصيغة مدمجة مختصرة',
+      when: 'عند تعديل عدد كبير من الملفات وتفضيل قائمة سريعة',
+      example: 'git status -s',
+    },
+    {
+      command: 'git diff',
+      does: 'يعرض التغييرات غير المجهّزة (بين Working Tree و Staging Area)',
+      when: 'لمراجعة التعديلات قبل عمل git add',
+      example: 'git diff',
+    },
+    {
+      command: 'git diff --cached',
+      does: 'يعرض التغييرات المجهّزة فقط في Staging Area الجاهزة للـ commit',
+      when: 'لمراجعة ما سيدخل فعليًا في الـ commit التالي',
+      example: 'git diff --cached',
+    },
+    {
+      id: 'git-add-file',
+      command: 'git add <file>',
+      does: 'يجهز ملفًا محددًا إلى Staging Area',
+      when: 'لتجهيز ملف معين بدقة وتجنب إدخال كل التغييرات دفعة واحدة',
+      example: 'git add src/index.ts',
+    },
+    {
+      id: 'git-add-all',
+      command: 'git add .',
+      does: 'يجهز كل التغييرات في المسار الحالي والمجلدات الفرعية',
+      when: 'لتجهيز كل التعديلات المراجعة دفعة واحدة',
+      example: 'git add .',
+    },
+    {
+      id: 'git-add-patch',
+      command: 'git add -p',
+      does: 'تجهيز تفاعلي يتيح مراجعة واختيار أجزاء محددة (Hunks) من الملف',
+      when: 'عند وجود تعديلات متعددة في ملف وتريد تقسيمها على عدة commits',
+      example: 'git add -p src/app.js',
+    },
+    {
+      command: 'git commit -m "msg"',
+      does: 'يسجل Snapshot جديدة للتغييرات المجهزة برسالة واضحة',
+      when: 'بعد الانتهاء من ميزة أو تعديل منطقي مستقل',
+      example: 'git commit -m "feat: add user authentication"',
+    },
+  ]}
+/>

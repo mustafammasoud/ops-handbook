@@ -1,0 +1,51 @@
+---
+title: Git Rebase & Cherry-Pick
+technology: git
+topic: rebasing
+description: إعادة ترتيب الالتزامات، دمج السجلات تفاعليًا (Squash)، ونقل commits محددة عبر الفروع.
+order: 5
+draft: false
+language: ar
+---
+
+
+## 1. Rebasing and Cherry-Picking
+
+<Callout type="warning" title="القاعدة الذهبية للـ Rebase">
+لا تقم بعمل Rebase على فروع عامة مشتركة تم رفعها ودفعها بالفعل للآخرين (`public branches`). استخدمه فقط على فروعك المحلية الخاصة قبل دمجها.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git rebase <branch>',
+      does: 'يعيد تطبيق commits الفرع الحالي فوق قمة الفرع المستهدف لتاريخ خطي نظيف',
+      when: 'لتحديث فرع الميزة بآخر تعديلات main بدون إنشاء merge commit إضافي',
+      example: 'git rebase origin/main',
+    },
+    {
+      command: 'git rebase -i HEAD~3',
+      does: 'إعادة هيكلة تفاعلية لآخر 3 commits (تعديل الرسائل، دمج squash، أو حذف)',
+      when: 'لتنظيف وترتيب تاريخ التعديلات قبل إنشاء Pull Request',
+      example: 'git rebase -i HEAD~3',
+    },
+    {
+      command: 'git rebase --continue',
+      does: 'يتابع عملية Rebase بعد حل التعارضات في الخطوة الحالية',
+      when: 'بعد حل تعارض ملف وإضافته بـ git add',
+      example: 'git rebase --continue',
+    },
+    {
+      command: 'git rebase --abort',
+      does: 'يلغي عملية Rebase الحالية بالكامل ويعود للحالة الأصلية السابقة',
+      when: 'عند مواجهة تعارضات لا ترغب في حلها الآن',
+      example: 'git rebase --abort',
+    },
+    {
+      command: 'git cherry-pick <hash>',
+      does: 'يطبّق تغيير commit محدد من فرع آخر على الفرع الحالي دون دمج كامل الفرع',
+      when: 'لنقل إصلاح عاجل (Hotfix) من فرع التطوير إلى فرع الإنتاج',
+      example: 'git cherry-pick a1b2c3d',
+    },
+  ]}
+/>

@@ -1,0 +1,63 @@
+---
+title: Git Advanced Troubleshooting
+technology: git
+topic: troubleshooting
+description: تنظيف الملفات غير المتتبعة، البحث الثنائي عن الأخطاء بـ bisect، واستعادة الـ commits المحذوفة عبر reflog.
+order: 9
+draft: false
+language: ar
+---
+
+
+## 1. Advanced Troubleshooting and Cleanup
+
+<Callout type="warning" title="أوامر التنظيف الخطيرة">
+`git clean -fd` يحذف ملفات ومجلدات غير متتبعة للأبد؛ افحص دائمًا بـ `git clean -nd` (dry-run) أولًا ولا تستخدمه أبدًا بدون فحص مسبق.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git reflog -10',
+      does: 'يعرض آخر 10 تحركات لـ HEAD لاستعادة commits أو فروع تم حذفها أو تجاوزها بـ reset',
+      when: 'لحظة الطوارئ عند فقدان كود بسبب reset --hard أو rebase خاطئ',
+      example: 'git reflog -10',
+    },
+    {
+      command: 'git branch recovery/lost-work <hash>',
+      does: 'ينشئ فرعًا جديدًا يبدأ من أي commit hash عثرت عليه في الـ reflog',
+      when: 'لحفظ واسترجاع عمل مفقود قبل أن يحذفه جامع القمامة (Garbage Collector)',
+      example: 'git branch recovery/lost-work c7a1b2d',
+    },
+    {
+      command: 'git clean -nd',
+      does: 'عرض جاف (Dry Run) للملفات والمجلدات غير المتتبعة التي سيتم حذفها دون حذف فعلي',
+      when: 'خطوة أولى إجبارية قبل أي عملية تنظيف للمستودع',
+      example: 'git clean -nd',
+    },
+    {
+      command: 'git clean -fd',
+      does: 'يحذف الملفات غير المتتبعة والمجلدات الفارغة بالقوة من Working Tree (خطير)',
+      when: 'لتنظيف مخلفات البناء والتجارب المؤقتة تمامًا',
+      example: 'git clean -fd',
+    },
+    {
+      command: 'git clean -fdx',
+      does: 'يحذف كل الملفات غير المتتبعة بما في ذلك الملفات المتجاهلة في .gitignore',
+      when: 'لإعادة المستودع إلى حالة نظيفة تمامًا كأنه استنساخ طازج',
+      example: 'git clean -fdx',
+    },
+    {
+      command: 'git bisect start',
+      does: 'يبدأ جلسة بحث ثنائي لاكتشاف الـ commit الدقيق الذي أدخل خطأ أو regression',
+      when: 'عند اكتشاف عطل في الكود وتريد معرفة متى ومن تسبب به بدقة',
+      example: 'git bisect start && git bisect bad && git bisect good v1.0.0',
+    },
+    {
+      command: 'git bisect reset',
+      does: 'ينهي جلسة bisect ويعيد HEAD إلى موقعه الأصلي قبل بدء الفحص',
+      when: 'بعد العثور على الـ commit المسبب للمشكلة',
+      example: 'git bisect reset',
+    },
+  ]}
+/>

@@ -1,0 +1,72 @@
+---
+title: Git Setup & Configuration
+technology: git
+topic: configuration
+description: إعداد Git للمرة الأولى، التحقق من الإصدار، ضبط الاسم والبريد، وبدء أو استنساخ المستودعات.
+order: 1
+draft: false
+language: ar
+---
+
+
+## 1. Setup and Configuration
+
+<Callout type="tip" title="نصيحة للإعداد">
+اضبط إعداداتك العامة (`--global`) مرة واحدة على جهازك، ويمكنك تجاوزها داخل مستودع معين بدون `--global`.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git --version',
+      does: 'يتحقق من تثبيت Git ورقم الإصدار الحالي',
+      when: 'بعد التثبيت أو للتأكد من دعم ميزات معينة',
+      example: 'git --version',
+    },
+    {
+      command: 'git config --global user.name "Your Name"',
+      does: 'يعرض أو يضبط اسم الكاتب المرتبط بكل commits',
+      when: 'عند إعداد بيئة التطوير لأول مرة',
+      example: 'git config --global user.name "Mustafa Masoud"',
+    },
+    {
+      command: 'git config --global user.email "you@example.com"',
+      does: 'يعرض أو يضبط البريد الإلكتروني للمؤلف',
+      when: 'لربط مساهماتك بحساب GitHub',
+      example: 'git config --global user.email "dev@example.com"',
+    },
+    {
+      command: 'git config --list --show-origin',
+      does: 'يعرض جميع الإعدادات المطبقة مع مسار كل ملف إعداد',
+      when: 'لتتبع تضارب الإعدادات بين System وGlobal وLocal',
+      example: 'git config --list --show-origin',
+    },
+  ]}
+/>
+
+---
+
+## 2. Creating and Cloning Repositories
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git init',
+      does: 'يبدأ Repository محلي جديد ويجهز مجلد .git',
+      when: 'عند بدء مشروع جديد من الصفر محليًا',
+      example: 'mkdir my-app && cd my-app && git init',
+    },
+    {
+      command: 'git clone <url>',
+      does: 'ينسخ Repository موجود محليًا مع كامل تاريخ التغييرات',
+      when: 'لتنزيل مشروع من GitHub أو خادم remote',
+      example: 'git clone https://github.com/user/repo.git',
+    },
+    {
+      command: 'git clone --depth 1 <url>',
+      does: 'استنساخ سطحي (Shallow Clone) لآخر commit فقط لتوفير الوقت والمساحة',
+      when: 'في خطوط CI/CD أو للتحميل السريع للمشاريع الضخمة',
+      example: 'git clone --depth 1 git@github.com:user/repo.git',
+    },
+  ]}
+/>

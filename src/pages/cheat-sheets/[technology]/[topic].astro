@@ -1,0 +1,66 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import CheatSheetLayout from '../../../layouts/CheatSheetLayout.astro';
+import Callout from '../../../components/Callout.astro';
+import CheatSheet from '../../../components/CheatSheet.astro';
+import Steps from '../../../components/Steps.astro';
+import Figure from '../../../components/Figure.astro';
+import InfoCard from '../../../components/InfoCard.astro';
+import CardGrid from '../../../components/CardGrid.astro';
+import TableCard from '../../../components/TableCard.astro';
+import ChecklistCard from '../../../components/ChecklistCard.astro';
+import { getTechnology, type Technology } from '../../../data/technologies';
+
+const mdxComponents = {
+  Callout,
+  CheatSheet,
+  Steps,
+  Figure,
+  InfoCard,
+  CardGrid,
+  TableCard,
+  ChecklistCard,
+};
+
+export async function getStaticPaths() {
+  const allCheatSheets = await getCollection('cheatSheets', ({ data }) => !data.draft);
+
+  return allCheatSheets.map((entry) => {
+    const technology = getTechnology(entry.data.technology);
+    if (!technology) {
+      throw new Error(
+        `[cheat-sheets] Unknown technology "${entry.data.technology}" in entry "${entry.id}"`,
+      );
+    }
+
+    const techTopics = allCheatSheets
+      .filter((e) => e.data.technology === entry.data.technology)
+      .sort((a, b) => a.data.order - b.data.order);
+
+    return {
+      params: {
+        technology: entry.data.technology,
+        topic: entry.data.topic,
+      },
+      props: {
+        entry,
+        technology,
+        topics: techTopics,
+      },
+    };
+  });
+}
+
+interface Props {
+  entry: CollectionEntry<'cheatSheets'>;
+  technology: Technology;
+  topics: CollectionEntry<'cheatSheets'>[];
+}
+
+const { entry, technology, topics } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<CheatSheetLayout entry={entry} technology={technology} topics={topics}>
+  <Content components={mdxComponents} />
+</CheatSheetLayout>

@@ -1,0 +1,69 @@
+---
+title: Kubernetes Pods Cheat Sheet
+technology: kubernetes
+topic: pods
+description: أوامر إدارة وتشخيص الـ Pods، فحص الحالة، قراءة السجلات الحية، تنفيذ الأوامر التفاعلية، وتوجيه المنافذ.
+order: 1
+draft: false
+language: ar
+---
+
+
+## 1. Pod Management & Inspection
+
+<Callout type="tip" title="تصفية مساحات الأسماء">
+استخدم العلم `-A` أو `--all-namespaces` لعرض الـ Pods عبر كامل الكتلة (Cluster)، أو `-n <namespace>` للتركيز على مساحة أسماء محددة.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'kubectl get pods -A',
+      does: 'يعرض جميع كبسولات العمل (Pods) قيد التشغيل عبر كامل مساحات الأسماء في الكتلة',
+      when: 'لأخذ نظرة عامة سريعة على صحة الخدمات في كامل الـ Cluster',
+      example: 'kubectl get pods -A -o wide',
+    },
+    {
+      command: 'kubectl get pods -n <ns> -w',
+      does: 'يراقب حالة الـ Pods لحظيًا ويطبع التغييرات فور حدوثها (Watch mode)',
+      when: 'أثناء نشر تحديث جديد أو عند مراقبة إعادة تشغيل Pod معطل',
+      example: 'kubectl get pods -n production -w',
+    },
+    {
+      command: 'kubectl describe pod <pod-name> -n <ns>',
+      does: 'يعرض تفاصيل شاملة عن الـ Pod، بما في ذلك الأحداث الأخيرة وحالات الحاويات والمحركات المثبتة',
+      when: 'عند مواجهة حالات CrashLoopBackOff أو ImagePullBackOff لمعرفة سبب الفشل في قسم Events',
+      example: 'kubectl describe pod api-server-79bbd8f-4x9zq -n production',
+    },
+    {
+      command: 'kubectl logs <pod-name> -f -n <ns>',
+      does: 'يطبع سجلات الحاوية داخل الـ Pod ويتابع البث المباشر للسجلات (-f / follow)',
+      when: 'لتتبع مسار الطلبات أو تشخيص الأخطاء البرمجية أثناء عمل التطبيق',
+      example: 'kubectl logs web-service-7db5c -f -n production',
+    },
+    {
+      command: 'kubectl logs <pod-name> -p -n <ns>',
+      does: 'يعرض سجلات النسخة السابقة للحاوية التي انهارت قبل إعادة تشغيلها مباشرة (-p / previous)',
+      when: 'عندما ينهار التطبيق سريعًا ويعاد تشغيله دون القدرة على قراءة السجل الحي',
+      example: 'kubectl logs crash-service-xyz -p -n production',
+    },
+    {
+      command: 'kubectl exec -it <pod-name> -n <ns> -- /bin/sh',
+      does: 'يفتح جلسة طرفية تفاعلية داخل حاوية الـ Pod لتنفيذ الأوامر المباشرة',
+      when: 'لاختبار الشبكة الداخلية أو فحص ملفات التكوين والبيئات داخل الحاوية',
+      example: 'kubectl exec -it redis-master-0 -n database -- sh',
+    },
+    {
+      command: 'kubectl port-forward pod/<pod-name> <local>:<remote> -n <ns>',
+      does: 'يوجه منفذًا من جهازك المحلي مباشرة إلى منفذ محدد داخل الـ Pod في الـ Cluster',
+      when: 'للوصول إلى خدمة داخلية وقواعد بيانات التطوير دون الحاجة لإنشاء Ingress أو LoadBalancer',
+      example: 'kubectl port-forward pod/postgres-0 5432:5432 -n database',
+    },
+    {
+      command: 'kubectl delete pod <pod-name> -n <ns> --grace-period=0 --force',
+      does: 'يجبر الكتلة على حذف الـ Pod فورًا دون انتظار الإغلاق السلس (Force delete)',
+      when: 'عندما يعلق الـ Pod في حالة Terminating بسبب مشكلة في عقدة العمل (Node)',
+      example: 'kubectl delete pod stuck-pod-99 -n default --grace-period=0 --force',
+    },
+  ]}
+/>

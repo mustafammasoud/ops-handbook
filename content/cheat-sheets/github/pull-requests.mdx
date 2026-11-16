@@ -1,0 +1,69 @@
+---
+title: GitHub Pull Requests
+technology: github
+topic: pull-requests
+description: دورة حياة طلبات السحب (PR)، التجهيز والدفع، الفحص قبل الدمج، وإنشاء ودمج الـ PRs عبر GitHub CLI.
+order: 3
+draft: false
+language: ar
+---
+
+
+## 1. Pull Request Workflow & Review
+
+<Callout type="tip" title="تحديث الفرع قبل فتح الـ PR">
+احرص دائمًا على جلب تحديثات `main` ودمجها أو إعادة البناء عليها (`git pull --ff-only` أو `git merge origin/main`) قبل تقديم طلب السحب لتجنب تعارضات الدمج.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git switch -c feature/x',
+      does: 'ينشئ فرع عمل جديد لميزة أو إصلاح وينتقل إليه مباشرة',
+      when: 'قبل البدء في كتابة أي كود جديد مخصص لطلب السحب',
+      example: 'git switch -c feature/health-check',
+    },
+    {
+      command: 'git diff --check',
+      does: 'يفحص التعديلات ويكتشف مسافات النهاية غير المرغوبة ومشاكل التنسيق',
+      when: 'قبل إضافة الملفات إلى الالتزام للحفاظ على نظافة الـ PR',
+      example: 'git diff --check',
+    },
+    {
+      command: 'git push -u origin feature/x',
+      does: 'يرفع فرع الميزة المحلي إلى المستودع البعيد ويضبط تتبع المسار',
+      when: 'عند الاستعداد لفتح طلب سحب جديد',
+      example: 'git push -u origin feature/health-check',
+    },
+    {
+      command: 'gh pr create --draft',
+      does: 'ينشئ طلب سحب في حالة مسودة (Draft PR) للإشارة إلى استمرار العمل',
+      when: 'للحصول على ملاحظات مبكرة من الفريق أو تشغيل فحوصات CI دون طلب مراجعة نهائية',
+      example: 'gh pr create --draft --title "WIP: Health check endpoint"',
+    },
+    {
+      command: 'gh pr view',
+      does: 'يعرض تفاصيل طلب السحب الحالي أو رقمه المحدد في الطرفية',
+      when: 'لمعرفة حالة الـ PR والمراجعين والتعليقات دون مغادرة الطرفية',
+      example: 'gh pr view',
+    },
+    {
+      command: 'gh pr diff',
+      does: 'يعرض الفروقات البرمجية الكاملة الخاصة بطلب السحب الحالي',
+      when: 'لمراجعة التغييرات المقدمة ومقارنتها بالفرع المستهدف',
+      example: 'gh pr diff',
+    },
+    {
+      command: 'gh pr checks',
+      does: 'يعرض نتائج فحوصات الـ CI/CD وسير عمل GitHub Actions للـ PR الحالي',
+      when: 'للتأكد من نجاح كافة الاختبارات والفحوصات الآلية قبل الدمج',
+      example: 'gh pr checks',
+    },
+    {
+      command: 'gh pr merge --squash',
+      does: 'يدمج طلب السحب بأسلوب ضغط الالتزامات (Squash Merge) في التزام واحد منظم',
+      when: 'للحفاظ على نظافة تسلسل وسجل الفرع الرئيسي',
+      example: 'gh pr merge --squash --delete-branch',
+    },
+  ]}
+/>

@@ -1,0 +1,59 @@
+---
+title: Git History & Diffs
+technology: git
+topic: history
+description: فحص سجل التعديلات، عرض رسائل الالتزام، مقارنة الفروع، وتتبع تغييرات الأسطر.
+order: 3
+draft: false
+language: ar
+---
+
+
+## 1. Viewing History and Diffs
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git log',
+      does: 'يعرض تاريخ الـ Commits المفصل مع اسم الكاتب والتاريخ والرسالة',
+      when: 'لمراجعة التاريخ الكامل للفرع الحالي',
+      example: 'git log',
+    },
+    {
+      command: 'git log --oneline -10',
+      does: 'تاريخ مختصر بسطر واحد لكل commit لآخر 10 سجلات',
+      when: 'لإلقاء نظرة سريعة على سجل التعديلات الحديثة',
+      example: 'git log --oneline -10',
+    },
+    {
+      command: 'git log --oneline --graph --decorate --all',
+      does: 'يعرض شجرة بصرية توضح تفريعات ودمج كل الفروع',
+      when: 'لفهم بنية التاريخ المعقد ومسارات الفروع المتوازية',
+      example: 'git log --oneline --graph --decorate --all -15',
+    },
+    {
+      command: 'git show <commit>',
+      does: 'يفحص تفاصيل ومحتوى وتعديلات (diff) لـ commit معين أو Tag',
+      when: 'لمعرفة ما تم تغييره بالضبط في إصدار أو نقطة زمنية',
+      example: 'git show v1.0.0',
+    },
+    {
+      command: 'git diff HEAD',
+      does: 'يقارن Working Tree بالكامل مع آخر commit في HEAD',
+      when: 'لمعرفة كل التغييرات المتبقية مقارنة بآخر التزام',
+      example: 'git diff HEAD',
+    },
+    {
+      command: 'git diff --check',
+      does: 'يكتشف أخطاء المسافات البيضاء والأسطر الزائدة قبل الالتزام',
+      when: 'لتفادي أخطاء التنسيق غير المقصودة في المراجعات',
+      example: 'git diff --check',
+    },
+    {
+      command: 'git blame <file>',
+      does: 'يحدد آخر commit وشخص غيّر كل سطر في الملف',
+      when: 'لمعرفة سياق وتاريخ كتابة سطر كود معين',
+      example: 'git blame src/server.ts',
+    },
+  ]}
+/>

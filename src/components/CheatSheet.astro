@@ -18,6 +18,8 @@ interface CheatRow {
   when: string;
   /** Optional concrete example. */
   example?: string;
+  /** Optional custom anchor ID override. */
+  id?: string;
 }
 
 interface Props {
@@ -30,6 +32,15 @@ const { rows, placeholder } = Astro.props;
 const isEmpty = rows.length === 0;
 const emptyNote =
   placeholder ?? 'Nothing added yet — commands for this section will be listed here.';
+
+function toRowId(cmd: string, index: number): string {
+  const base = cmd
+    .toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+  return base || `cmd-${index + 1}`;
+}
 ---
 
 <div class="cheat-card" data-cheat="" data-cheat-empty={isEmpty ? '' : undefined}>
@@ -46,9 +57,11 @@ const emptyNote =
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr data-cheat-row="">
-                <td class="cheat-cmd-cell">
+            {rows.map((row, index) => {
+              const rowId = row.id ?? toRowId(row.command, index);
+              return (
+                <tr id={rowId} data-cheat-row="" class="scroll-mt-24 transition-colors">
+                  <td class="cheat-cmd-cell">
                   <span class="cheat-cmd">
                     <code>{row.command}</code>
                     <button
@@ -99,7 +112,8 @@ const emptyNote =
                   )}
                 </td>
               </tr>
-            ))}
+            );
+          })}
           </tbody>
         </table>
       </div>
@@ -229,6 +243,14 @@ const emptyNote =
   .cheat-copy.is-error {
     border-color: var(--c-warning-border);
     color: var(--c-warning-fg);
+  }
+
+  tr[data-cheat-row]:target {
+    background-color: var(--c-accent-soft);
+  }
+
+  tr[data-cheat-row]:target td {
+    border-color: var(--c-accent);
   }
 </style>
 

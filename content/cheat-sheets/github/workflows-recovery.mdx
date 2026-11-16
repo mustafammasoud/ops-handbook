@@ -1,0 +1,63 @@
+---
+title: GitHub Workflows & Emergency Recovery
+technology: github
+topic: workflows-recovery
+description: مراجعة التغييرات الحرجة، استعادة النقاط السابقة عبر Reflog، والدفع الآمن باستخدام force-with-lease.
+order: 7
+draft: false
+language: ar
+---
+
+
+## 1. Advanced Workflows & Recovery
+
+<Callout type="warning" title="الدفع القسري الآمن">
+لا تستخدم أبدًا `git push --force` الأعمى على الفروع المشتركة. استخدم دائمًا `git push --force-with-lease` للتأكد من أنك لا تتجاوز التزامات قام زميلك برفعها في نفس الوقت.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git status',
+      does: 'يفحص حالة مجلد العمل وفهرس التجهيز قبل اتخاذ أي قرار تصحيحي',
+      when: 'الخطوة الأولى الإلزامية قبل أي استرجاع أو تعديل تاريخي',
+      example: 'git status',
+    },
+    {
+      command: 'git diff --cached',
+      does: 'يعرض التغييرات المجهزة في Staging والتي ستدخل في الالتزام القادم',
+      when: 'للتأكد من التغييرات قبل الضغط على commit',
+      example: 'git diff --cached',
+    },
+    {
+      command: 'git reflog -10',
+      does: 'يعرض سجل حركات مؤشر HEAD محليًا، مما يسمح باستعادة commits غير المرئية في السجل العادي',
+      when: 'عند فقدان التزام بعد rebase خاطئ أو reset غير مقصود',
+      example: 'git reflog -10',
+    },
+    {
+      command: 'git branch --show-current',
+      does: 'يطبع الاسم الدقيق للفرع النشط حاليًا لتجنب ارتكاب أخطاء على فرع غير مقصود',
+      when: 'في السكربتات أو للتحقق قبل تنفيذ أوامر دفع أو دمج',
+      example: 'git branch --show-current',
+    },
+    {
+      command: 'git switch -c recovery/my-work',
+      does: 'ينشئ فرع طوارئ مؤقت يحفظ الحالة الراهنة قبل تجربة أوامر تصحيح خطرة',
+      when: 'كإجراء وقائي قبل عمليات Rebase أو Revert المعقدة',
+      example: 'git switch -c recovery/backup-before-rebase',
+    },
+    {
+      command: 'git branch recovery/previous-state <hash>',
+      does: 'ينشئ فرعًا جديدًا يشير مباشرة إلى Hash التزام تم العثور عليه في الـ reflog',
+      when: 'لإنقاذ كود مفقود كان موجودًا في التزام تم التراجع عنه',
+      example: 'git branch recovery/lost-commit a1b2c3d',
+    },
+    {
+      command: 'git push --force-with-lease',
+      does: 'يرفع التعديلات التاريخية مع التحقق من عدم وجود تعديلات خارجية جديدة على الفرع البعيد',
+      when: 'بعد إعادة كتابة تاريخ الفرع الخاص بك (مثل rebase التفاعلي) بأمان',
+      example: 'git push --force-with-lease origin feature/login',
+    },
+  ]}
+/>

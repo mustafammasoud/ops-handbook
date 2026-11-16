@@ -1,0 +1,69 @@
+---
+title: Kubernetes Cluster Troubleshooting & Nodes
+technology: kubernetes
+topic: troubleshooting
+description: أوامر تشخيص العقد (Nodes)، عزل وصيانة الخوادم (Cordon & Drain)، تتبع الأحداث الحية ومراقبة استهلاك الموارد.
+order: 3
+draft: false
+language: ar
+---
+
+
+## 1. Node Maintenance & Diagnostics
+
+<Callout type="warning" title="تفريغ العقد (Drain)">
+أمر `drain` يقوم بطرد الـ Pods من العقدة. احرص دائمًا على توفر PodDisruptionBudgets مناسبة لتفادي انقطاع الخدمة في الإنتاج.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'kubectl get nodes -o wide',
+      does: 'يعرض حالة جميع عقد الكتلة مع إصدارات نظام التشغيل وعناوين الـ IP وإصدار Kubelet',
+      when: 'للتحقق من جاهزية العقد (Ready / NotReady) وصحة اتصالها بالـ Control Plane',
+      example: 'kubectl get nodes -o wide',
+    },
+    {
+      command: 'kubectl describe node <node-name>',
+      does: 'يعرض تفاصيل شاملة عن العقدة تشمل قيود الموارد (Allocatable)، والوسوم، وTaints وشرائح الضغط (DiskPressure/MemoryPressure)',
+      when: 'عندما تفشل جدولة كبسولات جديدة على العقدة أو عند تحولها إلى NotReady',
+      example: 'kubectl describe node worker-node-01',
+    },
+    {
+      command: 'kubectl get events -A --sort-by=".metadata.creationTimestamp"',
+      does: 'يجلب جميع أحداث الكتلة مرتبة تصاعديًا حسب وقت الحدوث من الأحدث إلى الأقدم',
+      when: 'لتتبع المشاكل الغامضة في الكتلة، مثل أخطاء التخصيص أو فشل مجسات الصحة Liveness/Readiness',
+      example: 'kubectl get events -A --sort-by=".metadata.creationTimestamp"',
+    },
+    {
+      command: 'kubectl top nodes',
+      does: 'يعرض استهلاك المعالج (CPU) والذاكرة (Memory) الفعلي لكل عقدة في الكتلة',
+      when: 'لتقييم ضغط الموارد وتحديد العقد ذات الاستهلاك المرتفع (يتطلب Metrics Server)',
+      example: 'kubectl top nodes',
+    },
+    {
+      command: 'kubectl top pods -A --sort-by=cpu',
+      does: 'يعرض الكبسولات الأكثر استهلاكًا للمعالج عبر كافة مساحات الأسماء',
+      when: 'لاكتشاف الخدمات ذات الاستهلاك الشاذ وتفادي تجاوز حدود الموارد المتاحة',
+      example: 'kubectl top pods -A --sort-by=cpu',
+    },
+    {
+      command: 'kubectl cordon <node-name>',
+      does: 'يحدد العقدة كغير قابلة للجدولة (SchedulingDisabled) لمنع إسناد أي كبسولات جديدة إليها',
+      when: 'كخطوة أولى قبل إجراء أعمال صيانة أو ترقية على الخادم',
+      example: 'kubectl cordon worker-node-02',
+    },
+    {
+      command: 'kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data',
+      does: 'يطرد جميع الكبسولات القابلة للنقل من العقدة ويعيد جدولتها على عقد أخرى بأمان',
+      when: 'لتفريغ الخادم بالكامل قبل إعادة التشغيل أو ترقية النواة ونظام التشغيل',
+      example: 'kubectl drain worker-node-02 --ignore-daemonsets --delete-emptydir-data',
+    },
+    {
+      command: 'kubectl uncordon <node-name>',
+      does: 'يزيل حالة الحظر ويعيد العقدة لتصبح جاهزة لاستقبال وجدولة كبسولات جديدة',
+      when: 'بعد الانتهاء من أعمال الصيانة وتأكيد استقرار الخادم وعودته للعمل',
+      example: 'kubectl uncordon worker-node-02',
+    },
+  ]}
+/>

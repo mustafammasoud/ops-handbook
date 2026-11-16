@@ -1,0 +1,70 @@
+---
+title: Git Undoing Changes & Recovery
+technology: git
+topic: undoing
+description: التراجع عن التعديلات غير المحفوظة، إعادة ضبط الفروع (soft, mixed, hard)، إلغاء الالتزامات بأمان، واستعادة المفقود عبر reflog.
+order: 6
+draft: false
+language: ar
+---
+
+
+## 1. Undoing Changes
+
+<Callout type="warning" title="أوامر خطرة تستوجب الحذر">
+- `git reset --hard` يمسح التغييرات المحلية نهائيًا؛ البديل الآمن: `git revert` أو `git reset --mixed` للحفاظ على ملفاتك.
+- `git commit --amend` يعيد كتابة الـ commit الأخير؛ لا تستخدمه إذا كان الـ commit قد رُفع بالفعل إلى remote مشترك.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git restore <file>',
+      does: 'يلغي تعديلات غير مجهزة (unstaged) في الملف ويعيده لآخر commit',
+      when: 'للتراجع عن تجربة غير ناجحة في ملف معين',
+      example: 'git restore src/app.js',
+    },
+    {
+      command: 'git restore --staged <file>',
+      does: 'يزيل الملف من Staging Area مع الاحتفاظ بالتعديلات في الملف محليًا',
+      when: 'عند إضافة ملف بـ git add عن طريق الخطأ وتريد إلغاء تجهيزه',
+      example: 'git restore --staged src/secret.env',
+    },
+    {
+      command: 'git reset --soft HEAD~1',
+      does: 'يرجع commit واحد للخلف مع الاحتفاظ بالتغييرات مجهزة في Staging',
+      when: 'لتعديل رسالة أو إضافة ملف إلى commit تم حفظه محليًا للتو',
+      example: 'git reset --soft HEAD~1',
+    },
+    {
+      command: 'git reset --mixed HEAD~1',
+      does: 'يرجع commit واحد للخلف ويعيد الملفات إلى Working Tree غير مجهزة (افتراضي)',
+      when: 'لتفكيك commit وإعادة تجهيزه بطريقة أخرى',
+      example: 'git reset --mixed HEAD~1',
+    },
+    {
+      command: 'git reset --hard HEAD~1',
+      does: 'يحرك الفرع للخلف ويمسح كل التغييرات من Index و Working Tree (خطير)',
+      when: 'للتخلص تمامًا من آخر commit وتغييراته للأبد',
+      example: 'git reset --hard HEAD~1',
+    },
+    {
+      command: 'git revert <commit>',
+      does: 'ينشئ commit جديد يعكس ويلغي تأثير commit سابق بأمان تام',
+      when: 'لإلغاء تغيير موجود على فرع عام مشترك دون إعادة كتابة التاريخ',
+      example: 'git revert a1b2c3d',
+    },
+    {
+      command: 'git commit --amend -m "new msg"',
+      does: 'يستبدل آخر commit محلي برسالة جديدة أو يدمج الملفات المجهزة حديثًا',
+      when: 'لتصحيح خطأ إملائي في رسالة الالتزام الأخيرة أو إضافة ملف نسيته',
+      example: 'git commit --amend -m "docs: clarify recovery steps"',
+    },
+    {
+      command: 'git reflog -10',
+      does: 'يعرض سجل تحركات مؤشر HEAD لاستعادة commits أو فروع تم حذفها',
+      when: 'شبكة أمان لاسترجاع كود مفقود بعد reset خاطئ أو rebase متعثر',
+      example: 'git reflog -10',
+    },
+  ]}
+/>

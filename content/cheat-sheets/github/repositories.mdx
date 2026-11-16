@@ -1,0 +1,57 @@
+---
+title: GitHub Repositories & Remotes
+technology: github
+topic: repositories
+description: إدارة المستودعات، تسمية الفروع الافتراضية، ضبط التتبع عن بعد، وإلغاء تتبع الملفات الحساسة.
+order: 2
+draft: false
+language: ar
+---
+
+
+## 1. Repositories Management & Remote Tracking
+
+<Callout type="warning" title="الملفات الحساسة">
+استخدم `git rm --cached` لإزالة ملفات التكوين والبيئات الحساسة (مثل `.env`) من سجل التتبع دون حذفها من جهازك المحلي.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'git remote -v',
+      does: 'يعرض أسماء وعناوين المستودعات البعيدة المسجلة (fetch و push)',
+      when: 'للتحقق من الرابط البعيد قبل الرفع أو الجلب',
+      example: 'git remote -v',
+    },
+    {
+      command: 'git branch -M main',
+      does: 'يعيد تسمية الفرع الحالي إلى main كاسم فرع افتراضي متوافق مع GitHub',
+      when: 'عند تهيئة مستودع جديد وتحويل master إلى main',
+      example: 'git branch -M main',
+    },
+    {
+      command: 'git push -u origin main',
+      does: 'يرفع الفرع المحلي إلى المستودع البعيد ويضبط التتبع الافتراضي (upstream tracking)',
+      when: 'في أول عملية دفع للفرع الرئيسي إلى GitHub',
+      example: 'git push -u origin main',
+    },
+    {
+      command: 'git rm --cached <file>',
+      does: 'يزيل الملف من فهرس التتبع (Staging) مع إبقائه في قرص التخزين المحلي',
+      when: 'عند إضافة ملف حساس بالخطأ وتريد تضمينه في .gitignore دون حذفه',
+      example: 'git rm --cached .env',
+    },
+    {
+      command: 'gh repo view',
+      does: 'يعرض ملخص المستودع الحالي من سطر الأوامر (الوصف، النجوم، والفرع الافتراضي)',
+      when: 'للاطلاع السريع على تفاصيل المستودع بدون فتح المتصفح',
+      example: 'gh repo view',
+    },
+    {
+      command: 'gh repo view --web',
+      does: 'يفتح صفحة المستودع الحالي مباشرة في متصفح الويب الافتراضي',
+      when: 'للانتقال الفوري إلى واجهة GitHub في المتصفح',
+      example: 'gh repo view --web',
+    },
+  ]}
+/>

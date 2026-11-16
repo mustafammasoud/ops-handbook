@@ -1,0 +1,51 @@
+---
+title: GitHub Issues & Task Tracking
+technology: github
+topic: issues
+description: إدارة المشكلات وتتبع المهام، استعراض القضايا المفتوحة، وإنشاء Issues وربطها بالالتزامات لإغلاقها آليًا.
+order: 5
+draft: false
+language: ar
+---
+
+
+## 1. Issues & Commit Linking
+
+<Callout type="tip" title="الإغلاق التلقائي للمهام">
+استخدام كلمات مثل `Fixes #12` أو `Closes #12` في رسالة الالتزام أو وصف طلب السحب يقوم بإغلاق الـ Issue تلقائيًا بمجرد دمج الفرع في الفرع الافتراضي.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      command: 'gh issue list --state open',
+      does: 'يعرض قائمة بجميع المشكلات والمهام المفتوحة في المستودع الحالي',
+      when: 'لمعرفة المهام المطلوب العمل عليها أو مراجعة المشاكل القائمة',
+      example: 'gh issue list --state open',
+    },
+    {
+      command: 'gh issue list --assignee "@me"',
+      does: 'يصفي ويعرض فقط المهام والمشكلات المسندة إلى حسابك شخصيًا',
+      when: 'للتركيز على المهام المسؤولة منك في المشروع',
+      example: 'gh issue list --assignee "@me"',
+    },
+    {
+      command: 'gh issue create',
+      does: 'ينشئ Issue جديدًا من الطرفية مع تحديد العنوان والوصف والملصقات',
+      when: 'للإبلاغ السريع عن خطأ أو فتح طلب ميزة جديدة دون مغادرة الطرفية',
+      example: 'gh issue create --title "Bug: Ingress timeout on 504" --body "Steps to reproduce..."',
+    },
+    {
+      command: 'gh issue view <number>',
+      does: 'يعرض تفاصيل المشكلة المحددة والتعليقات المرفقة بها في الطرفية',
+      when: 'لقراءة سياق المشكلة وتعليقات الفريق أثناء العمل على حلها',
+      example: 'gh issue view 42',
+    },
+    {
+      command: 'git commit -m "Fix ... (#42)"',
+      does: 'يربط الالتزام البرمجي برقم الـ Issue للإشارة إليه في واجهة GitHub',
+      when: 'عند كتابة التزام يحل أو يتعلق بمسألة محددة',
+      example: 'git commit -m "Fix container startup crash (Fixes #42)"',
+    },
+  ]}
+/>

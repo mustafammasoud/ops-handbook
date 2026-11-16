@@ -1,0 +1,80 @@
+---
+title: Git Branching & Merging
+technology: git
+topic: branching-merging
+description: إدارة الفروع المحلية والبعيدة، الانتقال بينها، والدمج، وإلغاء عمليات الدمج الجارية.
+order: 4
+draft: false
+language: ar
+---
+
+
+## 1. Branching and Merging Commands
+
+<Callout type="tip" title="نصيحة لتسمية الفروع">
+استخدم بادئات توضيحية للفروع مثل `feature/` للميزات، و`fix/` للإصلاحات، و`refactor/` لتسهيل التعرف عليها.
+</Callout>
+
+<CheatSheet
+  rows={[
+    {
+      id: 'git-branch-list',
+      command: 'git branch',
+      does: 'يعرض قائمة الفروع المحلية مع تمييز الفرع النشط بنجمة',
+      when: 'لمعرفة الفروع المتاحة وتحديد أين تقف حاليًا',
+      example: 'git branch',
+    },
+    {
+      id: 'git-branch-all',
+      command: 'git branch -a',
+      does: 'يعرض كل الفروع المحلية والبعيدة (Remote Tracking Branches)',
+      when: 'للتحقق من الفروع المرفوعة على GitHub',
+      example: 'git branch -a',
+    },
+    {
+      id: 'git-branch-create',
+      command: 'git branch <name>',
+      does: 'ينشئ فرعًا جديدًا دون الانتقال إليه',
+      when: 'لتحضير فرع لمهمة قادمة',
+      example: 'git branch feature/auth',
+    },
+    {
+      command: 'git switch <branch>',
+      does: 'ينتقل إلى فرع موجود مسبقًا',
+      when: 'للتبديل بين المهام المختلفة',
+      example: 'git switch main',
+    },
+    {
+      command: 'git switch -c <name>',
+      does: 'ينشئ فرعًا جديدًا وينتقل إليه فورًا في خطوة واحدة',
+      when: 'لبدء ميزة جديدة أو إصلاح عاجل',
+      example: 'git switch -c fix/login-validation',
+    },
+    {
+      command: 'git merge <branch>',
+      does: 'يدمج الفرع المحدد في الفرع النشط حاليًا',
+      when: 'لدمج التغييرات بعد الانتهاء من الميزة واختبارها',
+      example: 'git merge feature/auth',
+    },
+    {
+      command: 'git merge --abort',
+      does: 'يلغي عملية الدمج الجارية ويعيد الفرع لحالته قبل بدء الدمج',
+      when: 'عند ظهور تعارضات معقدة والرغبة في البدء من جديد بأمان',
+      example: 'git merge --abort',
+    },
+    {
+      id: 'git-branch-delete',
+      command: 'git branch -d <name>',
+      does: 'يحذف فرعًا محليًا بأمان نسبي (فقط إذا كان مدمجًا بالفعل)',
+      when: 'لتنظيف الفروع بعد الانتهاء من دمجها في main',
+      example: 'git branch -d feature/auth',
+    },
+    {
+      id: 'git-branch-force-delete',
+      command: 'git branch -D <name>',
+      does: 'يحذف فرعًا محليًا بالقوة حتى لو لم يتم دمجه (Force Delete)',
+      when: 'للتخلص من فرع تجريبي مهمل لا تحتاج لتغييراته',
+      example: 'git branch -D experiment/failed-test',
+    },
+  ]}
+/>

@@ -1,0 +1,126 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/Header.astro';
+import CategoryIcon from '../../../components/CategoryIcon.astro';
+import { technologies, type Technology } from '../../../data/technologies';
+import { categoryLabel } from '../../../data/categories';
+
+export async function getStaticPaths() {
+  const allCheatSheets = await getCollection('cheatSheets', ({ data }) => !data.draft);
+
+  return technologies
+    .filter((tech) => allCheatSheets.some((entry) => entry.data.technology === tech.id))
+    .map((tech) => ({
+      params: { technology: tech.id },
+      props: {
+        technology: tech,
+        topics: allCheatSheets
+          .filter((entry) => entry.data.technology === tech.id)
+          .sort((a, b) => a.data.order - b.data.order),
+      },
+    }));
+}
+
+interface Props {
+  technology: Technology;
+  topics: CollectionEntry<'cheatSheets'>[];
+}
+
+const { technology, topics } = Astro.props;
+const pageTitle = `${technology.name} Cheat Sheets | Ops Handbook`;
+const pageDescription = `Quick command references, syntax lookups, and practical cheatsheets for ${technology.name}.`;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <Header />
+
+  <main id="main" class="mx-auto w-full max-w-screen-2xl px-4 py-8 lg:py-12">
+    <!-- Breadcrumbs -->
+    <nav aria-label="Breadcrumb" class="mb-6 text-sm text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-accent-ink transition-colors">Home</a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/cheat-sheets" class="hover:text-accent-ink transition-colors">Cheat Sheets</a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="font-medium text-text">
+          {technology.name}
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Technology Hero -->
+    <header class="border-b border-border pb-8">
+      <div class="flex items-start gap-4 sm:items-center">
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface text-accent-ink shadow-xs">
+          <CategoryIcon name={technology.icon} class="h-7 w-7" />
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-muted">
+              {categoryLabel(technology.category)}
+            </span>
+            <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent-ink">
+              {topics.length} {topics.length === 1 ? 'Topic' : 'Topics'}
+            </span>
+          </div>
+          <h1 class="mt-2 text-2xl font-bold tracking-tight text-text sm:text-4xl">
+            {technology.name} Cheat Sheets
+          </h1>
+        </div>
+      </div>
+      <p class="mt-4 max-w-3xl text-base leading-relaxed text-muted sm:text-lg">
+        {technology.description}
+      </p>
+    </header>
+
+    <!-- Topics Section -->
+    <section class="mt-8" aria-labelledby="topics-heading">
+      <div class="mb-6 flex items-center justify-between">
+        <h2 id="topics-heading" class="text-lg font-semibold text-text">
+          Available Topics
+        </h2>
+        <span class="text-xs text-muted font-mono">
+          Showing all {topics.length} topics
+        </span>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {topics.map((topicItem) => (
+          <a
+            href={`/cheat-sheets/${technology.id}/${topicItem.data.topic}`}
+            class="group relative flex flex-col justify-between rounded-xl border border-border bg-surface p-5 transition-all hover:border-accent/50 hover:bg-surface-2 hover:shadow-xs"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-mono font-medium text-muted border border-border/60">
+                  Topic #{topicItem.data.order}
+                </span>
+                <span class="text-xs uppercase tracking-wider text-muted font-mono">
+                  {topicItem.data.language ?? 'en'}
+                </span>
+              </div>
+
+              <h3 class="text-base font-semibold text-text group-hover:text-accent-ink transition-colors">
+                {topicItem.data.title}
+              </h3>
+
+              <p class="mt-2 text-sm text-muted leading-relaxed line-clamp-3">
+                {topicItem.data.description}
+              </p>
+            </div>
+
+            <div class="mt-5 flex items-center justify-between pt-3 border-t border-border/60 text-xs font-medium text-accent-ink">
+              <span>View Cheat Sheet</span>
+              <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">&rarr;</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
