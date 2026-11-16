@@ -13,8 +13,16 @@
 /docs/security /docs/security-devsecops 301
 /docs/troubleshooting /docs/troubleshooting-production 301
 
-# Legacy article routes redirected to nested technology paths
-/docs/docker/introduction /docs/containers/docker/introduction 301
-/docs/kubernetes/overview /docs/container-orchestration/kubernetes/overview 301
-/docs/kubernetes/pods /docs/container-orchestration/kubernetes/pods 301
-/docs/linux/introduction /docs/operating-systems/linux/introduction 301
+# Legacy article routes — redirected to their technology index pages.
+# Individual article redirects are added when the target page is published.
+/docs/docker/introduction /docs/containers 301
+/docs/kubernetes/overview /docs/container-orchestration 301
+/docs/kubernetes/pods /docs/container-orchestration 301
+/docs/linux/introduction /docs/operating-systems 301
+
+# Cheat sheets pillar migration redirects
+/docs/cheat-sheets/git-cheat-sheet /cheat-sheets/git 301
+/docs/cheat-sheets/github-cheat-sheet /cheat-sheets/github 301
+/docs/cheat-sheets /cheat-sheets 301
+/docs/cheat-sheets/* /cheat-sheets 301
+
