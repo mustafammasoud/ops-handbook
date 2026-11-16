@@ -1,8 +1,9 @@
 ---
 /**
- * Client-side search: a dialog backed by the build-time `/search-index.json`.
- * Arabic-aware normalization (diacritics, alef/hamza/ta-marbuta forms) runs
- * in the browser — no backend, no extra dependency.
+ * Unified client-side search: a dialog backed by the build-time `/search-index.json`.
+ * Discovers content across all 3 pillars: Docs, Cheat Sheets, and Interview Questions.
+ * Supports source filtering, deep linking to headings/commands/questions,
+ * and Arabic-aware normalization (diacritics, alef/hamza/ta-marbuta forms).
  */
 ---
 
@@ -13,7 +14,7 @@
   class="flex h-11 w-auto items-center gap-2 rounded-full border border-border bg-bg px-3.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg motion-reduce:transition-none sm:h-10 sm:w-full sm:rounded-xl sm:bg-surface sm:px-3.5 sm:hover:border-accent sm:hover:bg-surface-2 sm:hover:text-text"
   aria-haspopup="dialog"
   aria-controls="search-dialog"
-  aria-label="Search the documentation"
+  aria-label="Search Ops Handbook"
 >
   <svg
     class="h-4 w-4 shrink-0"
@@ -27,9 +28,9 @@
     <circle cx="11" cy="11" r="7"></circle>
     <path d="m21 21-4.3-4.3"></path>
   </svg>
-  <span class="block min-w-0 flex-1 truncate text-start max-sm:hidden"
-    >Search the documentation…</span
-  >
+  <span class="block min-w-0 flex-1 truncate text-start max-sm:hidden">
+    Search Ops Handbook…
+  </span>
   <span class="block flex-1 text-start sm:hidden">Search</span>
   <kbd
     id="search-trigger-kbd"
@@ -43,10 +44,11 @@
 <dialog
   id="search-dialog"
   class="search-dialog"
-  aria-label="Search the documentation"
+  aria-label="Search Ops Handbook"
 >
-  <div class="flex max-h-[80vh] flex-col p-3">
-    <div class="flex items-center gap-2 rounded-full border border-border bg-bg px-4 sm:rounded-md sm:px-3">
+  <div class="flex max-h-[85vh] flex-col p-3">
+    <!-- Search Input Bar -->
+    <div class="flex items-center gap-2 rounded-full border border-border bg-bg px-4 sm:rounded-xl sm:px-3">
       <svg
         class="h-4 w-4 shrink-0 text-muted"
         viewBox="0 0 24 24"
@@ -63,9 +65,9 @@
         id="search-input"
         type="search"
         class="h-12 flex-1 bg-transparent text-base outline-none placeholder:text-muted sm:h-11"
-        placeholder="Search the documentation…"
+        placeholder="Search docs, cheat sheets, questions…"
         autocomplete="off"
-        aria-label="Search the documentation"
+        aria-label="Search Ops Handbook"
         role="combobox"
         aria-expanded="false"
         aria-controls="search-results"
@@ -80,27 +82,74 @@
       </button>
     </div>
 
+    <!-- Source Type Filter Tabs -->
+    <div
+      id="search-filters"
+      class="mt-2.5 flex items-center gap-1.5 border-b border-border/70 px-1 pb-2 text-xs"
+      role="group"
+      aria-label="Filter results by source pillar"
+    >
+      <button
+        type="button"
+        class="search-filter-btn rounded-full px-2.5 py-1 font-semibold bg-accent/15 text-accent-ink"
+        data-filter="all"
+        aria-pressed="true"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="search-filter-btn rounded-full px-2.5 py-1 text-muted hover:bg-surface-2 hover:text-text transition-colors"
+        data-filter="docs"
+        aria-pressed="false"
+      >
+        Docs
+      </button>
+      <button
+        type="button"
+        class="search-filter-btn rounded-full px-2.5 py-1 text-muted hover:bg-surface-2 hover:text-text transition-colors"
+        data-filter="cheat"
+        aria-pressed="false"
+      >
+        Cheat Sheets
+      </button>
+      <button
+        type="button"
+        class="search-filter-btn rounded-full px-2.5 py-1 text-muted hover:bg-surface-2 hover:text-text transition-colors"
+        data-filter="interview"
+        aria-pressed="false"
+      >
+        Interview Questions
+      </button>
+    </div>
+
+    <!-- Status & Results -->
     <p id="search-status" class="hidden px-1 pt-3 text-sm text-muted">
       Loading search index…
     </p>
+
     <ul
       id="search-results"
       role="listbox"
       aria-label="Search results"
-      class="max-h-[50vh] overflow-y-auto p-1"
+      class="max-h-[50vh] overflow-y-auto p-1 mt-1 space-y-1"
     >
     </ul>
+
     <p
       id="search-empty"
-      class="hidden px-1 py-5 text-center text-sm text-muted"
+      class="hidden px-1 py-6 text-center text-sm text-muted"
     >
       No matching results.
     </p>
 
-    <div class="mt-2 flex flex-wrap gap-4 border-t border-border px-1 pt-2 text-xs text-muted">
-      <span>↑ ↓ to navigate</span>
-      <span>Enter to open</span>
-      <span>Esc to close</span>
+    <div class="mt-2 flex flex-wrap items-center justify-between border-t border-border px-1 pt-2 text-xs text-muted">
+      <div class="flex items-center gap-3">
+        <span>↑ ↓ to navigate</span>
+        <span>Enter to open</span>
+        <span>Esc to close</span>
+      </div>
+      <span class="text-[11px] text-muted/70">Unified Hub Search</span>
     </div>
   </div>
 </dialog>
@@ -113,8 +162,10 @@
     /** title */ t: string;
     /** description */ d: string;
     /** category label */ cl: string;
-    /** headings */ h: string[];
+    /** headings / tags */ h: string[];
     /** body text */ b: string;
+    /** pillar type */ type: 'docs' | 'cheat' | 'interview';
+    /** badge label */ badge: string;
   };
 
   const trigger = document.getElementById('search-trigger');
@@ -125,10 +176,9 @@
   const statusEl = document.getElementById('search-status');
   const closeButton = document.getElementById('search-close');
   const kbd = document.getElementById('search-trigger-kbd');
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.search-filter-btn');
 
-  // Platform-specific shortcut hint. Server always renders "Ctrl K"; the Apple
-  // glyph is applied after mount (no hydration mismatch), and the badge is
-  // removed entirely on touch-only devices where it is meaningless.
+  // Platform-specific shortcut hint.
   if (kbd) {
     if (isTouchOnly()) {
       kbd.style.display = 'none';
@@ -142,6 +192,7 @@
     let current: SearchDoc[] = [];
     let active = -1;
     let debounceTimer: number | undefined;
+    let activeFilter: 'all' | 'docs' | 'cheat' | 'interview' = 'all';
 
     /** Arabic-aware normalization. All replacements are 1:1. */
     function normalize(value: string): string {
@@ -172,8 +223,13 @@
       const tokens = rawTokens.map(normalize).filter(Boolean);
       if (tokens.length === 0) return [];
 
+      const filteredDocs =
+        activeFilter === 'all'
+          ? docs
+          : docs.filter((doc) => doc.type === activeFilter);
+
       const scored: { doc: SearchDoc; score: number }[] = [];
-      for (const doc of docs) {
+      for (const doc of filteredDocs) {
         const fields = {
           t: normalize(doc.t),
           d: normalize(doc.d),
@@ -198,7 +254,7 @@
 
       return scored
         .sort((a, b) => b.score - a.score || a.doc.t.localeCompare(b.doc.t))
-        .slice(0, 12)
+        .slice(0, 16)
         .map((entry) => entry.doc);
     }
 
@@ -219,7 +275,17 @@
       return `${start > 0 ? '…' : ''}${source.slice(start, start + 150)}`;
     }
 
-    /** Best-effort raw-text highlighting (no length-shifting normalization). */
+    function getBadgeClass(type: string): string {
+      if (type === 'interview') {
+        return 'border border-emerald-600/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300';
+      }
+      if (type === 'cheat') {
+        return 'border border-amber-600/30 bg-amber-500/10 text-amber-700 dark:text-amber-300';
+      }
+      return 'border border-border bg-surface-2 text-muted';
+    }
+
+    /** Best-effort raw-text highlighting. */
     function appendHighlighted(parent: HTMLElement, text: string, rawTokens: string[]): void {
       const lower = text.toLowerCase();
       const ranges: [number, number][] = [];
@@ -273,26 +339,38 @@
         const link = document.createElement('a');
         link.href = doc.u;
         link.className =
-          'block rounded-md px-3 py-2.5 transition-colors hover:bg-bg focus-visible:bg-bg';
+          'block rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-border hover:bg-surface-2 focus-visible:bg-surface-2';
 
         const top = document.createElement('span');
         top.className = 'flex items-center justify-between gap-2';
 
+        const left = document.createElement('span');
+        left.className = 'flex items-center gap-2 min-w-0';
+
+        // Type Badge
+        const badge = document.createElement('span');
+        badge.className = `shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-medium ${getBadgeClass(doc.type)}`;
+        badge.textContent = doc.badge || doc.type;
+
+        // Title
         const title = document.createElement('span');
-        title.className = 'font-semibold';
+        title.className = 'font-semibold text-text truncate';
         appendHighlighted(title, doc.t, rawTokens);
 
+        left.append(badge, title);
+
+        // Context / Category Label
         const category = document.createElement('span');
-        category.className = 'shrink-0 text-xs text-muted';
+        category.className = 'shrink-0 text-xs text-muted font-mono';
         category.textContent = doc.cl;
 
-        top.append(title, category);
+        top.append(left, category);
         link.append(top);
 
         const text = snippet(doc, rawTokens);
         if (text) {
           const detail = document.createElement('span');
-          detail.className = 'mt-0.5 block truncate text-sm text-muted';
+          detail.className = 'mt-1 block truncate text-xs sm:text-sm text-muted leading-relaxed';
           appendHighlighted(detail, text, rawTokens);
           link.append(detail);
         }
@@ -328,6 +406,28 @@
       statusEl!.classList.add('hidden');
     }
 
+    // Filter Buttons Interaction
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter as 'all' | 'docs' | 'cheat' | 'interview';
+        if (!filter || filter === activeFilter) return;
+
+        activeFilter = filter;
+        filterBtns.forEach((b) => {
+          const isCurrent = b === btn;
+          b.setAttribute('aria-pressed', String(isCurrent));
+          b.classList.toggle('bg-accent/15', isCurrent);
+          b.classList.toggle('text-accent-ink', isCurrent);
+          b.classList.toggle('font-semibold', isCurrent);
+          b.classList.toggle('text-muted', !isCurrent);
+        });
+
+        if (input && input.value.trim()) {
+          runSearch(input.value);
+        }
+      });
+    });
+
     function setActive(next: number): void {
       const options = Array.from(resultsEl!.querySelectorAll<HTMLElement>('[role="option"]'));
       if (options.length === 0) return;
@@ -335,7 +435,8 @@
       options.forEach((option, i) => {
         const on = i === active;
         option.setAttribute('aria-selected', String(on));
-        option.querySelector('a')?.classList.toggle('bg-bg', on);
+        option.querySelector('a')?.classList.toggle('bg-surface-2', on);
+        option.querySelector('a')?.classList.toggle('border-accent/40', on);
         if (on) {
           input!.setAttribute('aria-activedescendant', option.id);
           option.scrollIntoView({ block: 'nearest' });
@@ -354,9 +455,6 @@
     }
 
     trigger!.addEventListener('click', openDialog);
-    // Shared API: any element marked [data-search-trigger] (e.g. the 404
-    // page's recovery action) opens this same dialog — never a second
-    // search experience.
     document.querySelectorAll<HTMLElement>('[data-search-trigger]').forEach((el) => {
       if (el !== trigger) el.addEventListener('click', openDialog);
     });
@@ -369,7 +467,7 @@
       window.clearTimeout(debounceTimer);
       debounceTimer = window.setTimeout(() => {
         void ensureIndex().then(() => runSearch(input!.value));
-      }, 120);
+      }, 100);
     });
 
     input!.addEventListener('keydown', (event) => {
@@ -384,8 +482,6 @@
         const target = active >= 0 ? current[active] : current[0];
         if (target) window.location.href = target.u;
       } else if (event.key === 'Escape') {
-        // Chrome swallows Escape on <input type="search"> (it clears the field),
-        // which would otherwise block the dialog's native cancel behavior.
         event.preventDefault();
         dialog!.close();
       }
@@ -404,7 +500,6 @@
 
     function onGlobalKeydown(event: KeyboardEvent): void {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        // Cmd+K on macOS, Ctrl+K elsewhere — always swallow the browser default.
         event.preventDefault();
         if (dialog!.open) dialog!.close();
         else openDialog();
@@ -418,7 +513,6 @@
     }
 
     document.addEventListener('keydown', onGlobalKeydown);
-    // Multi-page app: drop the listener when the page unloads/unmounts.
     window.addEventListener(
       'pagehide',
       () => document.removeEventListener('keydown', onGlobalKeydown),

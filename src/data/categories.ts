@@ -156,13 +156,6 @@ export const categories: Category[] = [
     icon: 'wrench',
     order: 14,
   },
-  {
-    id: 'cheat-sheets',
-    label: 'Cheat Sheets',
-    descriptionEn: 'Quick command references organized by purpose: Kubernetes, Git, Linux — copy-ready with short examples.',
-    icon: 'tag',
-    order: 15,
-  },
 ];
 
 /** Aliases for legacy top-level category IDs to preserve backward compatibility. */

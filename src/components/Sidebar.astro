@@ -143,7 +143,6 @@ const groups = orderedIds
                       ...toolGroup.directEntries,
                       ...toolGroup.subfolderGroups.flatMap((sg) => sg.entries),
                     ];
-                    const hasPages = allEntries.length > 0;
                     const containsCurrent = allEntries.some(
                       (d) => d.id === currentId,
                     );

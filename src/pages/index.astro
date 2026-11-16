@@ -6,6 +6,7 @@ import ArrowButton from '../components/ArrowButton.astro';
 import CategoryCard from '../components/CategoryCard.astro';
 import CategoryIcon from '../components/CategoryIcon.astro';
 import SocialIcon from '../components/SocialIcon.astro';
+import AnimatedTerminal from '../components/AnimatedTerminal.astro';
 import {
   categories,
   type CategoryStatus,
@@ -16,12 +17,11 @@ import {
   docPath,
   sortedDocs,
 } from '../utils/docs';
+import { aggregateTechQuestions } from '../utils/interview';
 
 /**
- * The homepage shows a curated subset of the documentation areas;
- * /docs keeps listing all of them. Metadata stays in `categories` —
- * this is only a selection of ids, in display order. Fundamentals is
- * intentionally omitted (the Start Here section already covers it).
+ * The homepage acts as the central Knowledge Hub landing page, introducing
+ * the three independent pillars: Docs, Cheat Sheets, and Interview Questions.
  */
 const HOMEPAGE_AREA_IDS = [
   'container-orchestration',
@@ -34,7 +34,16 @@ const homepageAreas = HOMEPAGE_AREA_IDS.flatMap((id) => {
   return category ? [category] : [];
 });
 
+// Dynamic build-time collection aggregation
 const docs = sortedDocs(await getCollection('docs', ({ data }) => !data.draft));
+const totalArticles = docs.length;
+
+const cheatSheets = await getCollection('cheatSheets', ({ data }) => !data.draft);
+const totalCheatTopics = cheatSheets.length;
+
+const interviewQuestions = await getCollection('interviewQuestions', ({ data }) => !data.draft);
+const interviewStats = aggregateTechQuestions(interviewQuestions);
+const totalInterviewQuestions = interviewStats.total;
 
 const counts = new Map<string, number>();
 for (const doc of docs) {
@@ -48,7 +57,6 @@ const fundamentalsDocs = docs.filter(
 );
 
 // Start Here: 3 curated fundamentals articles, selected by id (not index).
-// A missing id is skipped gracefully — the section still builds.
 const START_HERE_IDS = [
   'devops-fundamentals/what-is-devops',
   'devops-fundamentals/why-devops',
@@ -59,15 +67,7 @@ const startHereDocs = START_HERE_IDS.flatMap((id) => {
   return doc ? [doc] : [];
 });
 
-// Primary CTA: begin with DevOps Fundamentals when it has content, else the first
-// available topic.
-const primaryTarget = fundamentalsDocs[0] ?? docs[0];
-
-// Handbook statistics (dynamically derived)
-const totalArticles = docs.length;
-
-// Coverage & Roadmap: per-area status. A manual `status` override in
-// categories.ts wins; otherwise it is derived from the article count.
+// Coverage & Roadmap: per-area status.
 const areaRows = categories.map((category) => {
   const count = counts.get(category.id) ?? 0;
   const status: CategoryStatus =
@@ -75,7 +75,6 @@ const areaRows = categories.map((category) => {
   return { category, count, status };
 });
 
-// Display order: Published → In progress → Planned, each in canonical order.
 const STATUS_ORDER: Record<CategoryStatus, number> = {
   published: 0,
   'in-progress': 1,
@@ -87,12 +86,9 @@ const groupedAreas = [...areaRows].sort(
     a.category.order - b.category.order,
 );
 
-// Stats row — count-derived only (not affected by manual overrides).
 const publishedAreaCount = areaRows.filter((row) => row.count > 0).length;
 const plannedAreaCount = areaRows.filter((row) => row.count === 0).length;
 
-// Badge styling per status. Always rendered together with a text label so
-// status is never conveyed by color alone.
 const STATUS_BADGES: Record<CategoryStatus, { label: string; cls: string }> = {
   published: {
     label: 'Published',
@@ -108,7 +104,7 @@ const STATUS_BADGES: Record<CategoryStatus, { label: string; cls: string }> = {
   },
 };
 
-// Ecosystem strip: communicates the infrastructure toolchain, LTR like code.
+// Ecosystem strip: communicates the infrastructure toolchain
 const ecosystem = [
   { icon: 'terminal' as const, label: 'Linux' },
   { icon: 'cube' as const, label: 'Docker' },
@@ -127,71 +123,219 @@ const ecosystem = [
   <Header />
 
   <main id="main" class="mx-auto w-full max-w-screen-2xl px-4">
-    <!-- Hero -->
-    <section class="max-w-2xl pt-14 pb-12 sm:pt-20">
-      <h1 class="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-        Ops Handbook
-      </h1>
+    <!-- Knowledge Hub Hero -->
+    <section class="pt-12 pb-10 sm:pt-16 sm:pb-14">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <!-- Left: Hero Text, Metrics & Ecosystem (6 cols on lg) -->
+        <div class="lg:col-span-6 max-w-xl">
+          <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-accent-ink">
+            <span>DevOps Knowledge Hub</span>
+          </div>
 
-      <p
-        class="mt-5 text-xl font-medium leading-snug text-text text-balance"
-      >
-        Your structured DevOps knowledge base — from fundamentals to production.
-      </p>
+          <h1 class="text-3xl font-semibold leading-tight tracking-tight sm:text-5xl text-text">
+            Ops Handbook
+          </h1>
 
-      <p class="mt-3 leading-relaxed text-muted">
-        Notes, hands-on labs, diagrams, and command references, organized for learning
-        and quick lookup.
-      </p>
+          <p class="mt-4 text-xl font-medium leading-snug text-text text-balance sm:text-2xl">
+            An engineering knowledge base for DevOps, systems, and cloud infrastructure.
+          </p>
 
-      <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-        {
-          primaryTarget && (
-            <a
-              href={docPath(primaryTarget.id)}
-              class="rounded-full bg-accent-fill px-5 py-2.5 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90"
-            >
-              Start with the fundamentals
-            </a>
-          )
-        }
-        <ArrowButton href="/docs" label="Browse the documentation" />
+          <p class="mt-3 text-base leading-relaxed text-muted max-w-xl">
+            Organized into three independent pillars: deep technical documentation, fast command cheat sheets, and structured technical interview preparation.
+          </p>
+
+          <!-- Dynamic Knowledge Hub Metrics (Calculated at build time) -->
+          <div class="mt-6 flex flex-wrap items-center gap-2.5 text-xs font-mono">
+            <span class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-text shadow-2xs">
+              <span class="h-2 w-2 rounded-full bg-accent"></span>
+              <strong class="font-bold text-accent-ink">{totalArticles}</strong> Published Articles
+            </span>
+            <span class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-text shadow-2xs">
+              <span class="h-2 w-2 rounded-full bg-accent"></span>
+              <strong class="font-bold text-accent-ink">{totalCheatTopics}</strong> Cheat Sheet Topics
+            </span>
+            <span class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-text shadow-2xs">
+              <span class="h-2 w-2 rounded-full bg-accent"></span>
+              <strong class="font-bold text-accent-ink">{totalInterviewQuestions}</strong> Interview Questions
+            </span>
+          </div>
+
+          <!-- Technical ecosystem visual -->
+          <ul
+            class="mt-7 flex flex-wrap items-center gap-x-2 gap-y-2.5 text-muted"
+            dir="ltr"
+            aria-label="Platform technologies"
+          >
+            {
+              ecosystem.map((item, index) => (
+                <li class="flex items-center gap-2">
+                  {index > 0 && (
+                    <svg
+                      class="h-4 w-4 shrink-0 text-border"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  )}
+                  <span class="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5">
+                    <CategoryIcon name={item.icon} class="h-4 w-4 text-accent-ink" />
+                    <span class="text-xs font-medium tracking-wide" lang="en">
+                      {item.label}
+                    </span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <!-- Right: Animated Terminal (6 cols on lg) -->
+        <div class="lg:col-span-6 flex justify-center lg:justify-end w-full">
+          <AnimatedTerminal />
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Independent Pillars -->
+    <section class="border-t border-border py-12" aria-labelledby="pillars-heading">
+      <div class="mb-8">
+        <h2 id="pillars-heading" class="text-xs font-semibold uppercase tracking-wider text-muted">
+          Three Independent Pillars
+        </h2>
+        <p class="mt-1 text-xl font-bold tracking-tight text-text sm:text-2xl">
+          Choose the format that fits your immediate objective
+        </p>
       </div>
 
-      <!-- Technical ecosystem visual (monochrome, no stock images) -->
-      <ul
-        class="mt-10 flex flex-wrap items-center gap-x-2 gap-y-3 text-muted"
-        dir="ltr"
-        aria-label="Platform technologies"
-      >
-        {
-          ecosystem.map((item, index) => (
-            <li class="flex items-center gap-2">
-              {index > 0 && (
-                <svg
-                  class="h-4 w-4 shrink-0 text-border"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              )}
-              <span class="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5">
-                <CategoryIcon name={item.icon} class="h-5 w-5" />
-                <span class="text-xs font-medium tracking-wide" lang="en">
-                  {item.label}
-                </span>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <!-- Pillar A: Docs -->
+        <div class="group relative flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-all hover:border-accent/50 hover:bg-surface-2 hover:shadow-xs">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface-2 text-accent-ink">
+                <CategoryIcon name="modules" class="h-6 w-6" />
+              </div>
+              <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-mono font-semibold text-accent-ink">
+                {totalArticles} Articles
               </span>
-            </li>
-          ))
-        }
-      </ul>
+            </div>
+
+            <h3 class="text-lg font-bold text-text group-hover:text-accent-ink transition-colors">
+              Docs
+            </h3>
+            <p class="mt-2 text-sm text-text-body font-medium leading-relaxed">
+              Deep learning, technical explanations, and structured documentation.
+            </p>
+            <p class="mt-2 text-xs text-muted leading-relaxed">
+              Comprehensive architectural guides, core fundamentals, production setup, and operational best practices.
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-1.5 text-[11px] font-mono text-muted">
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Architecture</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Kubernetes</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Linux</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Networking</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-border/70">
+            <a
+              href="/docs"
+              class="inline-flex w-full items-center justify-between rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent hover:text-white dark:hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <span>Explore Documentation</span>
+              <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Pillar B: Cheat Sheets -->
+        <div class="group relative flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-all hover:border-accent/50 hover:bg-surface-2 hover:shadow-xs">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface-2 text-accent-ink">
+                <CategoryIcon name="terminal" class="h-6 w-6" />
+              </div>
+              <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-mono font-semibold text-accent-ink">
+                {totalCheatTopics} Topics
+              </span>
+            </div>
+
+            <h3 class="text-lg font-bold text-text group-hover:text-accent-ink transition-colors">
+              Cheat Sheets
+            </h3>
+            <p class="mt-2 text-sm text-text-body font-medium leading-relaxed">
+              Quick lookup, commands, configurations, and practical references.
+            </p>
+            <p class="mt-2 text-xs text-muted leading-relaxed">
+              Scannable command tables with one-click copy, real-world examples, and when-to-use guidance for fast troubleshooting.
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-1.5 text-[11px] font-mono text-muted">
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Kubernetes CLI</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Git Workflows</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">GitHub CLI</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-border/70">
+            <a
+              href="/cheat-sheets"
+              class="inline-flex w-full items-center justify-between rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent hover:text-white dark:hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <span>Explore Cheat Sheets</span>
+              <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Pillar C: Interview Questions -->
+        <div class="group relative flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-all hover:border-accent/50 hover:bg-surface-2 hover:shadow-xs">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface-2 text-accent-ink">
+                <CategoryIcon name="wheel" class="h-6 w-6" />
+              </div>
+              <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-mono font-semibold text-accent-ink">
+                {totalInterviewQuestions} Questions
+              </span>
+            </div>
+
+            <h3 class="text-lg font-bold text-text group-hover:text-accent-ink transition-colors">
+              Interview Questions
+            </h3>
+            <p class="mt-2 text-sm text-text-body font-medium leading-relaxed">
+              Technical interview preparation, understanding concepts, and testing knowledge.
+            </p>
+            <p class="mt-2 text-xs text-muted leading-relaxed">
+              Two-stage answer reveal, concise summaries for rapid recall, deep mechanics, candidate pitfalls, and follow-up questions.
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-1.5 text-[11px] font-mono text-muted">
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Control Plane</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Linux Inodes</span>
+              <span class="rounded bg-surface-2 px-1.5 py-0.5">Git Internals</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-border/70">
+            <a
+              href="/interview-questions"
+              class="inline-flex w-full items-center justify-between rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent hover:text-white dark:hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <span>Explore Interview Questions</span>
+              <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Start Here: Fundamentals Learning Sequence -->

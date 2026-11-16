@@ -3,8 +3,10 @@ import ThemeToggle from './ThemeToggle.astro';
 import Search from './Search.astro';
 import SocialIcon from './SocialIcon.astro';
 
-/** Highlight the "Docs" nav link on documentation routes. */
-const isDocs = Astro.url.pathname.startsWith('/docs');
+const pathname = Astro.url.pathname;
+const isDocs = pathname.startsWith('/docs');
+const isCheatSheets = pathname.startsWith('/cheat-sheets');
+const isInterview = pathname.startsWith('/interview-questions');
 ---
 
 <header
@@ -13,7 +15,7 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
 >
   <div class="mx-auto flex h-14 max-w-screen-2xl items-center gap-3 px-4 sm:gap-4">
     <!-- Left: logo + primary nav -->
-    <div class="flex min-w-0 flex-1 items-center gap-3">
+    <div class="flex min-w-0 items-center gap-3 lg:gap-5">
       <a
         href="/"
         class="flex shrink-0 items-center gap-2.5 font-semibold tracking-tight transition-opacity hover:opacity-75 motion-reduce:transition-none"
@@ -42,25 +44,54 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
         <span class="hidden sm:inline">Ops Handbook</span>
       </a>
 
-      <nav aria-label="Main navigation" class="hidden sm:block">
+      <!-- Desktop Primary Nav: 3 Core Pillars -->
+      <nav aria-label="Main navigation" class="hidden md:flex items-center gap-1">
         <a
           href="/docs"
           aria-current={isDocs ? 'page' : undefined}
-          class="docs-link nav-link rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
+          class:list={[
+            'nav-pill rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+            isDocs
+              ? 'bg-accent/15 text-accent-ink font-semibold'
+              : 'text-muted hover:bg-surface-2 hover:text-text',
+          ]}
         >
           Docs
+        </a>
+        <a
+          href="/cheat-sheets"
+          aria-current={isCheatSheets ? 'page' : undefined}
+          class:list={[
+            'nav-pill rounded-full px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap',
+            isCheatSheets
+              ? 'bg-accent/15 text-accent-ink font-semibold'
+              : 'text-muted hover:bg-surface-2 hover:text-text',
+          ]}
+        >
+          Cheat Sheets
+        </a>
+        <a
+          href="/interview-questions"
+          aria-current={isInterview ? 'page' : undefined}
+          class:list={[
+            'nav-pill rounded-full px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap',
+            isInterview
+              ? 'bg-accent/15 text-accent-ink font-semibold'
+              : 'text-muted hover:bg-surface-2 hover:text-text',
+          ]}
+        >
+          Interview Questions
         </a>
       </nav>
     </div>
 
-    <!-- Center: search — grows with the viewport, capped, centered between
-         the left and right regions (equal flex on both sides). -->
-    <div class="mx-auto flex min-w-0 flex-1 justify-center max-w-[32rem] sm:block">
+    <!-- Center: search — grows with the viewport, capped, centered -->
+    <div class="mx-auto flex min-w-0 flex-1 justify-center max-w-[28rem] sm:block">
       <Search />
     </div>
 
     <!-- Right: actions -->
-    <div class="flex flex-1 items-center justify-end gap-2">
+    <div class="flex items-center justify-end gap-2 shrink-0">
       <a
         href="https://github.com/mustafammasoud/ops-handbook"
         target="_blank"
@@ -73,6 +104,48 @@ const isDocs = Astro.url.pathname.startsWith('/docs');
       </a>
       <ThemeToggle />
     </div>
+  </div>
+
+  <!-- Mobile Section Nav Strip: 1-tap accessible navigation without modal friction -->
+  <div class="border-t border-border/60 bg-surface/80 px-3 py-1.5 md:hidden">
+    <nav aria-label="Mobile section navigation" class="flex items-center justify-between gap-1 text-xs">
+      <a
+        href="/docs"
+        aria-current={isDocs ? 'page' : undefined}
+        class:list={[
+          'flex-1 text-center rounded-lg py-1.5 px-2 font-medium transition-colors',
+          isDocs
+            ? 'bg-accent/15 text-accent-ink font-semibold'
+            : 'text-muted hover:bg-surface-2 hover:text-text',
+        ]}
+      >
+        Docs
+      </a>
+      <a
+        href="/cheat-sheets"
+        aria-current={isCheatSheets ? 'page' : undefined}
+        class:list={[
+          'flex-1 text-center rounded-lg py-1.5 px-2 font-medium transition-colors',
+          isCheatSheets
+            ? 'bg-accent/15 text-accent-ink font-semibold'
+            : 'text-muted hover:bg-surface-2 hover:text-text',
+        ]}
+      >
+        Cheat Sheets
+      </a>
+      <a
+        href="/interview-questions"
+        aria-current={isInterview ? 'page' : undefined}
+        class:list={[
+          'flex-1 text-center rounded-lg py-1.5 px-2 font-medium transition-colors',
+          isInterview
+            ? 'bg-accent/15 text-accent-ink font-semibold'
+            : 'text-muted hover:bg-surface-2 hover:text-text',
+        ]}
+      >
+        Interview Questions
+      </a>
+    </nav>
   </div>
 </header>
 
