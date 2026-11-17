@@ -2,49 +2,48 @@
 title: Git Rebase & Cherry-Pick
 technology: git
 topic: rebasing
-description: إعادة ترتيب الالتزامات، دمج السجلات تفاعليًا (Squash)، ونقل commits محددة عبر الفروع.
+description: Reorder commits, merge records interactively (Squash), and move specific commits across branches.
 order: 5
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Rebasing and Cherry-Picking
-
-<Callout type="warning" title="القاعدة الذهبية للـ Rebase">
-لا تقم بعمل Rebase على فروع عامة مشتركة تم رفعها ودفعها بالفعل للآخرين (`public branches`). استخدمه فقط على فروعك المحلية الخاصة قبل دمجها.
+<Callout type="warning" title="The Golden Rule of Rebase">
+Do not rebase on shared public branches that have already been lifted and pushed to others (`public branches`). Use it only on your own local branches before merging them.
 </Callout>
 
 <CheatSheet
   rows={[
     {
       command: 'git rebase <branch>',
-      does: 'يعيد تطبيق commits الفرع الحالي فوق قمة الفرع المستهدف لتاريخ خطي نظيف',
-      when: 'لتحديث فرع الميزة بآخر تعديلات main بدون إنشاء merge commit إضافي',
+      does: 'commits reverts the current branch above the top of the target branch for a clean linear history',
+      when: 'to update the feature branch with the latest main modifications without creating an additional merge commit',
       example: 'git rebase origin/main',
     },
     {
-      command: 'git rebase -i HEAD~3',
-      does: 'إعادة هيكلة تفاعلية لآخر 3 commits (تعديل الرسائل، دمج squash، أو حذف)',
-      when: 'لتنظيف وترتيب تاريخ التعديلات قبل إنشاء Pull Request',
+command: 'git rebase -i HEAD~3',
+      does: 'Interactive refactoring of the last 3 commits (modify messages, squash, or delete)',
+      when: 'to clean up and organize the modification history before creating a Pull Request',
       example: 'git rebase -i HEAD~3',
     },
     {
       command: 'git rebase --continue',
-      does: 'يتابع عملية Rebase بعد حل التعارضات في الخطوة الحالية',
-      when: 'بعد حل تعارض ملف وإضافته بـ git add',
+      does: 'Continues the Rebase operation after resolving conflicts in the current step',
+      when: 'After resolving a file conflict and adding it with git add',
       example: 'git rebase --continue',
     },
     {
       command: 'git rebase --abort',
-      does: 'يلغي عملية Rebase الحالية بالكامل ويعود للحالة الأصلية السابقة',
-      when: 'عند مواجهة تعارضات لا ترغب في حلها الآن',
+does: 'Cancels the current Rebase operation completely and returns to the previous original state',
+      when: 'When you encounter conflicts that you do not want to resolve right now',
       example: 'git rebase --abort',
     },
     {
       command: 'git cherry-pick <hash>',
-      does: 'يطبّق تغيير commit محدد من فرع آخر على الفرع الحالي دون دمج كامل الفرع',
-      when: 'لنقل إصلاح عاجل (Hotfix) من فرع التطوير إلى فرع الإنتاج',
+      does: 'Commits a specific commit change from another branch to the current branch without merging the entire branch',
+      when: 'to move a hotfix from the development branch to the production branch',
       example: 'git cherry-pick a1b2c3d',
     },
   ]}

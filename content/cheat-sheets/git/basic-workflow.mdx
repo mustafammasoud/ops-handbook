@@ -2,66 +2,66 @@
 title: Git Staging & Commits
 technology: git
 topic: basic-workflow
-description: دورة العمل اليومية، تجهيز التغييرات (Staging)، وفحص الحالة وفروق التعديلات.
+description: Daily work cycle, staging, checking status and variances of modifications.
 order: 2
 draft: false
-language: ar
+language: en
 ---
 
 
-## 1. Most Used Commands
+## 1. Most used commands
 
 <CheatSheet
   rows={[
     {
       command: 'git status',
-      does: 'يعرض حالة الـ Working Tree والـ Staging Area والملفات المعدلة',
-      when: 'قبل كل عملية commit أو بعد إجراء تعديلات',
+does: 'Displays the status of the Working Tree, Staging Area, and modified files',
+      when: 'Before each commit or after modifications',
       example: 'git status',
     },
     {
       command: 'git status -s',
-      does: 'يعرض حالة الملفات بصيغة مدمجة مختصرة',
-      when: 'عند تعديل عدد كبير من الملفات وتفضيل قائمة سريعة',
+      does: 'Displays the status of files in a compressed, compact format',
+      when: 'When editing a large number of files and preferring a quick list',
       example: 'git status -s',
     },
     {
       command: 'git diff',
-      does: 'يعرض التغييرات غير المجهّزة (بين Working Tree و Staging Area)',
-      when: 'لمراجعة التعديلات قبل عمل git add',
+      does: 'Displays unprocessed changes (between Working Tree and Staging Area)',
+      when: 'to review modifications before git add',
       example: 'git diff',
     },
     {
-      command: 'git diff --cached',
-      does: 'يعرض التغييرات المجهّزة فقط في Staging Area الجاهزة للـ commit',
-      when: 'لمراجعة ما سيدخل فعليًا في الـ commit التالي',
+command: 'git diff --cached',
+      does: 'Only displays ready-to-commit changes in the Staging Area ready to commit',
+      when: 'to review what will actually go into the next commit',
       example: 'git diff --cached',
     },
     {
       id: 'git-add-file',
       command: 'git add <file>',
-      does: 'يجهز ملفًا محددًا إلى Staging Area',
-      when: 'لتجهيز ملف معين بدقة وتجنب إدخال كل التغييرات دفعة واحدة',
+      does: 'Prepare a selected file to the Staging Area',
+      when: 'to prepare a specific file precisely and avoid making all the changes at once',
       example: 'git add src/index.ts',
     },
     {
       id: 'git-add-all',
       command: 'git add .',
-      does: 'يجهز كل التغييرات في المسار الحالي والمجلدات الفرعية',
-      when: 'لتجهيز كل التعديلات المراجعة دفعة واحدة',
-      example: 'git add .',
+      does: 'Prepare all changes to the current path and subfolders',
+      when: 'to process all review edits at once',
+example: 'git add .',
     },
     {
       id: 'git-add-patch',
       command: 'git add -p',
-      does: 'تجهيز تفاعلي يتيح مراجعة واختيار أجزاء محددة (Hunks) من الملف',
-      when: 'عند وجود تعديلات متعددة في ملف وتريد تقسيمها على عدة commits',
+      does: 'An interactive installation that allows reviewing and selecting specific parts (Hunks) of the file',
+      when: 'When there are multiple edits in a file and you want to split them over multiple commits',
       example: 'git add -p src/app.js',
     },
     {
       command: 'git commit -m "msg"',
-      does: 'يسجل Snapshot جديدة للتغييرات المجهزة برسالة واضحة',
-      when: 'بعد الانتهاء من ميزة أو تعديل منطقي مستقل',
+      does: 'Records a new Snapshot of changes equipped with a clear message',
+      when: 'After completion of a standalone logical feature or modification',
       example: 'git commit -m "feat: add user authentication"',
     },
   ]}

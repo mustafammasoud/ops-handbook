@@ -2,68 +2,67 @@
 title: Git Undoing Changes & Recovery
 technology: git
 topic: undoing
-description: التراجع عن التعديلات غير المحفوظة، إعادة ضبط الفروع (soft, mixed, hard)، إلغاء الالتزامات بأمان، واستعادة المفقود عبر reflog.
+description: Undo unsaved modifications, reset branches (soft, mixed, hard), safely undo commits, and restore lost ones via reflog.
 order: 6
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Undoing Changes
 
-<Callout type="warning" title="أوامر خطرة تستوجب الحذر">
-- `git reset --hard` يمسح التغييرات المحلية نهائيًا؛ البديل الآمن: `git revert` أو `git reset --mixed` للحفاظ على ملفاتك.
-- `git commit --amend` يعيد كتابة الـ commit الأخير؛ لا تستخدمه إذا كان الـ commit قد رُفع بالفعل إلى remote مشترك.
+<Callout type="warning" title="Dangerous commands that require caution">
+- `git reset --hard` permanently erases local changes; Safe alternative: `git revert` or `git reset --mixed` to keep your files.
+- `git commit --amend` rewrites the last commit; Do not use it if the commit has already been pushed to a remote shared.
 </Callout>
-
 <CheatSheet
   rows={[
     {
       command: 'git restore <file>',
-      does: 'يلغي تعديلات غير مجهزة (unstaged) في الملف ويعيده لآخر commit',
-      when: 'للتراجع عن تجربة غير ناجحة في ملف معين',
+      does: 'Cancels unstaged modifications in the file and returns it to the last commit',
+      when: 'to undo an unsuccessful attempt on a specific file',
       example: 'git restore src/app.js',
     },
     {
       command: 'git restore --staged <file>',
-      does: 'يزيل الملف من Staging Area مع الاحتفاظ بالتعديلات في الملف محليًا',
-      when: 'عند إضافة ملف بـ git add عن طريق الخطأ وتريد إلغاء تجهيزه',
+      does: 'Removes the file from the Staging Area while keeping modifications to the file locally',
+      when: 'When you added a file with git add by mistake and want to unprepare it',
       example: 'git restore --staged src/secret.env',
     },
     {
       command: 'git reset --soft HEAD~1',
-      does: 'يرجع commit واحد للخلف مع الاحتفاظ بالتغييرات مجهزة في Staging',
-      when: 'لتعديل رسالة أو إضافة ملف إلى commit تم حفظه محليًا للتو',
-      example: 'git reset --soft HEAD~1',
+      does: 'Goes one commit back while keeping the changes stored in Staging',
+      when: 'To edit a message or add a file to commit that was just saved locally',
+example: 'git reset --soft HEAD~1',
     },
     {
       command: 'git reset --mixed HEAD~1',
-      does: 'يرجع commit واحد للخلف ويعيد الملفات إلى Working Tree غير مجهزة (افتراضي)',
-      when: 'لتفكيك commit وإعادة تجهيزه بطريقة أخرى',
+      does: 'One commit goes back and returns files to the unequipped Working Tree (default)',
+      when: 'to dismantle commit and reconfigure it another way',
       example: 'git reset --mixed HEAD~1',
     },
     {
       command: 'git reset --hard HEAD~1',
-      does: 'يحرك الفرع للخلف ويمسح كل التغييرات من Index و Working Tree (خطير)',
-      when: 'للتخلص تمامًا من آخر commit وتغييراته للأبد',
+      does: 'Moves the branch back and clears all changes from Index and Working Tree (dangerous)',
+      when: 'to completely delete the last commit and its changes forever',
       example: 'git reset --hard HEAD~1',
     },
     {
       command: 'git revert <commit>',
-      does: 'ينشئ commit جديد يعكس ويلغي تأثير commit سابق بأمان تام',
-      when: 'لإلغاء تغيير موجود على فرع عام مشترك دون إعادة كتابة التاريخ',
-      example: 'git revert a1b2c3d',
+      does: 'Creates a new commit that safely reverses and undoes the effect of a previous commit',
+      when: 'to undo an existing change on a shared public branch without rewriting history',
+example: 'git revert a1b2c3d',
     },
     {
       command: 'git commit --amend -m "new msg"',
-      does: 'يستبدل آخر commit محلي برسالة جديدة أو يدمج الملفات المجهزة حديثًا',
-      when: 'لتصحيح خطأ إملائي في رسالة الالتزام الأخيرة أو إضافة ملف نسيته',
+      does: 'Replaces the last local commit with a new message or merges newly prepared files',
+      when: 'To correct a typo in the last commit message or add a file you forgot',
       example: 'git commit --amend -m "docs: clarify recovery steps"',
     },
     {
       command: 'git reflog -10',
-      does: 'يعرض سجل تحركات مؤشر HEAD لاستعادة commits أو فروع تم حذفها',
-      when: 'شبكة أمان لاسترجاع كود مفقود بعد reset خاطئ أو rebase متعثر',
+      does: 'Displays the history of the HEAD cursor movement for recovering deleted commits or branches',
+      when: 'A safety net for recovering a lost code after a wrong reset or failed rebase',
       example: 'git reflog -10',
     },
   ]}

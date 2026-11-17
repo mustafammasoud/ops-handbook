@@ -2,56 +2,56 @@
 title: GitHub Forks & Open Source
 technology: github
 topic: forks
-description: استنساخ الشُعَب (Forks)، ربط المستودع الأصلي (Upstream)، ومزامنة التحديثات للمساهمة في المشاريع مفتوحة المصدر.
+description: Cloning forks, linking to the original repository (Upstream), and synchronizing updates to contribute to open source projects.
 order: 4
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Forking & Upstream Synchronization
 
-<Callout type="note" title="قاعدة الـ Fast-Forward مع Upstream">
-استخدم `git merge --ff-only upstream/main` على فرع `main` المحلي لضمان عدم وجود تباين أو التزامات محلية تعيق التحديث النظيف من المستودع الأصلي.
+<Callout type="note" title="Fast-Forward with Upstream">
+Use `git merge --ff-only upstream/main` on your local `main` branch to ensure there are no discrepancies or local commits getting in the way of a clean update from the original repository.
 </Callout>
 
 <CheatSheet
   rows={[
     {
       command: 'git clone <fork-url>',
-      does: 'ينسخ مستودع الـ Fork الخاص بحسابك إلى جهازك المحلي',
-      when: 'بعد عمل Fork لأي مشروع على GitHub والبدء في إعداده محليًا',
+      does: 'Copies the fork repository from your account to your local machine',
+      when: 'After forking any project on GitHub and starting to set it up locally',
       example: 'git clone git@github.com:YOUR_USERNAME/PROJECT.git',
     },
     {
       command: 'git remote add upstream <url>',
-      does: 'يضيف رابط المستودع الأصلي للمشروع باسم upstream للرجوع إليه',
-      when: 'لمزامنة التغييرات القادمة من المشروع الأصلي مستقبلاً',
+      does: 'Adds the link to the original repository of the project as upstream for reference',
+      when: 'to synchronize changes coming from the original project in the future',
       example: 'git remote add upstream https://github.com/ORIGINAL_OWNER/PROJECT.git',
-    },
+},
     {
       command: 'git fetch upstream',
-      does: 'يجلب جميع الفروع والالتزامات الجديدة من المستودع الأصلي دون دمجها',
-      when: 'قبل البدء في عمل جديد أو قبل مزامنة الفرع الرئيسي',
+      does: 'Fetches all new branches and commits from the original repository without merging them',
+      when: 'Before starting a new job or before synchronizing the master branch',
       example: 'git fetch upstream',
     },
     {
       command: 'git merge --ff-only upstream/main',
-      does: 'يقدم مؤشر الفرع المحلي إلى أحدث التزام في المستودع الأصلي دون إنشاء commit دمج',
-      when: 'لتحديث فرع main المحلي ليتطابق تمامًا مع المستودع الأصلي',
+      does: 'Advance the local branch pointer to the most recent commit in the original repository without creating a commit merge',
+      when: 'to update the local main branch to exactly match the original repository',
       example: 'git merge --ff-only upstream/main',
     },
     {
       command: 'git push origin main',
-      does: 'يرفع التحديثات المأخوذة من upstream إلى مستودع الـ Fork الخاص بك على GitHub',
-      when: 'للحفاظ على تزامن فرع main في نسختك السحابية مع الأصل',
+does: 'Uploads updates taken from the upstream to your fork repository on GitHub',
+      when: 'to keep the master branch in your cloud copy in sync with the original',
       example: 'git push origin main',
     },
     {
       command: 'git push origin feature-branch',
-      does: 'يرفع فرع التعديلات الجديد إلى الـ Fork تمهيدًا لفتح PR نحو المشروع الأصلي',
-      when: 'بعد الانتهاء من تجهيز ميزة أو إصلاح للمساهمة',
-      example: 'git push -u origin feature-fix-typo',
+      does: 'The new modifications branch is uploaded to the fork in preparation for opening PR to the original project',
+      when: 'After you finish preparing a feature or fix to contribute',
+      example: 'git push -u origin feature-fix-type',
     },
   ]}
 />

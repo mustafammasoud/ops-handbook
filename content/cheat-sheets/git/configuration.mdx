@@ -2,43 +2,43 @@
 title: Git Setup & Configuration
 technology: git
 topic: configuration
-description: إعداد Git للمرة الأولى، التحقق من الإصدار، ضبط الاسم والبريد، وبدء أو استنساخ المستودعات.
+description: Set up Git for the first time, check the version, set name and mail, and start or clone repositories.
 order: 1
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Setup and Configuration
 
-<Callout type="tip" title="نصيحة للإعداد">
-اضبط إعداداتك العامة (`--global`) مرة واحدة على جهازك، ويمكنك تجاوزها داخل مستودع معين بدون `--global`.
+<Callout type="tip" title="Setup tip">
+Set your global settings (`--global`) once on your device, and you can override them within a specific repository without `--global`.
 </Callout>
 
 <CheatSheet
-  rows={[
+rows={[
     {
       command: 'git --version',
-      does: 'يتحقق من تثبيت Git ورقم الإصدار الحالي',
-      when: 'بعد التثبيت أو للتأكد من دعم ميزات معينة',
+      does: 'Checks Git installation and current version number',
+      when: 'After installation or to ensure certain features are supported',
       example: 'git --version',
     },
     {
       command: 'git config --global user.name "Your Name"',
-      does: 'يعرض أو يضبط اسم الكاتب المرتبط بكل commits',
-      when: 'عند إعداد بيئة التطوير لأول مرة',
+      does: 'displays or sets the author name associated with all commits',
+      when: 'When setting up the development environment for the first time',
       example: 'git config --global user.name "Mustafa Masoud"',
     },
     {
       command: 'git config --global user.email "you@example.com"',
-      does: 'يعرض أو يضبط البريد الإلكتروني للمؤلف',
-      when: 'لربط مساهماتك بحساب GitHub',
+      does: 'Displays or sets the author email address',
+      when: 'to link your contributions to your GitHub account',
       example: 'git config --global user.email "dev@example.com"',
-    },
+},
     {
       command: 'git config --list --show-origin',
-      does: 'يعرض جميع الإعدادات المطبقة مع مسار كل ملف إعداد',
-      when: 'لتتبع تضارب الإعدادات بين System وGlobal وLocal',
+      does: 'Displays all applied settings along with the path to each setting file',
+      when: 'to track settings conflicts between System, Global and Local',
       example: 'git config --list --show-origin',
     },
   ]}
@@ -52,20 +52,20 @@ language: ar
   rows={[
     {
       command: 'git init',
-      does: 'يبدأ Repository محلي جديد ويجهز مجلد .git',
-      when: 'عند بدء مشروع جديد من الصفر محليًا',
+does: 'Starts a new local Repository and prepares the .git folder',
+      when: 'When starting a new project from scratch locally',
       example: 'mkdir my-app && cd my-app && git init',
     },
     {
       command: 'git clone <url>',
-      does: 'ينسخ Repository موجود محليًا مع كامل تاريخ التغييرات',
-      when: 'لتنزيل مشروع من GitHub أو خادم remote',
+      does: 'Copy a locally existing Repository with the full history of changes',
+      when: 'to download a project from GitHub or remote server',
       example: 'git clone https://github.com/user/repo.git',
     },
     {
       command: 'git clone --depth 1 <url>',
-      does: 'استنساخ سطحي (Shallow Clone) لآخر commit فقط لتوفير الوقت والمساحة',
-      when: 'في خطوط CI/CD أو للتحميل السريع للمشاريع الضخمة',
+      does: 'Shallow clone to the last commit just to save time and space',
+      when: 'In CI/CD pipelines or for quick loading of large projects',
       example: 'git clone --depth 1 git@github.com:user/repo.git',
     },
   ]}

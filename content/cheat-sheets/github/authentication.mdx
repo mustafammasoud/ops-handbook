@@ -2,55 +2,55 @@
 title: GitHub Authentication & SSH
 technology: github
 topic: authentication
-description: اختبار اتصال SSH مع GitHub، تبديل بروتوكول المستودع بين HTTPS وSSH، وتسجيل الدخول عبر GitHub CLI.
+description: Test SSH connectivity with GitHub, switch repository protocol between HTTPS and SSH, and log in via the GitHub CLI.
 order: 1
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Authentication and SSH Configuration
 
-<Callout type="tip" title="تفضيل مفاتيح SSH">
-يوصى دائمًا باستخدام مفاتيح SSH (نوع Ed25519) لتفادي طلب كلمات المرور والتوكنات المتكررة عند الدفع والجلب.
+<Callout type="tip" title="Prefer SSH keys">
+It is always recommended to use SSH keys (type Ed25519) to avoid requesting duplicate passwords and tokens when pushing and fetching.
 </Callout>
 
 <CheatSheet
   rows={[
     {
       command: 'ssh -T git@github.com',
-      does: 'يختبر اتصال مفتاح SSH المحلي مع خوادم GitHub ويتأكد من التعرف على حسابك',
-      when: 'بعد توليد أو إضافة مفتاح SSH جديد في إعدادات GitHub',
+      does: 'Tests the connection from your local SSH key to GitHub and confirms that your account is recognized',
+      when: 'After generating or adding a new SSH key in GitHub settings',
       example: 'ssh -T git@github.com',
     },
     {
       command: 'git remote set-url origin <url>',
-      does: 'يغيّر عنوان الـ remote المسجل (مثل التبديل من HTTPS إلى SSH)',
-      when: 'للتحويل إلى مصادقة SSH وتفادي طلب Personal Access Token',
+      does: 'Change the registered remote address (eg switching from HTTPS to SSH)',
+      when: 'to switch to SSH authentication and avoid the Personal Access Token request',
       example: 'git remote set-url origin git@github.com:OWNER/REPO.git',
-    },
+},
     {
       command: 'git remote add origin <url>',
-      does: 'يربط المستودع المحلي بمستودع بعيد جديد على GitHub',
-      when: 'عند رفع مستودع محلي جديد للمرة الأولى',
+      does: 'Links the local repository to a new remote repository on GitHub',
+      when: 'When a new local repository is uploaded for the first time',
       example: 'git remote add origin git@github.com:OWNER/REPO.git',
     },
     {
       command: 'gh auth login',
-      does: 'يبدأ معالج تفاعلي لتسجيل الدخول إلى حساب GitHub عبر المتصفح أو التوكن',
-      when: 'عند إعداد أداة GitHub CLI لأول مرة على جهازك',
+      does: 'Starts an interactive wizard to log in to your GitHub account via browser or token',
+      when: 'When setting up the GitHub CLI for the first time on your machine',
       example: 'gh auth login',
     },
     {
       command: 'gh auth status',
-      does: 'يعرض حالة تسجيل الدخول واسم المستخدم والبروتوكول المستخدم في GitHub CLI',
-      when: 'للتحقق من صلاحية الجلسة والحساب النشط حاليًا',
+does: 'Displays the login status, username, and protocol used in the GitHub CLI',
+      when: 'to check the validity of the session and currently active account',
       example: 'gh auth status',
     },
     {
       command: 'gh auth refresh -s <scope>',
-      does: 'يحدث صلاحيات الجلسة لإضافة نطاقات جديدة (مثل صلاحية workflow أو write:packages)',
-      when: 'عند رفض أمر بسبب نقص في صلاحيات التوكن',
+      does: 'Update session permissions to add new scopes (such as workflow or write:packages permissions)',
+      when: 'When an order is rejected due to a lack of token permissions',
       example: 'gh auth refresh -s workflow',
     },
   ]}

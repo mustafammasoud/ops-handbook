@@ -2,78 +2,78 @@
 title: Git Branching & Merging
 technology: git
 topic: branching-merging
-description: إدارة الفروع المحلية والبعيدة، الانتقال بينها، والدمج، وإلغاء عمليات الدمج الجارية.
+description: Managing local and remote branches, moving between them, merging, and canceling ongoing mergers.
 order: 4
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Branching and Merging Commands
 
-<Callout type="tip" title="نصيحة لتسمية الفروع">
-استخدم بادئات توضيحية للفروع مثل `feature/` للميزات، و`fix/` للإصلاحات، و`refactor/` لتسهيل التعرف عليها.
+<Callout type="tip" title="Tip for naming branches">
+Use branch prefixes such as `feature/` for features, `fix/` for fixes, and `refactor/` to make them easier to identify.
 </Callout>
 
 <CheatSheet
   rows={[
     {
-      id: 'git-branch-list',
+id: 'git-branch-list',
       command: 'git branch',
-      does: 'يعرض قائمة الفروع المحلية مع تمييز الفرع النشط بنجمة',
-      when: 'لمعرفة الفروع المتاحة وتحديد أين تقف حاليًا',
+      does: 'Displays a list of local branches with the active branch marked with a star',
+      when: 'to see which branches are available and determine where you currently stand',
       example: 'git branch',
     },
     {
       id: 'git-branch-all',
       command: 'git branch -a',
-      does: 'يعرض كل الفروع المحلية والبعيدة (Remote Tracking Branches)',
-      when: 'للتحقق من الفروع المرفوعة على GitHub',
+      does: 'Displays all local and remote branches (Remote Tracking Branches)',
+      when: 'to check branches uploaded to GitHub',
       example: 'git branch -a',
     },
     {
       id: 'git-branch-create',
       command: 'git branch <name>',
-      does: 'ينشئ فرعًا جديدًا دون الانتقال إليه',
-      when: 'لتحضير فرع لمهمة قادمة',
+      does: 'Creates a new branch without moving to it',
+      when: 'to prepare a branch for an upcoming task',
       example: 'git branch feature/auth',
     },
-    {
+{
       command: 'git switch <branch>',
-      does: 'ينتقل إلى فرع موجود مسبقًا',
-      when: 'للتبديل بين المهام المختلفة',
+      does: 'Moves to a pre-existing branch',
+      when: 'to switch between different tasks',
       example: 'git switch main',
     },
     {
       command: 'git switch -c <name>',
-      does: 'ينشئ فرعًا جديدًا وينتقل إليه فورًا في خطوة واحدة',
-      when: 'لبدء ميزة جديدة أو إصلاح عاجل',
+      does: 'Creates a new branch and jumps to it immediately in one step',
+      when: 'to start a new feature or hotfix',
       example: 'git switch -c fix/login-validation',
     },
     {
       command: 'git merge <branch>',
-      does: 'يدمج الفرع المحدد في الفرع النشط حاليًا',
-      when: 'لدمج التغييرات بعد الانتهاء من الميزة واختبارها',
+      does: 'Merge the selected branch into the currently active branch',
+      when: 'to merge changes after the feature is finished and tested',
       example: 'git merge feature/auth',
     },
     {
       command: 'git merge --abort',
-      does: 'يلغي عملية الدمج الجارية ويعيد الفرع لحالته قبل بدء الدمج',
-      when: 'عند ظهور تعارضات معقدة والرغبة في البدء من جديد بأمان',
+does: 'Cancels the ongoing merge and returns the branch to its state before the merge started',
+      when: 'When complex conflicts arise and you want to start over safely',
       example: 'git merge --abort',
     },
     {
       id: 'git-branch-delete',
       command: 'git branch -d <name>',
-      does: 'يحذف فرعًا محليًا بأمان نسبي (فقط إذا كان مدمجًا بالفعل)',
-      when: 'لتنظيف الفروع بعد الانتهاء من دمجها في main',
+      does: 'Deletes a local branch safely when it has already been merged',
+      when: 'to clean up branches after merging them into main',
       example: 'git branch -d feature/auth',
     },
     {
       id: 'git-branch-force-delete',
       command: 'git branch -D <name>',
-      does: 'يحذف فرعًا محليًا بالقوة حتى لو لم يتم دمجه (Force Delete)',
-      when: 'للتخلص من فرع تجريبي مهمل لا تحتاج لتغييراته',
+      does: 'Force delete a local branch even if it is not merged (Force Delete)',
+      when: 'To remove an obsolete test branch that you no longer need',
       example: 'git branch -D experiment/failed-test',
     },
   ]}

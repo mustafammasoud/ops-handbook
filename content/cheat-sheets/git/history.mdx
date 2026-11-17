@@ -2,10 +2,10 @@
 title: Git History & Diffs
 technology: git
 topic: history
-description: فحص سجل التعديلات، عرض رسائل الالتزام، مقارنة الفروع، وتتبع تغييرات الأسطر.
+description: Examine modification history, view commit messages, compare branches, and track line changes.
 order: 3
 draft: false
-language: ar
+language: en
 ---
 
 
@@ -13,46 +13,46 @@ language: ar
 
 <CheatSheet
   rows={[
-    {
+{
       command: 'git log',
-      does: 'يعرض تاريخ الـ Commits المفصل مع اسم الكاتب والتاريخ والرسالة',
-      when: 'لمراجعة التاريخ الكامل للفرع الحالي',
+      does: 'Displays detailed commit history with the author name, date, and message',
+      when: 'to review the full history of the current branch',
       example: 'git log',
     },
     {
       command: 'git log --oneline -10',
-      does: 'تاريخ مختصر بسطر واحد لكل commit لآخر 10 سجلات',
-      when: 'لإلقاء نظرة سريعة على سجل التعديلات الحديثة',
+      does: 'One-line summary history for each commit of the last 10 records',
+      when: 'to take a quick look at your recent edit history',
       example: 'git log --oneline -10',
     },
     {
       command: 'git log --oneline --graph --decorate --all',
-      does: 'يعرض شجرة بصرية توضح تفريعات ودمج كل الفروع',
-      when: 'لفهم بنية التاريخ المعقد ومسارات الفروع المتوازية',
+      does: 'Displays a visual tree showing the branches and merging of all branches',
+when: 'to understand the structure of complex history and the paths of parallel branches',
       example: 'git log --oneline --graph --decorate --all -15',
     },
     {
       command: 'git show <commit>',
-      does: 'يفحص تفاصيل ومحتوى وتعديلات (diff) لـ commit معين أو Tag',
-      when: 'لمعرفة ما تم تغييره بالضبط في إصدار أو نقطة زمنية',
+      does: 'Checks details, content and edits (diff) for a specific commit or tag',
+      when: 'to see exactly what was changed at a version or point in time',
       example: 'git show v1.0.0',
     },
     {
       command: 'git diff HEAD',
-      does: 'يقارن Working Tree بالكامل مع آخر commit في HEAD',
-      when: 'لمعرفة كل التغييرات المتبقية مقارنة بآخر التزام',
+      does: 'Compares the entire Working Tree with the last commit in HEAD',
+      when: 'to see all remaining changes compared to the last commit',
       example: 'git diff HEAD',
     },
-    {
+{
       command: 'git diff --check',
-      does: 'يكتشف أخطاء المسافات البيضاء والأسطر الزائدة قبل الالتزام',
-      when: 'لتفادي أخطاء التنسيق غير المقصودة في المراجعات',
+      does: 'Detects whitespace and trailing line errors before committing',
+      when: 'to avoid unintentional formatting errors in reviews',
       example: 'git diff --check',
     },
     {
       command: 'git blame <file>',
-      does: 'يحدد آخر commit وشخص غيّر كل سطر في الملف',
-      when: 'لمعرفة سياق وتاريخ كتابة سطر كود معين',
+      does: 'identifies the last commit and person who changed each line in the file',
+      when: 'to know the context and date of writing a specific line of code',
       example: 'git blame src/server.ts',
     },
   ]}

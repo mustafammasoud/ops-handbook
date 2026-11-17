@@ -2,67 +2,67 @@
 title: Kubernetes Cluster Troubleshooting & Nodes
 technology: kubernetes
 topic: troubleshooting
-description: أوامر تشخيص العقد (Nodes)، عزل وصيانة الخوادم (Cordon & Drain)، تتبع الأحداث الحية ومراقبة استهلاك الموارد.
+description: Commands for diagnosing nodes, isolating and maintaining servers (Cordon & Drain), tracking live events and monitoring resource consumption.
 order: 3
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Node Maintenance & Diagnostics
 
-<Callout type="warning" title="تفريغ العقد (Drain)">
-أمر `drain` يقوم بطرد الـ Pods من العقدة. احرص دائمًا على توفر PodDisruptionBudgets مناسبة لتفادي انقطاع الخدمة في الإنتاج.
+<Callout type="warning" title="Drain">
+The `drain` command expels Pods from the node. Always have appropriate PodDisruptionBudgets available to avoid outages in production.
 </Callout>
 
 <CheatSheet
-  rows={[
+rows={[
     {
       command: 'kubectl get nodes -o wide',
-      does: 'يعرض حالة جميع عقد الكتلة مع إصدارات نظام التشغيل وعناوين الـ IP وإصدار Kubelet',
-      when: 'للتحقق من جاهزية العقد (Ready / NotReady) وصحة اتصالها بالـ Control Plane',
+      does: 'Displays the status of all cluster nodes with OS versions, IP addresses and Kubelet version',
+      when: 'To verify the readiness of the nodes (Ready / NotReady) and the correctness of their connection to the Control Plane',
       example: 'kubectl get nodes -o wide',
     },
     {
       command: 'kubectl describe node <node-name>',
-      does: 'يعرض تفاصيل شاملة عن العقدة تشمل قيود الموارد (Allocatable)، والوسوم، وTaints وشرائح الضغط (DiskPressure/MemoryPressure)',
-      when: 'عندما تفشل جدولة كبسولات جديدة على العقدة أو عند تحولها إلى NotReady',
+      does: 'Displays comprehensive details about the node including resource constraints (Allocatable), tags, taints and pressure slices (DiskPressure/MemoryPressure)',
+      when: 'When new pods fail to be scheduled on the node or it switches to NotReady',
       example: 'kubectl describe node worker-node-01',
     },
     {
       command: 'kubectl get events -A --sort-by=".metadata.creationTimestamp"',
-      does: 'يجلب جميع أحداث الكتلة مرتبة تصاعديًا حسب وقت الحدوث من الأحدث إلى الأقدم',
-      when: 'لتتبع المشاكل الغامضة في الكتلة، مثل أخطاء التخصيص أو فشل مجسات الصحة Liveness/Readiness',
+      does: 'Fetches all block events sorted in ascending order by time of occurrence from newest to oldest',
+      when: 'To track obscure problems in the cluster, such as allocation errors or failure of Liveness/Readiness health sensors',
       example: 'kubectl get events -A --sort-by=".metadata.creationTimestamp"',
-    },
+},
     {
       command: 'kubectl top nodes',
-      does: 'يعرض استهلاك المعالج (CPU) والذاكرة (Memory) الفعلي لكل عقدة في الكتلة',
-      when: 'لتقييم ضغط الموارد وتحديد العقد ذات الاستهلاك المرتفع (يتطلب Metrics Server)',
+      does: 'Displays the actual CPU and memory consumption of each node in the cluster',
+      when: 'To evaluate resource pressure and identify nodes with high consumption (requires Metrics Server)',
       example: 'kubectl top nodes',
     },
     {
       command: 'kubectl top pods -A --sort-by=cpu',
-      does: 'يعرض الكبسولات الأكثر استهلاكًا للمعالج عبر كافة مساحات الأسماء',
-      when: 'لاكتشاف الخدمات ذات الاستهلاك الشاذ وتفادي تجاوز حدود الموارد المتاحة',
+      does: 'Displays the most processor intensive pods across all namespaces',
+      when: 'to detect services with abnormal consumption and avoid exceeding the limits of available resources',
       example: 'kubectl top pods -A --sort-by=cpu',
     },
     {
       command: 'kubectl cordon <node-name>',
-      does: 'يحدد العقدة كغير قابلة للجدولة (SchedulingDisabled) لمنع إسناد أي كبسولات جديدة إليها',
-      when: 'كخطوة أولى قبل إجراء أعمال صيانة أو ترقية على الخادم',
+      does: 'Marks the node as SchedulingDisabled to prevent any new pods from being assigned to it',
+      when: 'As a first step before performing maintenance or upgrade work on the server',
       example: 'kubectl cordon worker-node-02',
-    },
+},
     {
       command: 'kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data',
-      does: 'يطرد جميع الكبسولات القابلة للنقل من العقدة ويعيد جدولتها على عقد أخرى بأمان',
-      when: 'لتفريغ الخادم بالكامل قبل إعادة التشغيل أو ترقية النواة ونظام التشغيل',
+      does: 'Evicts all removable pods from the node and safely reschedules them on other nodes',
+      when: 'to completely unload the server before rebooting or upgrading the kernel and operating system',
       example: 'kubectl drain worker-node-02 --ignore-daemonsets --delete-emptydir-data',
     },
     {
       command: 'kubectl uncordon <node-name>',
-      does: 'يزيل حالة الحظر ويعيد العقدة لتصبح جاهزة لاستقبال وجدولة كبسولات جديدة',
-      when: 'بعد الانتهاء من أعمال الصيانة وتأكيد استقرار الخادم وعودته للعمل',
+      does: 'Removes the blocking state and restores the node to be ready to receive and schedule new pods',
+      when: 'After completing the maintenance work and confirming the stability of the server and its return to work',
       example: 'kubectl uncordon worker-node-02',
     },
   ]}

@@ -2,73 +2,73 @@
 title: Git Remotes & Sync
 technology: git
 topic: remotes
-description: ربط المستودعات البعيدة، جلب التحديثات، المزامنة، الدفع الآمن باستخدام force-with-lease.
+description: Connect remote repositories, fetch updates, sync, secure push using force-with-lease.
 order: 7
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Remote Repositories and Synchronization
 
-<Callout type="warning" title="تجنب Force Push التقليدي">
-استخدم دائمًا `--force-with-lease` بدلًا من `--force` العادي، حيث يتحقق الأول من عدم وجود commits جديدة دفعها زميلك قبل استبدال التاريخ.
+<Callout type="warning" title="Avoid traditional Force Push">
+Always use `--force-with-lease` instead of regular `--force`, as the former checks for new commits pushed by your colleague before replacing the date.
 </Callout>
 
 <CheatSheet
   rows={[
-    {
+{
       command: 'git remote -v',
-      does: 'يعرض أسماء وعناوين الـ remotes المسجلة للمستودع (fetch و push)',
-      when: 'للتحقق من خوادم الـ remote المرتبطة',
+      does: 'Displays the names and addresses of the remotes registered for the repository (fetch and push)',
+      when: 'to check the associated remote servers',
       example: 'git remote -v',
     },
     {
       command: 'git remote add origin <url>',
-      does: 'يربط المستودع المحلي بمستودع بعيد جديد تحت اسم origin',
-      when: 'عند رفع مستودع محلي جديد إلى GitHub لأول مرة',
+      does: 'Link the local repository to a new remote repository named origin',
+      when: 'When a new local repository is uploaded to GitHub for the first time',
       example: 'git remote add origin git@github.com:user/repo.git',
     },
     {
       command: 'git fetch origin',
-      does: 'يجلب جميع التحديثات والفروع من الـ remote دون دمجها في فرعك المحلي',
-      when: 'للاطلاع على ما هو جديد على الخادم بأمان ودون مفاجآت',
+      does: 'Fetch all updates and branches from remote without merging them into your local branch',
+      when: 'To see what is new on the server safely and without surprises',
       example: 'git fetch origin',
     },
     {
-      command: 'git pull',
-      does: 'يجلب التحديثات ويقوم بدمجها تلقائيًا في الفرع الحالي',
-      when: 'لتحديث الفرع المحلي العادي',
+command: 'git pull',
+      does: 'Fetches updates and automatically merges them into the current branch',
+      when: 'to update the regular local branch',
       example: 'git pull',
     },
     {
       command: 'git pull --ff-only',
-      does: 'يجلب ويحدث الفرع فقط إذا كان يمكن التحديث بـ Fast-Forward دون إنشاء merge commit',
-      when: 'للحفاظ على نظافة واستقامة تاريخ الفرع المحلي',
+      does: 'Fetch and update the branch only if it can be Fast-Forward updated without creating a merge commit',
+      when: 'To maintain the cleanliness and integrity of the history of the local branch',
       example: 'git pull --ff-only',
     },
     {
       command: 'git pull --rebase origin main',
-      does: 'يجلب ويعيد تطبيق التغييرات المحلية فوق آخر تحديث للفرع البعيد',
-      when: 'قبل الدفع لتجنب إنشاء merge commit غير ضروري',
+      does: 'Fetches and reapplies local changes over the latest update of the remote branch',
+      when: 'before payment to avoid unnecessary merge commit',
       example: 'git pull --rebase origin main',
     },
     {
       command: 'git push',
-      does: 'يرفع الـ commits المحلية للفرع المرتبط بالـ remote',
-      when: 'لنشر التعديلات بعد عمل commits',
+does: 'Uploads local commits to remote branch',
+      when: 'to publish edits after commits',
       example: 'git push',
     },
     {
       command: 'git push -u origin <branch>',
-      does: 'يرفع الفرع ويضبط علاقة التتبع (Upstream Tracking) تلقائيًا',
-      when: 'عند دفع فرع جديد لأول مرة إلى الـ remote',
+      does: 'Automatically raises the branch and sets upstream tracking',
+      when: 'When a new branch is first pushed to the remote',
       example: 'git push -u origin feature/login',
     },
     {
       command: 'git push --force-with-lease',
-      does: 'نسخة أكثر أمانًا من Force Push تفحص ما إذا كان هناك تعديل لم تره قبل الاستبدال',
-      when: 'بعد إجراء rebase أو commit --amend على فرعك الخاص',
+      does: 'A safer version of force push that checks for changes you did not see before replacing remote history',
+      when: 'After rebase or commit --amend on your own branch',
       example: 'git push --force-with-lease origin feature/login',
     },
   ]}

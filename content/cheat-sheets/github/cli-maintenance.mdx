@@ -2,61 +2,60 @@
 title: GitHub CLI & Repository Maintenance
 technology: github
 topic: cli-maintenance
-description: أوامر الصيانة وأداة GitHub CLI، استنساخ المستودعات، إدارة الإصدارات (Releases)، والأرشفة والحذف الآمن.
+description: GitHub CLI and maintenance commands, repositories cloning, releases, archiving and secure deletion.
 order: 6
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. CLI Tools & Maintenance
 
-<Callout type="warning" title="حذف المستودعات">
-أمر `gh repo delete` نهائي ولا يمكن التراجع عنه. استخدم `gh repo archive` إن كنت تريد فقط جعل المستودع للقراءة فقط مع الحفاظ على تاريخه.
+<Callout type="warning" title="Delete repositories">
+The `gh repo delete` command is final and cannot be undone. Use `gh repo archive` if you just want to make the repository read-only while preserving its history.
 </Callout>
-
 <CheatSheet
   rows={[
     {
       command: 'gh --version',
-      does: 'يتحقق من تثبيت أداة GitHub CLI ويعرض رقم الإصدار الحالي',
-      when: 'للتأكد من توفر الأداة قبل تنفيذ أوامر السكربتات',
+      does: 'Checks the installation of the GitHub CLI and displays the current version number',
+      when: 'to check tool availability before executing script commands',
       example: 'gh --version',
     },
     {
       command: 'gh repo clone OWNER/REPO',
-      does: 'ينسخ مستودعًا مباشرة باستخدام بروتوكول المصادقة المفضل لديك في CLI',
-      when: 'لاستنساخ المشاريع دون الحاجة لنسخ روابط URL يدويًا',
+      does: 'Copy a repository directly using your preferred authentication protocol in the CLI',
+      when: 'to clone projects without having to manually copy URLs',
       example: 'gh repo clone kubernetes/kubernetes',
     },
     {
-      command: 'gh release list',
-      does: 'يعرض قائمة الإصدارات المنشورة مع وسومها وتواريخ إطلاقها',
-      when: 'للاطلاع على الإصدارات السابقة وتاريخ التوزيع للمشروع',
+command: 'gh release list',
+      does: 'Displays a list of published releases with their tags and release dates',
+      when: 'To view previous versions and distribution history of the project',
       example: 'gh release list --limit 10',
     },
     {
       command: 'gh release create <tag>',
-      does: 'ينشئ إصدارًا جديدًا (Release) مع إضافة ملاحظات التغيير وإرفاق الملفات',
-      when: 'عند نشر إصدار جديد جاهز للإنتاج',
+      does: 'Creates a new release with change notes and attached files',
+      when: 'When a new production-ready version is published',
       example: 'gh release create v1.2.0 --title "v1.2.0" --notes "Bug fixes and stability improvements"',
     },
     {
       command: 'gh status',
-      does: 'يعرض ملخصًا لحالة الإشعارات وطلبات السحب والمشكلات المرتبطة بك',
-      when: 'في بداية يوم العمل لمعرفة ما يحتاج لاهتمامك المباشر',
+      does: 'Displays a summary of the status of notifications, pull requests and issues associated with you',
+      when: 'At the beginning of the work day to find out what needs your immediate attention',
       example: 'gh status',
-    },
+},
     {
       command: 'gh repo archive OWNER/REPO',
-      does: 'ينقل المستودع إلى وضع الأرشفة للقراءة فقط ويمنع أي تعديلات إضافية',
-      when: 'عند إيقاف صيانة المشروع مع الرغبة في الاحتفاظ به كمرجع تاريخي',
+      does: 'Moves the repository to read-only archive mode and prevents any further modifications',
+      when: 'When you stop maintaining the project and want to keep it for historical reference',
       example: 'gh repo archive my-org/legacy-service --yes',
     },
     {
       command: 'gh repo delete OWNER/REPO',
-      does: 'يحذف المستودع بالكامل من خوادم GitHub نهائيًا (يتطلب تأكيدًا يدويًا)',
-      when: 'للتخلص من مستودعات التجارب أو المستودعات غير المرغوبة نهائيًا',
+      does: 'Permanently deletes the entire repository from GitHub servers (requires manual confirmation)',
+      when: 'to permanently eliminate test repositories or unwanted repositories',
       example: 'gh repo delete my-org/temp-playground --yes',
     },
   ]}

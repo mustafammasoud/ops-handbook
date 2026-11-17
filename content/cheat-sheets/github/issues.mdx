@@ -2,49 +2,48 @@
 title: GitHub Issues & Task Tracking
 technology: github
 topic: issues
-description: إدارة المشكلات وتتبع المهام، استعراض القضايا المفتوحة، وإنشاء Issues وربطها بالالتزامات لإغلاقها آليًا.
+description: Manage issues and track tasks, review open issues, create issues and link them to commitments to close them automatically.
 order: 5
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Issues & Commit Linking
-
-<Callout type="tip" title="الإغلاق التلقائي للمهام">
-استخدام كلمات مثل `Fixes #12` أو `Closes #12` في رسالة الالتزام أو وصف طلب السحب يقوم بإغلاق الـ Issue تلقائيًا بمجرد دمج الفرع في الفرع الافتراضي.
+<Callout type="tip" title="Automatically close tasks">
+Using words like `Fixes #12` or `Closes #12` in the commit message or pull request description automatically closes the issue once the branch is merged into the default branch.
 </Callout>
 
 <CheatSheet
   rows={[
     {
       command: 'gh issue list --state open',
-      does: 'يعرض قائمة بجميع المشكلات والمهام المفتوحة في المستودع الحالي',
-      when: 'لمعرفة المهام المطلوب العمل عليها أو مراجعة المشاكل القائمة',
+      does: 'Displays a list of all open issues and tasks in the current repository',
+      when: 'to know the tasks to be worked on or review existing problems',
       example: 'gh issue list --state open',
     },
     {
-      command: 'gh issue list --assignee "@me"',
-      does: 'يصفي ويعرض فقط المهام والمشكلات المسندة إلى حسابك شخصيًا',
-      when: 'للتركيز على المهام المسؤولة منك في المشروع',
+command: 'gh issue list --assignee "@me"',
+      does: 'Filters and displays only tasks and issues assigned to your account personally',
+      when: 'to focus on your responsible tasks in the project',
       example: 'gh issue list --assignee "@me"',
     },
     {
       command: 'gh issue create',
-      does: 'ينشئ Issue جديدًا من الطرفية مع تحديد العنوان والوصف والملصقات',
-      when: 'للإبلاغ السريع عن خطأ أو فتح طلب ميزة جديدة دون مغادرة الطرفية',
+      does: 'Creates a new Issue from the terminal with title, description and labels specified',
+      when: 'To quickly report an error or open a new feature request without leaving the terminal',
       example: 'gh issue create --title "Bug: Ingress timeout on 504" --body "Steps to reproduce..."',
     },
     {
       command: 'gh issue view <number>',
-      does: 'يعرض تفاصيل المشكلة المحددة والتعليقات المرفقة بها في الطرفية',
-      when: 'لقراءة سياق المشكلة وتعليقات الفريق أثناء العمل على حلها',
+does: 'Displays details of the selected problem and associated comments in the terminal',
+      when: 'To read the issue context and the team comments as they work on it',
       example: 'gh issue view 42',
     },
     {
       command: 'git commit -m "Fix ... (#42)"',
-      does: 'يربط الالتزام البرمجي برقم الـ Issue للإشارة إليه في واجهة GitHub',
-      when: 'عند كتابة التزام يحل أو يتعلق بمسألة محددة',
+      does: 'Associates the commit with an issue number to indicate it in the GitHub interface',
+      when: 'When writing a commit that resolves or relates to a specific issue',
       example: 'git commit -m "Fix container startup crash (Fixes #42)"',
     },
   ]}

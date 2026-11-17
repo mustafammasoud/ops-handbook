@@ -2,67 +2,67 @@
 title: GitHub Pull Requests
 technology: github
 topic: pull-requests
-description: دورة حياة طلبات السحب (PR)، التجهيز والدفع، الفحص قبل الدمج، وإنشاء ودمج الـ PRs عبر GitHub CLI.
+description: Pull Request (PR) lifecycle, staging and pushing, pre-merge screening, and creating and merging PRs via the GitHub CLI.
 order: 3
 draft: false
-language: ar
+language: en
 ---
 
 
 ## 1. Pull Request Workflow & Review
 
-<Callout type="tip" title="تحديث الفرع قبل فتح الـ PR">
-احرص دائمًا على جلب تحديثات `main` ودمجها أو إعادة البناء عليها (`git pull --ff-only` أو `git merge origin/main`) قبل تقديم طلب السحب لتجنب تعارضات الدمج.
+<Callout type="tip" title="Update the branch before opening the PR">
+Always fetch and merge or rebuild updates to `main` (`git pull --ff-only` or `git merge origin/main`) before submitting a pull request to avoid merge conflicts.
 </Callout>
 
 <CheatSheet
-  rows={[
+rows={[
     {
       command: 'git switch -c feature/x',
-      does: 'ينشئ فرع عمل جديد لميزة أو إصلاح وينتقل إليه مباشرة',
-      when: 'قبل البدء في كتابة أي كود جديد مخصص لطلب السحب',
+      does: 'Creates a new working branch for a feature or fix and jumps to it directly',
+      when: 'Before starting to write any new code for the pull request',
       example: 'git switch -c feature/health-check',
     },
     {
       command: 'git diff --check',
-      does: 'يفحص التعديلات ويكتشف مسافات النهاية غير المرغوبة ومشاكل التنسيق',
-      when: 'قبل إضافة الملفات إلى الالتزام للحفاظ على نظافة الـ PR',
+      does: 'Checks edits and detects unwanted end spaces and formatting problems',
+      when: 'before adding files to the commit to keep the PR clean',
       example: 'git diff --check',
     },
     {
       command: 'git push -u origin feature/x',
-      does: 'يرفع فرع الميزة المحلي إلى المستودع البعيد ويضبط تتبع المسار',
-      when: 'عند الاستعداد لفتح طلب سحب جديد',
+      does: 'Uploads the local feature branch to the remote repository and sets the trace',
+      when: 'When ready to open a new withdrawal request',
       example: 'git push -u origin feature/health-check',
-    },
+},
     {
       command: 'gh pr create --draft',
-      does: 'ينشئ طلب سحب في حالة مسودة (Draft PR) للإشارة إلى استمرار العمل',
-      when: 'للحصول على ملاحظات مبكرة من الفريق أو تشغيل فحوصات CI دون طلب مراجعة نهائية',
+      does: 'Creates a draft PR to indicate work is continuing',
+      when: 'To get early feedback from the team or run CI checks without requiring a final review',
       example: 'gh pr create --draft --title "WIP: Health check endpoint"',
     },
     {
       command: 'gh pr view',
-      does: 'يعرض تفاصيل طلب السحب الحالي أو رقمه المحدد في الطرفية',
-      when: 'لمعرفة حالة الـ PR والمراجعين والتعليقات دون مغادرة الطرفية',
+      does: 'Displays the details of the current withdrawal request or its number specified in the terminal',
+      when: 'To know the status of PR, reviewers and comments without leaving the terminal',
       example: 'gh pr view',
     },
     {
       command: 'gh pr diff',
-      does: 'يعرض الفروقات البرمجية الكاملة الخاصة بطلب السحب الحالي',
-      when: 'لمراجعة التغييرات المقدمة ومقارنتها بالفرع المستهدف',
+      does: 'Displays the full programming differences for the current withdrawal request',
+      when: 'to review the submitted changes and compare them to the target branch',
       example: 'gh pr diff',
-    },
+},
     {
       command: 'gh pr checks',
-      does: 'يعرض نتائج فحوصات الـ CI/CD وسير عمل GitHub Actions للـ PR الحالي',
-      when: 'للتأكد من نجاح كافة الاختبارات والفحوصات الآلية قبل الدمج',
+      does: 'Displays the results of CI/CD checks and GitHub Actions workflow for the current PR',
+      when: 'to ensure the success of all automated tests and checks before merging',
       example: 'gh pr checks',
     },
     {
       command: 'gh pr merge --squash',
-      does: 'يدمج طلب السحب بأسلوب ضغط الالتزامات (Squash Merge) في التزام واحد منظم',
-      when: 'للحفاظ على نظافة تسلسل وسجل الفرع الرئيسي',
+      does: 'Squash merge the pull request into one structured commit',
+      when: 'to keep the master branch sequence and history clean',
       example: 'gh pr merge --squash --delete-branch',
     },
   ]}
