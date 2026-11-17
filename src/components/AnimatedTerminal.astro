@@ -2,10 +2,9 @@
 /**
  * AnimatedTerminal.astro
  *
- * A prominent, multi-line engineering terminal component for the Ops Handbook hero.
- * Simulates complete engineering sessions with multiple commands and outputs
- * visible simultaneously, demonstrating Kubernetes, Linux, Docker, Git, Terraform,
- * and the actual Ops Handbook knowledge base architecture.
+ * A modern, smooth, interactive engineering terminal component for the Ops Handbook hero.
+ * Features Starship/zsh styled prompts, live syntax highlighting, smooth variable-cadence typing,
+ * soft entry animations for outputs, session tabs, copy action, and pause/play controls.
  */
 ---
 
@@ -15,90 +14,215 @@
   role="region"
   aria-label="Interactive DevOps terminal session"
 >
-  <!-- Ambient backdrop glow matching Ops Handbook theme -->
+  <!-- Multi-layered modern ambient backdrop glow -->
   <div
-    class="pointer-events-none absolute -inset-2 rounded-3xl bg-accent/15 opacity-60 blur-2xl dark:bg-accent/10"
+    class="pointer-events-none absolute -inset-3 rounded-3xl bg-gradient-to-tr from-accent/20 via-emerald-500/10 to-accent/5 opacity-70 blur-2xl transition-opacity duration-700"
     aria-hidden="true"
   ></div>
 
-  <!-- Terminal Window -->
+  <!-- Terminal Window Surface -->
   <div
-    class="terminal-window relative overflow-hidden rounded-2xl border border-[#273a32] bg-[#0c120f] dark:bg-[#080d0b] text-[#e1ece6] shadow-2xl shadow-black/25 dark:shadow-black/60"
+    class="terminal-window relative overflow-hidden rounded-2xl border border-white/[0.08] dark:border-white/[0.06] bg-[#090e0c] dark:bg-[#060a08] text-[#e3ece7] shadow-2xl shadow-black/50 transition-shadow duration-300 hover:shadow-accent/5 hover:border-white/[0.12]"
   >
-    <!-- Terminal Header Bar -->
+    <!-- Top specular line for realistic glass sheen -->
     <div
-      class="flex h-11 items-center justify-between border-b border-[#1f2e27] bg-[#141c18] dark:bg-[#0d1411] px-4 sm:px-5"
+      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Terminal Header Bar (Extra blur with high saturation glassmorphism) -->
+    <div
+      class="terminal-navbar flex h-10.5 items-center justify-between border-b border-white/[0.07] bg-[#090e0c]/55 px-3 sm:px-4 backdrop-blur-2xl select-none"
     >
-      <!-- Window Controls -->
+      <!-- macOS Window Traffic Lights (Darker, deep muted tones) -->
       <div class="flex items-center gap-2" aria-hidden="true">
-        <span class="h-3 w-3 rounded-full bg-[#e05f4e] shadow-xs"></span>
-        <span class="h-3 w-3 rounded-full bg-[#e5a93b] shadow-xs"></span>
-        <span class="h-3 w-3 rounded-full bg-[#4ca868] shadow-xs"></span>
+        <span class="group relative flex h-3 w-3 items-center justify-center rounded-full bg-[#6a1c18] border border-[#852520]/60 shadow-2xs"></span>
+        <span class="group relative flex h-3 w-3 items-center justify-center rounded-full bg-[#6b4b0e] border border-[#875f12]/60 shadow-2xs"></span>
+        <span class="group relative flex h-3 w-3 items-center justify-center rounded-full bg-[#144722] border border-[#1d6330]/60 shadow-2xs"></span>
       </div>
 
-      <!-- Title / Shell context -->
-      <div class="flex items-center gap-2 font-mono text-xs font-medium text-[#9ab3a7]">
-        <svg class="h-3.5 w-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="4 17 10 11 4 5"></polyline>
-          <line x1="12" y1="19" x2="20" y2="19"></line>
-        </svg>
-        <span class="terminal-session-title">ops-handbook ~ zsh</span>
+      <!-- Interactive Session Tabs -->
+      <div class="hidden sm:flex items-center gap-1 rounded-lg bg-black/40 p-0.5 border border-white/[0.06]">
+        <button
+          type="button"
+          class="terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200"
+          data-session="0"
+          aria-label="k8s cluster session"
+        >
+          k8s
+        </button>
+        <button
+          type="button"
+          class="terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200"
+          data-session="1"
+          aria-label="knowledge hub session"
+        >
+          hub
+        </button>
+        <button
+          type="button"
+          class="terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200"
+          data-session="2"
+          aria-label="linux runtime session"
+        >
+          linux
+        </button>
+        <button
+          type="button"
+          class="terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200"
+          data-session="3"
+          aria-label="terraform iac session"
+        >
+          iac
+        </button>
       </div>
 
-      <!-- Right terminal badge -->
-      <div class="flex items-center gap-2 text-[11px] font-mono text-[#6c8579]">
-        <span class="hidden sm:inline-block rounded border border-[#263830] bg-[#101714] px-2 py-0.5">
-          xterm-256color
+      <!-- Right Action Controls (Live indicator + Pause + Copy) -->
+      <div class="flex items-center gap-2 text-[11px] font-mono text-[#8ca397]">
+        <!-- Live status pill -->
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          live
         </span>
+
+        <!-- Pause / Play Button -->
+        <button
+          id="terminal-play-pause-btn"
+          type="button"
+          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer"
+          title="Pause / Resume terminal animation"
+          aria-label="Pause or Resume terminal animation"
+        >
+          <svg id="icon-pause" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+          <svg id="icon-play" class="hidden h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+
+        <!-- Copy Session Output Button -->
+        <button
+          id="terminal-copy-btn"
+          type="button"
+          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer"
+          title="Copy session output"
+          aria-label="Copy terminal text"
+        >
+          <svg id="icon-copy" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <svg id="icon-check" class="hidden h-3.5 w-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
 
-    <!-- Terminal Screen: Substantial 410-450px height allows multiple commands + outputs -->
+    <!-- Terminal Screen Surface: Compact, balanced height -->
     <div
       id="terminal-screen"
-      class="terminal-screen h-[340px] sm:h-[380px] lg:h-[400px] p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-y-auto overflow-x-auto no-scrollbar scroll-smooth"
+      class="terminal-screen relative h-[270px] sm:h-[295px] lg:h-[315px] p-3.5 sm:p-4 font-mono text-xs sm:text-[13px] leading-relaxed overflow-y-auto overflow-x-auto scroll-smooth no-scrollbar"
     >
-      <!-- Session History: Retains all executed commands & outputs for the active session -->
+      <!-- Session History: Smoothly renders executed commands and formatted outputs -->
       <div id="terminal-history" class="space-y-4"></div>
 
-      <!-- Active Typing Command Line -->
-      <div id="terminal-active-line" class="mt-3 flex items-start gap-2">
-        <span class="terminal-prompt text-accent font-bold select-none">$</span>
-        <span id="terminal-active-input" class="text-white font-semibold tracking-wide"></span>
-        <span class="terminal-cursor inline-block w-2 h-4.5 bg-accent align-middle ml-0.5" aria-hidden="true"></span>
+      <!-- Active Typing Line with Modern Starship-style Prompt -->
+      <div id="terminal-active-line" class="mt-3.5 flex items-start gap-2">
+        <div class="terminal-prompt flex items-center gap-1.5 shrink-0 select-none">
+          <span class="text-emerald-400 font-semibold">~/handbook</span>
+          <span class="text-purple-400/90 text-[11px] font-medium flex items-center gap-0.5">
+            <span class="text-purple-400">⎇</span><span id="terminal-branch">main</span>
+          </span>
+          <span class="text-accent font-bold">❯</span>
+        </div>
+        <div class="flex-1 flex items-center flex-wrap min-w-0">
+          <span id="terminal-active-input" class="inline tracking-wide"></span>
+          <span class="terminal-cursor ml-1" aria-hidden="true"></span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .terminal-cursor {
-    animation: terminal-blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Premium terminal typography and rendering */
+  .terminal-window,
+  .terminal-screen {
+    font-family: 'JetBrains Mono', var(--font-mono);
+    font-feature-settings: "calt" 1, "zero" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.012em;
   }
 
-  @keyframes terminal-blink {
+  /* Ultra-smooth backdrop blur for header */
+  .terminal-navbar {
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+  }
+
+  /* Modern glowing cursor */
+  .terminal-cursor {
+    display: inline-block;
+    width: 0.5rem;
+    height: 1.15rem;
+    border-radius: 2px;
+    background: var(--c-accent, #f2a93c);
+    box-shadow: 0 0 10px var(--c-accent, #f2a93c);
+    vertical-align: text-bottom;
+    animation: terminal-glow 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes terminal-glow {
     0%, 100% {
       opacity: 1;
+      transform: scaleY(1);
     }
     50% {
-      opacity: 0;
+      opacity: 0.2;
+      transform: scaleY(0.92);
     }
   }
 
-  /* Custom scrollbar for terminal if needed */
+  /* Smooth reveal animation for commands and outputs */
+  :global(.terminal-command-block) {
+    animation: terminal-enter 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes terminal-enter {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Custom subtle scrollbar */
   .no-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   .no-scrollbar::-webkit-scrollbar-thumb {
     background: #1f3028;
-    border-radius: 4px;
+    border-radius: 9999px;
+  }
+  .no-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2b4539;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .terminal-cursor {
       animation: none;
-      opacity: 0;
+      opacity: 0.5;
+    }
+    :global(.terminal-command-block) {
+      animation: none;
     }
   }
 </style>
@@ -111,34 +235,39 @@
   }
 
   interface TerminalSession {
+    id: string;
+    name: string;
+    branch: string;
     title: string;
     commands: TerminalCommand[];
   }
 
-  // 4 Curated Multi-Command Engineering Sessions
   const SESSIONS: TerminalSession[] = [
     {
+      id: 'k8s',
+      name: 'k8s',
+      branch: 'main',
       title: 'ops-handbook ~ k8s-cluster',
       commands: [
         {
           cmd: 'kubectl get nodes',
           output: [
-            'NAME                   STATUS   ROLES           AGE   VERSION',
-            'k8s-control-plane-01   Ready    control-plane   42d   v1.30.0',
-            'k8s-worker-node-01     Ready    worker          42d   v1.30.0',
-            'k8s-worker-node-02     Ready    worker          42d   v1.30.0',
+            'NAME                   STATUS    ROLES           AGE   VERSION',
+            'k8s-control-plane-01   ● Ready   control-plane   42d   v1.30.0',
+            'k8s-worker-node-01     ● Ready   worker          42d   v1.30.0',
+            'k8s-worker-node-02     ● Ready   worker          42d   v1.30.0',
           ],
           outputClass: 'text-emerald-400/90',
         },
         {
           cmd: 'kubectl get pods -n kube-system',
           output: [
-            'NAME                                   READY   STATUS    RESTARTS   AGE',
-            'coredns-5dd5756b68-2kxnf               1/1     Running   0          42d',
-            'etcd-k8s-control-plane-01              1/1     Running   0          42d',
-            'kube-apiserver-k8s-control-plane-01    1/1     Running   0          42d',
+            'NAME                                   READY   STATUS      RESTARTS   AGE',
+            'coredns-5dd5756b68-2kxnf               1/1     ● Running   0          42d',
+            'etcd-k8s-control-plane-01              1/1     ● Running   0          42d',
+            'kube-apiserver-k8s-control-plane-01    1/1     ● Running   0          42d',
           ],
-          outputClass: 'text-[#d6dfd9]',
+          outputClass: 'text-sky-300/90',
         },
         {
           cmd: 'kubectl get svc --all-namespaces',
@@ -152,23 +281,19 @@
       ],
     },
     {
+      id: 'hub',
+      name: 'hub',
+      branch: 'docs',
       title: 'ops-handbook ~ knowledge-hub',
       commands: [
         {
-          cmd: 'ls -F content/cheat-sheets/',
-          output: [
-            'git/      github/      kubernetes/',
-          ],
-          outputClass: 'text-[#8ee3b0]',
-        },
-        {
           cmd: 'find content/cheat-sheets -mindepth 1 -maxdepth 1 -type d',
           output: [
-            'content/cheat-sheets/git         (9 topics)',
-            'content/cheat-sheets/github      (7 topics)',
-            'content/cheat-sheets/kubernetes  (3 topics)',
+            'content/cheat-sheets/git         (9 topics · 52 commands)',
+            'content/cheat-sheets/github      (7 topics · 38 commands)',
+            'content/cheat-sheets/kubernetes  (3 topics · 34 commands)',
           ],
-          outputClass: 'text-[#d6dfd9]',
+          outputClass: 'text-emerald-400/90',
         },
         {
           cmd: 'find content/interview-questions -mindepth 1 -maxdepth 1 -type d',
@@ -179,9 +304,21 @@
           ],
           outputClass: 'text-amber-400/90',
         },
+        {
+          cmd: 'npm run build',
+          output: [
+            '✓ Synced content collections in 1.1s',
+            '✓ Generated 175 static HTML pages',
+            '✨ Build finished cleanly in 18.2s',
+          ],
+          outputClass: 'text-emerald-400 font-semibold',
+        },
       ],
     },
     {
+      id: 'linux',
+      name: 'linux',
+      branch: 'prod',
       title: 'ops-handbook ~ linux-runtime',
       commands: [
         {
@@ -192,11 +329,11 @@
             'redis-cache       Up 18 days      6379/tcp',
             'metrics-exporter  Up 18 days      9100/tcp',
           ],
-          outputClass: 'text-[#d6dfd9]',
+          outputClass: 'text-sky-300/90',
         },
         {
           cmd: 'systemctl is-active docker containerd',
-          output: ['active', 'active'],
+          output: ['● active', '● active'],
           outputClass: 'text-emerald-400 font-semibold',
         },
         {
@@ -206,11 +343,14 @@
             'Mem:           15Gi       4.2Gi       7.1Gi         10.5Gi',
             'Swap:         4.0Gi          0B       4.0Gi          4.0Gi',
           ],
-          outputClass: 'text-[#8ee3b0]',
+          outputClass: 'text-amber-400/90',
         },
       ],
     },
     {
+      id: 'iac',
+      name: 'iac',
+      branch: 'infra',
       title: 'ops-handbook ~ terraform-iac',
       commands: [
         {
@@ -237,65 +377,142 @@
     },
   ];
 
-  (function initSessionTerminal() {
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  /**
+   * Modern syntax highlighter for shell commands
+   */
+  function highlightCommand(cmd: string): string {
+    const tokens = cmd.split(' ');
+    return tokens
+      .map((token, idx) => {
+        if (!token) return '';
+        const escaped = escapeHtml(token);
+
+        // Command binary / primary executable
+        if (idx === 0 || tokens[idx - 1] === '|' || tokens[idx - 1] === '&&') {
+          return `<span class="text-emerald-400 font-bold">${escaped}</span>`;
+        }
+
+        // Subcommands (get, plan, validate, show, is-active, ps, run)
+        if (
+          idx === 1 &&
+          !token.startsWith('-') &&
+          ['get', 'plan', 'validate', 'show', 'is-active', 'ps', 'run', 'build'].includes(token)
+        ) {
+          return `<span class="text-sky-300 font-semibold">${escaped}</span>`;
+        }
+
+        // Flags / options (-n, --format, -compact-warnings, etc)
+        if (token.startsWith('-')) {
+          return `<span class="text-amber-300/90 font-medium">${escaped}</span>`;
+        }
+
+        // Pipe / operator
+        if (['|', '&&', '>', '>>'].includes(token)) {
+          return `<span class="text-accent font-bold">${escaped}</span>`;
+        }
+
+        // Strings / arguments
+        if (token.startsWith('"') || token.startsWith("'")) {
+          return `<span class="text-teal-200/90">${escaped}</span>`;
+        }
+
+        return `<span class="text-slate-100">${escaped}</span>`;
+      })
+      .join(' ');
+  }
+
+  (function initModernTerminal() {
     const screenEl = document.getElementById('terminal-screen');
     const historyEl = document.getElementById('terminal-history');
-    const activeLineEl = document.getElementById('terminal-active-line');
     const activeInputEl = document.getElementById('terminal-active-input');
-    const titleEl = document.querySelector<HTMLElement>('.terminal-session-title');
+    const branchEl = document.getElementById('terminal-branch');
+    const playPauseBtn = document.getElementById('terminal-play-pause-btn');
+    const copyBtn = document.getElementById('terminal-copy-btn');
+    const iconPause = document.getElementById('icon-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const iconCopy = document.getElementById('icon-copy');
+    const iconCheck = document.getElementById('icon-check');
+    const tabButtons = document.querySelectorAll<HTMLButtonElement>('.terminal-tab');
 
-    if (!screenEl || !historyEl || !activeLineEl || !activeInputEl) return;
+    if (!screenEl || !historyEl || !activeInputEl) return;
 
     let sessionIdx = 0;
     let cmdIdx = 0;
     let charIdx = 0;
     let activeTimer: number | undefined;
+    let isPaused = false;
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    function renderStaticFallback() {
-      const session = SESSIONS[0];
-      if (titleEl) titleEl.textContent = session.title;
-      historyEl!.replaceChildren();
-      session.commands.forEach((item) => {
-        const block = createCompletedCommandBlock(item.cmd, item.output, item.outputClass);
-        historyEl!.append(block);
+    function updateTabsUI() {
+      tabButtons.forEach((btn, idx) => {
+        if (idx === sessionIdx) {
+          btn.className =
+            'terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200 bg-accent/25 text-accent-ink dark:text-accent font-bold border border-accent/40 shadow-xs';
+        } else {
+          btn.className =
+            'terminal-tab px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all duration-200 text-[#8ca397] hover:text-white hover:bg-white/5 border border-transparent cursor-pointer';
+        }
       });
-      activeInputEl!.textContent = '';
     }
 
-    if (motionQuery.matches) {
-      renderStaticFallback();
-      return;
-    }
-
-    function createCompletedCommandBlock(cmd: string, outputLines: string[], outputClass?: string): HTMLElement {
+    function createCompletedCommandBlock(
+      cmd: string,
+      branch: string,
+      outputLines: string[],
+      outputClass?: string
+    ): HTMLElement {
       const container = document.createElement('div');
-      container.className = 'terminal-command-block space-y-1';
+      container.className = 'terminal-command-block space-y-1.5';
 
-      // Command row
+      // Command line row
       const cmdRow = document.createElement('div');
-      cmdRow.className = 'flex items-center gap-2';
+      cmdRow.className = 'flex items-center gap-1.5 flex-wrap';
 
-      const prompt = document.createElement('span');
-      prompt.className = 'text-accent font-bold select-none';
-      prompt.textContent = '$';
+      const prompt = document.createElement('div');
+      prompt.className = 'flex items-center gap-1.5 select-none shrink-0';
+      prompt.innerHTML = `
+        <span class="text-emerald-400 font-semibold">~/handbook</span>
+        <span class="text-purple-400/90 text-[11px] font-medium flex items-center gap-0.5">
+          <span class="text-purple-400">⎇</span><span>${escapeHtml(branch)}</span>
+        </span>
+        <span class="text-accent font-bold">❯</span>
+      `;
 
-      const cmdText = document.createElement('span');
-      cmdText.className = 'text-white font-semibold tracking-wide';
-      cmdText.textContent = cmd;
+      const cmdText = document.createElement('div');
+      cmdText.className = 'tracking-wide';
+      cmdText.innerHTML = highlightCommand(cmd);
 
       cmdRow.append(prompt, cmdText);
       container.append(cmdRow);
 
-      // Output rows
+      // Formatted Output block
       if (outputLines.length > 0) {
         const outContainer = document.createElement('div');
-        outContainer.className = `mt-1 space-y-0.5 text-xs ${outputClass ?? 'text-[#d6dfd9]'}`;
+        outContainer.className = `mt-1 pl-3 border-l-2 border-white/[0.08] space-y-0.5 text-xs ${
+          outputClass ?? 'text-[#d6dfd9]'
+        }`;
 
         outputLines.forEach((line) => {
           const lineEl = document.createElement('div');
-          lineEl.textContent = line;
+          // Highlight status indicators smoothly
+          if (line.includes('● Ready') || line.includes('● Running') || line.includes('● active')) {
+            lineEl.innerHTML = escapeHtml(line).replace(
+              /●\s(Ready|Running|active)/g,
+              '<span class="text-emerald-400 font-semibold">● $1</span>'
+            );
+          } else {
+            lineEl.textContent = line;
+          }
           outContainer.append(lineEl);
         });
 
@@ -305,34 +522,135 @@
       return container;
     }
 
-    function scrollScreenToBottom() {
-      screenEl!.scrollTop = screenEl!.scrollHeight;
+    function smoothScrollToBottom() {
+      if (!screenEl) return;
+      screenEl.scrollTo({
+        top: screenEl.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+
+    function renderStaticFallback() {
+      const session = SESSIONS[sessionIdx];
+      if (branchEl) branchEl.textContent = session.branch;
+      updateTabsUI();
+      historyEl!.replaceChildren();
+      session.commands.forEach((item) => {
+        const block = createCompletedCommandBlock(item.cmd, session.branch, item.output, item.outputClass);
+        historyEl!.append(block);
+      });
+      activeInputEl!.innerHTML = '';
+    }
+
+    if (motionQuery.matches) {
+      renderStaticFallback();
+      return;
+    }
+
+    function switchSession(idx: number) {
+      if (activeTimer) window.clearTimeout(activeTimer);
+      sessionIdx = idx;
+      cmdIdx = 0;
+      charIdx = 0;
+      updateTabsUI();
+      const currentSession = SESSIONS[sessionIdx];
+      if (branchEl) branchEl.textContent = currentSession.branch;
+
+      historyEl!.style.opacity = '0';
+      historyEl!.style.transition = 'opacity 180ms ease';
+
+      activeTimer = window.setTimeout(() => {
+        historyEl!.replaceChildren();
+        activeInputEl!.innerHTML = '';
+        historyEl!.style.opacity = '1';
+        historyEl!.style.transition = '';
+        smoothScrollToBottom();
+
+        if (!isPaused) {
+          activeTimer = window.setTimeout(step, 300);
+        }
+      }, 180);
+    }
+
+    // Tab buttons click listener
+    tabButtons.forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        switchSession(idx);
+      });
+    });
+
+    // Play/Pause button listener
+    if (playPauseBtn && iconPause && iconPlay) {
+      playPauseBtn.addEventListener('click', () => {
+        isPaused = !isPaused;
+        if (isPaused) {
+          iconPause.classList.add('hidden');
+          iconPlay.classList.remove('hidden');
+          if (activeTimer) window.clearTimeout(activeTimer);
+        } else {
+          iconPlay.classList.add('hidden');
+          iconPause.classList.remove('hidden');
+          step();
+        }
+      });
+    }
+
+    // Copy button listener
+    if (copyBtn && iconCopy && iconCheck) {
+      copyBtn.addEventListener('click', async () => {
+        const currentSession = SESSIONS[sessionIdx];
+        const lines: string[] = [];
+        currentSession.commands.forEach((c) => {
+          lines.push(`$ ${c.cmd}`);
+          lines.push(...c.output);
+        });
+
+        try {
+          await navigator.clipboard.writeText(lines.join('\n'));
+          iconCopy.classList.add('hidden');
+          iconCheck.classList.remove('hidden');
+          setTimeout(() => {
+            iconCheck.classList.add('hidden');
+            iconCopy.classList.remove('hidden');
+          }, 1800);
+        } catch {
+          // fallback ignore
+        }
+      });
     }
 
     function step() {
+      if (isPaused) return;
+
       const currentSession = SESSIONS[sessionIdx];
-      if (titleEl && charIdx === 0 && cmdIdx === 0) {
-        titleEl.textContent = currentSession.title;
-      }
+      updateTabsUI();
+      if (branchEl) branchEl.textContent = currentSession.branch;
 
       const currentCommand = currentSession.commands[cmdIdx];
 
-      // Typing phase
+      // Typing phase: natural human-like variation
       if (charIdx < currentCommand.cmd.length) {
         charIdx++;
-        activeInputEl!.textContent = currentCommand.cmd.slice(0, charIdx);
-        scrollScreenToBottom();
+        const currentSlice = currentCommand.cmd.slice(0, charIdx);
+        activeInputEl!.innerHTML = highlightCommand(currentSlice);
+        smoothScrollToBottom();
 
-        // Typing cadence: 32ms per character
-        activeTimer = window.setTimeout(step, 32);
+        // Cadence with micro-pause at spaces or symbols for realistic smoothness
+        const char = currentCommand.cmd[charIdx - 1];
+        const delay = char === ' ' ? 65 : char === '-' ? 50 : 26 + Math.floor(Math.random() * 14);
+
+        activeTimer = window.setTimeout(step, delay);
         return;
       }
 
-      // Command typing completed: brief execution pause before output
+      // Command typed: brief pause before execution
       activeTimer = window.setTimeout(() => {
-        // Append completed command and its output into session history
+        if (isPaused) return;
+
+        // Render completed block with slide-in animation
         const block = createCompletedCommandBlock(
           currentCommand.cmd,
+          currentSession.branch,
           currentCommand.output,
           currentCommand.outputClass
         );
@@ -340,18 +658,19 @@
 
         // Reset active line
         charIdx = 0;
-        activeInputEl!.textContent = '';
-        scrollScreenToBottom();
+        activeInputEl!.innerHTML = '';
+        smoothScrollToBottom();
 
         cmdIdx++;
 
         if (cmdIdx < currentSession.commands.length) {
-          // Pause between commands in same session
-          activeTimer = window.setTimeout(step, 380);
+          // Pause between commands in the same session
+          activeTimer = window.setTimeout(step, 420);
         } else {
-          // Entire session completed: hold session visible for comfortable reading
+          // Session completed: hold for reading, then smoothly transition to next
           activeTimer = window.setTimeout(() => {
-            // Smoothly clear session
+            if (isPaused) return;
+
             historyEl!.style.opacity = '0';
             historyEl!.style.transition = 'opacity 250ms ease';
 
@@ -363,20 +682,18 @@
               cmdIdx = 0;
               charIdx = 0;
               sessionIdx = (sessionIdx + 1) % SESSIONS.length;
-              scrollScreenToBottom();
+              smoothScrollToBottom();
 
-              // Delay before starting next session
-              activeTimer = window.setTimeout(step, 500);
-            }, 260);
-          }, 3600);
+              activeTimer = window.setTimeout(step, 400);
+            }, 250);
+          }, 3800);
         }
-      }, 300);
+      }, 280);
     }
 
-    // Launch initial animation loop
-    activeTimer = window.setTimeout(step, 400);
+    // Launch animation
+    activeTimer = window.setTimeout(step, 350);
 
-    // Cancel all timers on pagehide to prevent memory leaks
     window.addEventListener(
       'pagehide',
       () => {
