@@ -29,17 +29,7 @@ export function extractQuestionCounts(body: string | undefined): QuestionCounts 
 /**
  * Human-readable label for difficulty levels.
  */
-export function difficultyLabel(level: DifficultyLevel, lang: 'en' | 'ar' = 'en'): string {
-  if (lang === 'ar') {
-    switch (level) {
-      case 'beginner':
-        return 'مبتدئ';
-      case 'intermediate':
-        return 'متوسط';
-      case 'advanced':
-        return 'متقدم';
-    }
-  }
+export function difficultyLabel(level: DifficultyLevel): string {
   switch (level) {
     case 'beginner':
       return 'Beginner';

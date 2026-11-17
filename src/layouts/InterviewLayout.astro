@@ -15,9 +15,8 @@ interface Props {
 }
 
 const { entry, technology, topics } = Astro.props;
-const { title, description, language = 'ar' } = entry.data;
-const dir = language === 'ar' ? 'rtl' : 'ltr';
-const isAr = language === 'ar';
+const { title, description, language = 'en' } = entry.data;
+const dir = 'ltr';
 
 // Question stats for current topic
 const currentCounts = extractQuestionCounts(entry.body);
@@ -180,21 +179,21 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
         <!-- Stats Breakdown Badges -->
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
           <span class="rounded-md border border-border bg-surface px-2.5 py-1 font-semibold text-text">
-            {currentCounts.total} {isAr ? 'أسئلة' : 'Questions'}
+            {currentCounts.total} Questions
           </span>
           {currentCounts.beginner > 0 && (
             <span class="rounded-md border border-emerald-600/30 bg-emerald-500/10 px-2 py-1 font-medium text-emerald-700 dark:text-emerald-300">
-              {currentCounts.beginner} {difficultyLabel('beginner', language)}
+              {currentCounts.beginner} {difficultyLabel('beginner')}
             </span>
           )}
           {currentCounts.intermediate > 0 && (
             <span class="rounded-md border border-amber-600/30 bg-amber-500/10 px-2 py-1 font-medium text-amber-700 dark:text-amber-300">
-              {currentCounts.intermediate} {difficultyLabel('intermediate', language)}
+              {currentCounts.intermediate} {difficultyLabel('intermediate')}
             </span>
           )}
           {currentCounts.advanced > 0 && (
             <span class="rounded-md border border-rose-600/30 bg-rose-500/10 px-2 py-1 font-medium text-rose-700 dark:text-rose-300">
-              {currentCounts.advanced} {difficultyLabel('advanced', language)}
+              {currentCounts.advanced} {difficultyLabel('advanced')}
             </span>
           )}
         </div>
@@ -214,7 +213,7 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
             data-filter="all"
             aria-pressed="true"
           >
-            {isAr ? 'الكل' : 'All'} ({currentCounts.total})
+            All ({currentCounts.total})
           </button>
           {currentCounts.beginner > 0 && (
             <button
@@ -223,7 +222,7 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
               data-filter="beginner"
               aria-pressed="false"
             >
-              {difficultyLabel('beginner', language)} ({currentCounts.beginner})
+              {difficultyLabel('beginner')} ({currentCounts.beginner})
             </button>
           )}
           {currentCounts.intermediate > 0 && (
@@ -233,7 +232,7 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
               data-filter="intermediate"
               aria-pressed="false"
             >
-              {difficultyLabel('intermediate', language)} ({currentCounts.intermediate})
+              {difficultyLabel('intermediate')} ({currentCounts.intermediate})
             </button>
           )}
           {currentCounts.advanced > 0 && (
@@ -243,7 +242,7 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
               data-filter="advanced"
               aria-pressed="false"
             >
-              {difficultyLabel('advanced', language)} ({currentCounts.advanced})
+              {difficultyLabel('advanced')} ({currentCounts.advanced})
             </button>
           )}
         </div>
@@ -253,19 +252,19 @@ const pageTitle = `${title} — ${technology.name} Interview Questions | Ops Han
           type="button"
           class="reveal-all-btn inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-muted hover:text-accent-ink hover:border-accent/40 transition-colors"
           data-state="collapsed"
-          data-label-reveal={isAr ? 'كشف جميع الإجابات' : 'Reveal All Answers'}
-          data-label-collapse={isAr ? 'إخفاء جميع الإجابات' : 'Collapse All'}
+          data-label-reveal="Reveal All Answers"
+          data-label-collapse="Collapse All"
         >
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="7 13 12 18 17 13"></polyline>
             <polyline points="7 6 12 11 17 6"></polyline>
           </svg>
-          <span class="reveal-all-text">{isAr ? 'كشف جميع الإجابات' : 'Reveal All Answers'}</span>
+          <span class="reveal-all-text">Reveal All Answers</span>
         </button>
       </section>
 
       <!-- Questions List (Rendered via MDX slot) -->
-      <article class="interview-topic max-w-4xl" dir={dir} lang={language}>
+      <article class="interview-topic max-w-none" dir={dir} lang={language}>
         <slot />
       </article>
 

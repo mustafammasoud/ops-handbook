@@ -144,17 +144,17 @@ const pageDescription = `Real-world ${technology.name} interview questions, scen
                 <div class="mt-4 flex flex-wrap gap-1.5 text-[11px] font-mono">
                   {topicCounts.beginner > 0 && (
                     <span class="text-emerald-700 dark:text-emerald-400">
-                      {topicCounts.beginner} {difficultyLabel('beginner', topicItem.data.language)}
+                      {topicCounts.beginner} {difficultyLabel('beginner')}
                     </span>
                   )}
                   {topicCounts.intermediate > 0 && (
                     <span class="text-amber-700 dark:text-amber-400">
-                      · {topicCounts.intermediate} {difficultyLabel('intermediate', topicItem.data.language)}
+                      · {topicCounts.intermediate} {difficultyLabel('intermediate')}
                     </span>
                   )}
                   {topicCounts.advanced > 0 && (
                     <span class="text-rose-700 dark:text-rose-400">
-                      · {topicCounts.advanced} {difficultyLabel('advanced', topicItem.data.language)}
+                      · {topicCounts.advanced} {difficultyLabel('advanced')}
                     </span>
                   )}
                 </div>
