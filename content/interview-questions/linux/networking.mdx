@@ -2,10 +2,10 @@
 title: Linux Networking & Sockets Interview Questions
 technology: linux
 topic: networking
-description: أسئلة مقابلات حول شبكات خوادم لينكس، فحص المقابس (Sockets)، مسار حل أسماء النطاقات (DNS Resolution)، وتشخيص الحزم بأداة tcpdump.
+description: Interview questions about Linux server networks, socket inspection, DNS resolution path, and tcpdump packet diagnostics.
 order: 4
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,36 +13,36 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["linux", "networking", "ss", "sockets"]}
-  question="لماذا استُبدلت أداة netstat بأداة ss في توزيعات لينكس الحديثة، وما هو الأمر المفضل لفحص المنافذ المفتوحة والمستمعة؟"
-  directAnswer="أداة netstat تقرأ تفاصيل الشبكة ببطء شديد عبر التكرار في ملفات /proc/net/ النصية؛ في الخوادم عالية الحمل التي تحتوي على مئات آلاف الاتصالات المفتوحة، قد يتجمد أمر netstat أو يستغرق دقائق. بينما تستخدم أداة ss واجهة Netlink السريعة داخل النواة مباشرة مما يمنحها استجابة فورية. الأمر القياسي هو: ss -tulpn (t=TCP, u=UDP, l=Listening, p=Process, n=Numeric IPs)."
+  question="Why was the netstat tool replaced by ss in modern Linux distributions, and what is the preferred command for checking open and listening ports?"
+  directAnswer="The netstat tool reads network details very slowly through looping through /proc/net/ text files; on high-load servers with hundreds of thousands of open connections, the netstat command may freeze or take minutes. ss uses the fast Netlink interface directly inside the kernel, giving it immediate response. The standard command is: ss -tulpn (t=TCP, u=UDP, l=Listening, p=Process, n=Numeric IPs)."
   pitfalls={[
-    "نسيان استخدام العلم -n، مما يجبر الأمر على إجراء استعلامات DNS بطيئة لترجمة كل عنوان IP ورقم منفذ إلى اسم نصي، مسببًا تأخيرًا كبيرًا.",
-    "الاعتقاد بأن عدم ظهور اسم العملية (Process Name) في العمود الأخير يعني خللاً؛ يجب تشغيل الأمر بصلاحيات sudo لعرض العمليات المملوكة لمستخدمين آخرين."
+    "Forgetting to use the -n flag, forcing the command to perform slow DNS queries to translate every IP address and port number into a text name, causing significant delay.",
+    "It is believed that the process name not appearing in the last column means a defect; the command must be run with sudo privileges to view processes owned by other users."
   ]}
   followUps={[
-    "ماذا تعني حالة TIME_WAIT في اتصالات TCP وكيف تؤثر على استنزاف المنافذ سريعة الزوال (Ephemeral Ports)؟",
-    "كيف يمكنك تصفية مخرجات ss لعرض اتصالات TCP المرتبطة بمنفذ محدد مثل 443 فقط؟"
+    "What does the TIME_WAIT state mean in TCP connections and how does it affect ephemeral port drain?",
+    "How do you filter the ss output to only display TCP connections associated with a specific port such as 443?"
   ]}
 >
-المقارنة واستخدام الأمر القياسي:
+Compare and use the standard command:
 
 ```bash
-# فحص جميع المنافذ المستمعة (Listening) مع رقم الـ PID واسم البرنامج
+# Check all listening ports with the PID number and program name
 sudo ss -tulpn
 
-# تصفية المقابس المستمعة على منفذ الويب 443 فقط
+# Filter sockets listening on web port 443 only
 sudo ss -tulpn '( sport = :443 )'
 
-# فحص عدد الاتصالات في حالة التأسيس (ESTABLISHED)
+# Check the number of connections in ESTABLISHED state.
 ss -t -a state established
 ```
 
-دلالات الأعلام في `ss -tulpn`:
-- `-t`: حصر الفحص في بروتوكول **TCP**.
-- `-u`: حصر الفحص في بروتوكول **UDP**.
-- `-l`: عرض المقابس المستمعة فقط (**Listening**) وتجاهل الاتصالات المنتهية.
-- `-p`: إظهار معرف العملية (**PID**) واسم التطبيق المرتبط بالمنفذ.
-- `-n`: عرض العناوين والمنافذ كأرقام مجردة (**Numeric**) دون إضاعة الوقت في استعلامات DNS.
+Semantics of flags in `ss -tulpn`:
+- `-t`: Limit the scan to the **TCP** protocol.
+- `-u`: Limit the scan to the **UDP** protocol.
+- `-l`: Display only listening sockets (**Listening**) and ignore expired connections.
+- `-p`: Show the process identifier (**PID**) and application name associated with the port.
+- `-n`: Display addresses and ports as abstract numbers (**Numeric**) without wasting time on DNS queries.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -50,18 +50,18 @@ ss -t -a state established
   number={2}
   difficulty="intermediate"
   tags={["linux", "networking", "dns", "nsswitch"]}
-  question="اشرح المسار الكامل لعملية حل أسماء النطاقات (DNS Resolution) عند تنفيذ أمر مثل curl https://api.stripe.com على خادم لينكس."
-  directAnswer="تبدأ العملية باستدعاء دالة مكتبة C القياسية getaddrinfo(). أولاً يقرأ النظام ملف التوجيه /etc/nsswitch.conf للتحقق من ترتيب المصادر (عادة hosts: files dns). يفحص النظام أولاً ملف /etc/hosts المحلي؛ إذا لم يجد الاسم، يوجه الاستعلام إلى خادم الأسماء المسجل في /etc/resolv.conf (أو خدمة systemd-resolved المحلية عبر 127.0.0.53) الذي يرسل طلب DNS متكرر (Recursive Query) إلى ملقم DNS الخارجي."
+  question="Explain the full DNS resolution process when executing a command like curl https://api.stripe.com on a Linux server."
+  directAnswer="The process begins with a call to the standard C library function getaddrinfo(). First the system reads the /etc/nsswitch.conf directive file to check the order of sources (usually hosts: files dns). The system first checks the local /etc/hosts file; if it does not find the name, it directs the query to the nameserver registered in /etc/resolv.conf (or the local systemd-resolved service via 127.0.0.53) which sends a recursive DNS request (Recursive Query) to the external DNS server."
   pitfalls={[
-    "تعديل ملف /etc/resolv.conf يدويًا في الأنظمة الحديثة التي تعتمد على systemd-resolved أو NetworkManager؛ حيث يتم الكتابة فوق الملف وإلغاء التعديلات تلقائيًا عند إعادة تشغيل الخدمة أو تجديد إيجار DHCP.",
-    "تجاهل وجود إدخال قديم أو خاطئ في ملف /etc/hosts يتجاوز نتائج خوادم الـ DNS الحقيقية ويضلل عمليات التشخيص."
+    "Manually modifying the /etc/resolv.conf file on modern systems that rely on systemd-resolved or NetworkManager; the file is overwritten and the modifications are automatically canceled when the service is restarted or the DHCP lease is renewed.",
+    "Ignoring an outdated or incorrect entry in the /etc/hosts file overrides the results of real DNS servers and misleads diagnostics."
   ]}
   followUps={[
-    "ما الأمر الموصى به لإدارة وتعديل إعدادات DNS مع خدمة systemd-resolved؟",
-    "كيف تستخدم أداة dig لفحص سجلات A و CNAME وتتبع مسار التفويض عبر علم +trace؟"
+    "What is the recommended command to manage and modify DNS settings with the systemd-resolved service?",
+    "How do you use dig to inspect A and CNAME records and trace the authorization path via the +trace flag?"
   ]}
 >
-مسار التحليل في لينكس:
+Analysis path in Linux:
 
 ```
 [Application: curl] ──> getaddrinfo()
@@ -70,23 +70,23 @@ ss -t -a state established
                    [/etc/nsswitch.conf]
                              │
               ┌──────────────┴──────────────┐
-              ▼                             ▼
-       1. files                        2. dns
-     [/etc/hosts]                [/etc/resolv.conf]
-              │                             │
-    (Found? Return IP)               (Systemd-resolved)
+              ▼ ▼
+       1. files 2. dns
+     [/etc/hosts] [/etc/resolv.conf]
+              │ │
+    (Found? Return IP) (Systemd-resolved)
                                             │
                                             ▼
                                   Upstream DNS Server
                                   (e.g., 8.8.8.8, 1.1.1.1)
 ```
 
-لتعديل إعدادات الـ DNS بشكل دائم في الأنظمة الحديثة:
+To permanently modify DNS settings in modern systems:
 ```bash
-# استخدام resolvectl للتحقق من خوادم DNS لكل واجهة شبكة
+# Use resolvectl to check DNS servers for each network interface
 resolvectl status
 
-# فحص استجابة DNS بالتفصيل
+# Check DNS response in detail
 dig @1.1.1.1 api.stripe.com +trace
 ```
 </InterviewQuestion>

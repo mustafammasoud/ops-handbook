@@ -2,10 +2,10 @@
 title: Git Remote Collaboration & Workflows Interview Questions
 technology: git
 topic: collaboration
-description: أسئلة مقابلات حول التعاون الجماعي في Git، الفرق بين Fetch وPull، خطورة Force Push وميزة force-with-lease، وقواعد حماية الفروع.
+description: Interview questions about team collaboration in Git, the difference between Fetch and Pull, the dangers of Force Push and force-with-lease, and branch protection rules.
 order: 4
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,59 +13,84 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["git", "collaboration", "force-push", "safety"]}
-  question="لماذا يُعد git push --force-with-lease البديل الآمن الوحيد لـ git push --force بعد إعادة كتابة التاريخ؟"
-  directAnswer="يقوم git push --force الأعمى بالكتابة فوق الفرع البعيد بغض النظر عما إذا كان زميل لك في الفريق قد رفع التزامات جديدة متزامنة في نفس اللحظة، مما يؤدي إلى مسح كوده نهائيًا من السيرفر. بينما يتحقق --force-with-lease أولاً من أن مؤشر الفرع البعيد المحلي (origin/branch) يطابق بدقة الحالة الفعلية في الخادم؛ فإذا رفع شخص آخر التزامًا جديدًا لم تطلع عليه بعد، يرفض Git عملية الدفع ويطلب منك التحديث أولاً."
+  question="Why is git push --force-with-lease the only safe alternative to git push --force after history rewrite?"
+  directAnswer="blind git push --force overwrites the remote branch regardless of whether a teammate has uploaded new concurrent commits at the same moment, permanently wiping its code from the server. While --force-with-lease first checks that the local remote branch pointer (origin/branch) accurately matches the actual state on the server; if someone else uploads a new commit that you haven't seen yet, Git rejects the push and asks you to update first."
   pitfalls={[
-    "استخدام git push --force-with-lease مباشرة بعد أمر git fetch دون مراجعة ما تم جلبه؛ لأن git fetch يحدث المؤشر المرجعي محليًا ويلغي الحماية الوقائية للـ lease.",
-    "الاعتماد على الدفع بالقوة كإجراء روتيني بدلاً من استخدام فروع ميزات منفصلة وقواعد حماية الفروع (Branch Protection Rules)."
+    "Using git push --force-with-lease immediately after a git fetch command without reviewing what was fetched, because git fetch updates the reference pointer locally and voids lease protection.",
+    "Rely on force push as a routine rather than using separate feature branches and Branch Protection Rules."
   ]}
   followUps={[
-    "كيف يمكنك ضبط git config لفرض استخدام --force-with-lease افتراضيًا كبديل آمن؟",
-    "ما الإجراءات المتبعة في منصات مثل GitHub لمنع عمليات Force Push تمامًا على الفروع الحساسة؟"
+    "How do you adjust git config to force --force-with-lease by default as a safe alternative?",
+    "What are the procedures in place at platforms like GitHub to completely prevent Force Push operations on sensitive branches?"
   ]}
 >
-المقارنة العملية:
+Practical comparison:
 
 ```bash
-# 1. الدفع القسري الخطير (قد يمسح كود زملائك دون علمك):
+#1. Dangerous forced payment (may erase your colleagues' code without your knowledge):
 git push --force origin feature/login
 
-# 2. الدفع القسري الآمن مع التحقق من عقد الإيجار (Lease):
+#2. Secure Forced Payment with Lease Verification:
 git push --force-with-lease origin feature/login
 ```
 
-كيف تعمل الحماية؟
-- يفحص Git: هل يعرف جهازك كل الالتزامات الموجودة حالياً على `origin/feature/login`؟
-- إذا قام زميلك برفع التزام جديد: يرفض Git العملية بالرسالة:
+How does protection work?
+- Checks Git: Does your machine know all the commits currently on `origin/feature/login`?
+- If your colleague uploads a new commit: Git rejects the operation with the message:
   `[remote rejected] feature/login -> feature/login (stale info)`
-- هذا يمنع فقدان البيانات ويجبرك على فحص ومراجعة كود زميلك قبل إعادة الدفع.
+- This prevents data loss and forces you to check and review your colleague's code before re-paying.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="git-safe-recover-accidental-force-push"
+  number={2}
+  difficulty="advanced"
+  tags={["git", "collaboration", "recovery", "force-push"]}
+  question="A teammate accidentally force-pushes a shared branch and hides other commits. How do you recover safely?"
+  directAnswer="Freeze further pushes, identify the last known good commit from local reflogs, pull-request references, CI logs, or another clone, then restore the branch with a reviewed force-with-lease push. Communicate the recovery commit and ask contributors to rebase or reset only after the shared branch is restored."
+  pitfalls={["Immediately force-pushing your own local branch without confirming it contains every lost commit.", "Using --force instead of --force-with-lease during recovery and overwriting new recovery work."]}
+  followUps={["Which Git hosting features can prevent force pushes to protected branches?", "How can git reflog help after a commit is no longer reachable from a branch?"]}
+>
+One safe recovery pattern is:
+
+```bash
+# Inspect local history and find the good commit.
+git reflog show origin/main
+git show <good-commit>
+
+# Create a recovery branch for review, then restore only after agreement.
+git switch -c recovery-main <good-commit>
+git push --force-with-lease origin recovery-main:main
+```
+
+Use a pull request or a second reviewer when possible. Protect the branch afterward so normal contributors cannot force-push to it.
 </InterviewQuestion>
 
 <InterviewQuestion
   id="git-fetch-vs-pull-ff-only"
-  number={2}
+  number={3}
   difficulty="beginner"
   tags={["git", "collaboration", "fetch", "pull"]}
-  question="ما الفرق بين git fetch و git pull، ولماذا يُنصح بضبط pull.ff only في إعدادات Git؟"
-  directAnswer="يقوم git fetch بتنزيل الكائنات والمراجع الجديدة من المستودع البعيد وتحديث فروع التتبع (مثل origin/main) دون دمجها أو تعديل ملفاتك المحلية. أما git pull فينفذ خطوتين متتاليتين: fetch ثم دمج فوري (merge أو rebase) في فرعك الحالي. يُنصح بضبط pull.ff only لضمان أن التحديث لن ينشئ التزامات دمج غير مقصودة (Merge Commits) إذا تباعد فرعك المحلي عن الفرع البعيد، ويجبرك على اتخاذ قرار الدمج أو إعادة البناء يدويًا."
+  question="What is the difference between git fetch and git pull, and why is it recommended to set pull.ff only in Git settings?"
+  directAnswer="git fetch downloads new objects and references from the remote repository and updates tracking branches (such as origin/main) without merging them or modifying your local files. git pull performs two sequential steps: fetch and then an immediate merge or rebase into your current branch. Set pull.ff only so an update cannot create an unintended merge commit when your local branch diverges from the remote branch; this forces you to choose how to integrate the changes."
   pitfalls={[
-    "استخدام git pull الأعمى أثناء وجود تعديلات محلية، مما ينشئ دمجًا تلقائيًا فوضويًا برؤوس التزام تلقائية مثل Merge branch 'main' of ... تشوه تاريخ المشروع.",
-    "الاعتقاد بأن git fetch يغير أي سطر في ملفات مجلد العمل؛ git fetch آمن تمامًا ولا يغير كودك الحالي مطلقًا."
+    "Using blind git pull while there are local edits, creating a messy auto-merge with auto-commit headers like Merge branch 'main' of ... distorting the project history.",
+    "Belief that git fetch changes any line in working folder files; git fetch is completely safe and never changes your existing code."
   ]}
   followUps={[
-    "كيف يمكنك ضبط سياسة Fast-Forward Only عالميًا في Git؟",
-    "ما الفرق بين git pull --rebase و git pull --ff-only؟"
+    "How do you set the Fast-Forward Only policy globally in Git?",
+    "What's the difference between git pull --rebase and git pull --ff-only?"
   ]}
 >
-الصيغة المعمارية لـ `git pull`:
+Architectural syntax for `git pull`:
 ```text
 git pull = git fetch + git merge (or git rebase)
 ```
 
-**ضبط السلوك الآمن عالميًا:**
+**Controlling safe behavior globally:**
 ```bash
-# منع إنشاء التزامات دمج غير متوقعة عند الجلب:
+# Prevent unexpected merge commits from being created when fetching:
 git config --global pull.ff only
 ```
-إذا تباعد الفرع المحلي عن الفرع البعيد، سيرفض Git عملية الـ pull ويعرض رسالة واضحة تنصحك إما بإعادة ترتيب التزاماتك عبر `git pull --rebase` أو دمجها صراحة، مما يحافظ على نظافة تاريخ المستودع.
+If the local branch diverges from the remote branch, Git will reject the pull and display a clear message advising you to either reorder your commits via `git pull --rebase` or merge them explicitly, keeping the repository history clean.
 </InterviewQuestion>

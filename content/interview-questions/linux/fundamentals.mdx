@@ -2,10 +2,10 @@
 title: Linux Fundamentals Interview Questions
 technology: linux
 topic: fundamentals
-description: أسئلة مقابلات حول المبادئ المعمارية لنظام لينكس، مراحل إقلاع النظام (Boot Process)، أهداف Systemd، ومسارات تدفق المدخلات والمخرجات القياسية.
+description: Interview questions about Linux architectural principles, the boot process, Systemd goals, and standard input/output flow paths.
 order: 1
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,35 +13,35 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["linux", "boot-process", "systemd", "kernel"]}
-  question="اشرح بالتفصيل مراحل إقلاع نظام لينكس (Linux Boot Process) بدءًا من الضغط على زر التشغيل وحتى ظهور شاشة تسجيل الدخول."
-  directAnswer="يمر الإقلاع بست مراحل متتالية: 1. تشغيل البرامج الثابتة (BIOS / UEFI) وفحص العتاد (POST)، 2. محمل الإقلاع (GRUB2) واختيار النواة، 3. تحميل النواة (Kernel) ونظام الملفات المؤقت في الذاكرة (initramfs)، 4. تهيئة تعريفات العتاد وتثبيت نظام الملفات الجذري الحقيقي (Root FS)، 5. تشغيل مدير العمليات الأول (Systemd كمعرف PID 1)، 6. تفعيل أهداف الإقلاع (Default Target مثل multi-user.target أو graphical.target) وتشغيل خدمات النظام."
+  question="Explain in detail the stages of booting the Linux system (Linux Boot Process), starting from pressing the power button until the login screen appears."
+  directAnswer="booting goes through six successive stages: 1. Booting the firmware (BIOS / UEFI) and checking the hardware (POST), 2. Bootloader (GRUB2) and selecting the kernel, 3. Loading the kernel (initramfs), 4. Initializing the hardware drivers and installing the real root file system (Root FS), 5. Running the first process manager (Systemd as PID 1), 6. Activating targets Boot (Default Target such as multi-user.target or graphical.target) and run system services."
   pitfalls={[
-    "الاعتقاد بأن النواة تقوم بتشغيل الخدمات مباشرة؛ النواة فقط تقوم بتهيئة العتاد ثم تسلم التحكم بالكامل إلى معالج النظام الأول PID 1 (/sbin/init أو systemd).",
-    "تجاهل دور initramfs (Initial RAM Filesystem) في تحميل تعريفات وحدات التخزين ومصفوفات RAID والتشفير LVM/LUKS قبل إمكانية قراءة القرص الصلب الحقيقي."
+    "The belief is that the kernel runs services directly; the kernel just initializes the hardware and then hands over full control to the first system processor PID 1 (/sbin/init or systemd).",
+    "Ignoring the role of initramfs (Initial RAM Filesystem) in loading volume definitions, RAID arrays, and LVM/LUKS encryption before the physical hard disk can be read."
   ]}
   followUps={[
-    "ما دور ملف /boot/grub2/grub.cfg في تحديد معلمات تمرير النواة (Kernel Parameters)؟",
-    "ماذا يحدث إذا فشلت النواة في العثور على أو تشغيل ملف /sbin/init (Kernel Panic)؟"
+    "What is the role of the file /boot/grub2/grub.cfg in specifying kernel parameters?",
+    "What happens if the kernel fails to find or run the /sbin/init file (Kernel Panic)?"
   ]}
 >
-المراحل الست لإقلاع لينكس:
+The six stages of Linux booting:
 
 1. **BIOS / UEFI:**
-   - يفحص سلامة مكونات العتاد (POST - Power-On Self Test).
-   - يقرأ إعدادات ترتيب الإقلاع (Boot Order) من شريحة NVRAM ويحمل كود MBR أو ملف EFI من قسم ESP.
+   - Checks the integrity of gear components (POST - Power-On Self Test).
+   - Reads Boot Order settings from NVRAM chip and loads MBR code or EFI file from ESP partition.
 2. **GRUB2 (Grand Unified Bootloader):**
-   - يعرض قائمة أنوية لينكس المتاحة وخيارات التمهيد.
-   - يحمل صورة النواة المضغوطة `vmlinuz` وصورة الذاكرة المؤقتة `initramfs` في الذاكرة العشوائية (RAM).
+   - Displays a list of available Linux kernels and boot options.
+   - It holds the compressed kernel image `vmlinuz` and the cache image `initramfs` in RAM.
 3. **Kernel Initialization:**
-   - تفك النواة ضغط نفسها وتتحكم في المعالج والذاكرة.
-   - تهيئ مساحات النواة ومحركات الأجهزة الأساسية.
+   - The kernel decompresses itself and takes control of the processor and memory.
+   - Configure kernel spaces and basic device drivers.
 4. **initramfs:**
-   - نظام ملفات مصغر مؤقت في الذاكرة يحتوي على وحدات النواة الضرورية للوصول إلى وحدة التخزين الرئيسية (مثل تعريفات NVMe أو iSCSI أو تشفير LUKS). بمجرد تثبيت القسم الجذري الحقيقي `/`، يُلغى تثبيت initramfs.
+   - A temporary mini-file system in memory that contains the kernel modules necessary to access the main volume (such as NVMe, iSCSI, or LUKS encryption drivers). Once the real root partition `/` is mounted, initramfs is unmounted.
 5. **Systemd (PID 1):**
-   - أول عملية تبدأ في مساحة المستخدمين (User Space) برقم المعرف `PID 1`.
-   - تحلل شجرة الاعتماديات لملفات التكوين `.service` و `.mount`.
+   - The first process starts in User Space with ID number `PID 1`.
+   - Dependency tree analysis for `.service` and `.mount` configuration files.
 6. **Default Target:**
-   - الوصول إلى الهدف الافتراضي (يقابل Runlevels القديمة)، مثل `multi-user.target` للخوادم أو `graphical.target` لمحطات العمل الرسومية.
+   - Access the default target (corresponding to legacy Runlevels), such as `multi-user.target` for servers or `graphical.target` for graphics workstations.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -49,36 +49,36 @@ language: ar
   number={2}
   difficulty="beginner"
   tags={["linux", "shell", "redirection", "io"]}
-  question="ما هي مسارات الإدخال والإخراج القياسية الثلاثة (Standard Streams) في لينكس، وماذا يعني الرمز 2>&1؟"
-  directAnswer="المسارات الثلاثة وواصفات ملفاتها هي: stdin (المعرف 0 للمدخلات القياسية)، stdout (المعرف 1 للمخرجات القياسية)، و stderr (المعرف 2 لمخرجات الأخطاء القياسية). الرمز 2>&1 يوجه مخرجات الأخطاء (واصف 2) إلى نفس الوجهة التي يتجه إليها المخرج القياسي (واصف 1)، مما يدمج السجلات والأخطاء في ملف واحد."
+  question="What are the three standard input and output streams in Linux, and what does 2>&1 mean?"
+  directAnswer="The three paths and their file descriptors are: stdin (ID 0 for standard input), stdout (ID 1 for standard output), and stderr (ID 2 for standard error output). The symbol 2>&1 directs the error output (descriptor 2) to the same destination as the standard output (descriptor 1), combining the logs and errors into a single file."
   pitfalls={[
-    "كتابة > file 2>&1 بترتيب معكوس مثل 2>&1 > file؛ الترتيب مهم جدًا لأن القشرة (Shell) تقيم عمليات إعادة التوجيه من اليسار إلى اليمين.",
-    "الاعتقاد بأن الأنبوب | ينقل الأخطاء القياسية (stderr)؛ الأنبوب يمرر stdout فقط بشكل افتراضي، إلا إذا دمجت القنوات باستخدام |& في قشرة Bash الحديثة."
+    "Write <file 2>&1 in reverse order as 2>&1 > file; the order is very important because the shell evaluates redirections from left to right.",
+    "Belief that pipe | passes standard errors (stderr); pipe only passes stdout by default, unless you merge channels using |& in a modern Bash shell."
   ]}
   followUps={[
-    "كيف يمكنك تجاهل مخرجات الأخطاء القياسية بالكامل في سطر الأوامر دون حفظها؟",
-    "ما الفرق بين عملية إعادة التوجيه الفردية > وعملية الإلحاق المزدوجة >>؟"
+    "How can you completely ignore standard error output on the command line without saving it?",
+    "What is the difference between a single redirect > operation and a double append operation >>?"
   ]}
 >
-واصفات الملفات (File Descriptors) القياسية:
+Standard file descriptors:
 
-| واصف الملف (FD) | الاسم | المصدر / الوجهة الافتراضية |
+| File Descriptor (FD) | Name | Default source/destination |
 |---|---|---|
-| `0` | `stdin` | لوحة المفاتيح (Keyboard) |
-| `1` | `stdout` | شاشة الطرفية (Terminal Screen) |
-| `2` | `stderr` | شاشة الطرفية (Terminal Screen) |
+| `0` | `stdin` | Keyboard |
+| `1` | `stdout` | Terminal Screen |
+| `2` | `stderr` | Terminal Screen |
 
-أمثلة متكررة في مقابلات DevOps:
+Frequent examples in DevOps interviews:
 ```bash
-# 1. إرسال المخرجات الطبيعية لملف والأخطاء لملف آخر
-command > output.log 2> error.log
+#1. Send normal output to one file and errors to another
+command > output.log 2 > error.log
 
-# 2. دمج stdout و stderr في ملف واحد
+#2. Merge stdout and stderr into one file
 command > all.log 2>&1
-# أو بصيغة Bash المختصرة:
-command &> all.log
+# Or in shortened Bash form:
+command &> all. log
 
-# 3. إخفاء كافة المخرجات والأخطاء في سكربتات Cron
+#3. Hide all output and errors in Cron scripts
 command > /dev/null 2>&1
 ```
 </InterviewQuestion>

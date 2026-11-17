@@ -2,10 +2,10 @@
 title: Linux Permissions & SUID Interview Questions
 technology: linux
 topic: permissions
-description: أسئلة مقابلات حول صلاحيات ملفات لينكس، الصلاحيات الخاصة (SUID وSGID وSticky Bit)، حساب umask، وإدارة sudoers الآمنة.
+description: Interview questions about Linux file permissions, special privileges (SUID, SGID, and Sticky Bit), umask calculation, and secure sudoers management.
 order: 5
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,29 +13,29 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["linux", "security", "permissions", "suid", "sticky-bit"]}
-  question="اشرح الصلاحيات الخاصة الثلاث في لينكس: SUID و SGID و Sticky Bit، مع ذكر حالة استخدام واقعية لكل منها."
-  directAnswer="SUID (القيمة الثمانية 4000) تجعل الملف التنفيذي يعمل بصلاحيات مالك الملف (غالباً root) بدلاً من المستخدم الذي قام بتشغيله (مثال: أمر passwd). SGID (القيمة 2000) على المجلد تجعل أي ملف جديد ينشأ داخله يرث مجموعة المجلد تلقائيًا بدلاً من المجموعة الأساسية للمنشئ (مثال: مجلد العمل التشاركي للفريق). Sticky Bit (القيمة 1000) على المجلد تمنع أي مستخدم من حذف أو إعادة تسمية ملف إلا إذا كان مالك الملف نفسه أو root (مثال: مجلد /tmp)."
+  question="Explain the three special privileges in Linux: SUID, SGID, and Sticky Bit, with a real-life use case for each."
+  directAnswer="SUID (octet 4000) makes the executable file run with the privileges of the file owner (usually root) rather than the user who ran it (example: passwd command). SGID (value 2000) on the folder makes any new file created within it automatically inherit the folder set instead of the creator's base set (example: team coworking folder). Sticky Bit (value 1000) on the folder prevents any user from deleting or renaming a file unless The owner of the file itself or root (example: /tmp folder)."
   pitfalls={[
-    "منح صلاحية SUID لملفات نصية (Bash Scripts) أو مترجمات تفاعلية مثل Python أو Perl، مما يفتح ثغرة تصعيد صلاحيات فورية (Privilege Escalation) لأي مستخدم محلي.",
-    "الاعتقاد بأن صلاحية rwxrwxrwx على مجلد بدون Sticky Bit تحمي الملفات؛ أي مستخدم يملك تصريح كتابة على المجلد يمكنه حذف ملفات غيره حتى لو لم يكن يملك تصريح قراءة لتلك الملفات."
+    "Granting SUID privileges to Bash scripts or interactive compilers such as Python or Perl, opening a Privilege Escalation vulnerability for any local user.",
+    "The belief that rwxrwxrwx permission on a folder without Sticky Bit protects files; any user with write permission on the folder can delete someone else's files even if they do not have read permission for those files."
   ]}
   followUps={[
-    "كيف تبحث في النظام عن جميع الملفات التي تمتلك صلاحية SUID لتدقيق الأمان؟",
-    "ما معنى ظهور حرف s صغير مقابل S كبير في مخرجات أمر ls -l لصلاحية SUID أو SGID؟"
+    "How do you search the system for all files with SUID permission for security auditing?",
+    "What does the appearance of a lowercase s versus an uppercase S in the output of the ls -l command mean for a SUID or SGID authority?"
   ]}
 >
-جدول الصلاحيات الخاصة في لينكس:
+Special privileges table in Linux:
 
-| الصلاحية | القيمة الثمانية | السلوك على الملفات | السلوك على المجلدات | مثال شهير |
+| Validity | Octal value | Behavior on files | Behavior on folders | Famous example |
 |---|---|---|---|---|
-| **SUID** | `4000` | يعمل بصلاحية **مالك الملف** | لا أثر عملي | `/usr/bin/passwd` (لكتابة كلمة المرور في `/etc/shadow`) |
-| **SGID** | `2000` | يعمل بصلاحية **مجموعة الملف** | أي ملف جديد يرث **مجموعة المجلد** | مجلدات المطورين المشتركة `/var/share/project` |
-| **Sticky Bit** | `1000` | لا أثر عملي | المالك الحقيقي و root فقط يمكنهم **حذف الملف** | مجلد الملفات المؤقتة `/tmp` |
+| **SUID** | `4000` | Operates as **File Owner** | No practical effect `/usr/bin/passwd` (to write the password in `/etc/shadow`) |
+| **SGID** | `2000` | Operates with **FileSet** | permission Any new file inherits **folder set** | Shared developer folders `/var/share/project` |
+| **Sticky Bit** | `1000` | No practical effect Only the real owner and root can **delete the file** | Temporary files folder `/tmp` |
 
-- ظهور **`s` صغير**: الصلاحية الخاصة مفعلة وصلاحية التنفيذ `x` موجودة أصلاً.
-- ظهور **`S` كبير**: الصلاحية الخاصة مفعلة ولكن صلاحية التنفيذ `x` غير موجودة (خطأ في التكوين).
+- The appearance of a small **`s`**: the special permission is activated and the execution permission `x` already exists.
+- Large **`S`** appears: The special permission is enabled but the execution permission `x` does not exist (configuration error).
 
-**أمر تدقيق الأمان لاكتشاف ملفات SUID المشبوهة:**
+**Security audit command to detect suspicious SUID files:**
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 ```
@@ -46,37 +46,37 @@ find / -perm -4000 -type f 2>/dev/null
   number={2}
   difficulty="beginner"
   tags={["linux", "permissions", "umask"]}
-  question="كيف تعمل قيمة umask في لينكس، وما هي الصلاحيات الافتراضية لملف ومجلد تم إنشاؤهما حديثًا إذا كانت قيمة umask هي 022؟"
-  directAnswer="تعمل قيمة umask كقناع استبعاد (Permission Mask) يطرح الصلاحيات المحددة فيه من الصلاحيات القصوى الافتراضية (وهي 666 للملفات و777 للمجلدات). إذا كانت umask هي 022، تصبح صلاحية الملف الجديد: 666 - 022 = 644 (rw-r--r--)، وتصبح صلاحية المجلد الجديد: 777 - 022 = 755 (rwxr-xr-x)."
+  question="How does umask work in Linux, and what are the default permissions for a newly created file and folder if umask is 022?"
+  directAnswer="The umask value acts as a Permission Mask that subtracts the permissions specified in it from the default maximum permissions (666 for files and 777 for folders). If umask is 022, the permission of the new file becomes: 666 - 022 = 644 (rw-r--r--), and the permission of the new folder becomes: 777 - 022 = 755 (rwxr-xr-x)."
   pitfalls={[
-    "الاعتقاد بأن الصلاحية القصوى للملفات تبدأ بـ 777؛ الصلاحيات الافتراضية للملفات في لينكس لا تمنح أبدًا صلاحية التنفيذ x كإجراء أمني وقائي، وتبدأ بـ 666.",
-    "الاعتقاد بأن الحساب يتم بالطرح الحسابي البسيط دائمًا؛ هو في الواقع عملية منطقية بنمط Bitwise AND مع مكمل القناع (AND NOT)."
+    "Belief that maximum file permissions start with 777; default file permissions in Linux never grant execution permission x as a security precaution, and start with 666.",
+    "The belief that calculation is always done by simple arithmetic subtraction; it is actually a bitwise AND with mask complement (AND NOT)."
   ]}
   followUps={[
-    "ماذا تصبح صلاحية الملف والمجلد إذا تم تغيير umask إلى 027 في بيئة إنتاج مشددة؟",
-    "أين يتم ضبط قيمة umask العامة لكافة المستخدمين في النظام؟"
+    "What does the file and folder expiry become if umask is changed to 027 in a stressed production environment?",
+    "Where is the global umask value set for all users in the system?"
   ]}
 >
-معادلة حساب الصلاحيات:
+Power calculation formula:
 
-- **الصلاحية القصوى للمجلدات:** `777` (`rwxrwxrwx`)
-- **الصلاحية القصوى للملفات:** `666` (`rw-rw-rw-`)
+- **Maximum folder validity:** `777` (`rwxrwxrwx`)
+- **Maximum file validity:** `666` (`rw-rw-rw-`)
 
-تطبيق القناع `022`:
+Application of mask `022`:
 ```
-   777 (المجلد الأقصى)
--  022 (قناع umask)
+   777 (maximum volume)
+- 022 (umask)
 ───────
-   755 (الصلاحية الناتجة للمجلد: rwxr-xr-x)
+   755 (resulting folder validity: rwxr-xr-x)
 
-   666 (الملف الأقصى)
--  022 (قناع umask)
+   666 (maximum file)
+- 022 (umask)
 ───────
-   644 (الصلاحية الناتجة للملف: rw-r--r--)
+   644 (resulting file validity: rw-r--r--)
 ```
 
-إذا كانت قيمة الـ `umask` هي `027`:
-- المجلد: `777 - 027 = 750` (`rwxr-x---`)
-- الملف: `666 - 027 = 640` (`rw-r-----`)
-وهذا يمنع بقية مستخدمي الخادم (Other) من قراءة أو كتابة أي ملف جديد ينشئه المستخدم.
+If the value of `umask` is `027`:
+- Folder: `777 - 027 = 750` (`rwxr-x---`)
+- File: `666 - 027 = 640` (`rw-r-----`)
+This prevents other server users from reading or writing any new file the user creates.
 </InterviewQuestion>

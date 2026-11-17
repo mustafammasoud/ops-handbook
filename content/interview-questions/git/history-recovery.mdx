@@ -2,10 +2,10 @@
 title: Git History & Recovery Interview Questions
 technology: git
 topic: history-recovery
-description: أسئلة مقابلات حول استعادة التعديلات المفقودة في Git، حالات Detached HEAD، مقارنة أوامر Reset وRevert وRestore، وسجل النجاة Reflog.
+description: Interview questions about recovering lost modifications in Git, Detached HEAD cases, comparison of Reset, Revert, and Restore commands, and Reflog.
 order: 3
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,30 +13,30 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["git", "recovery", "reset", "revert"]}
-  question="قارن بين مستويات أمر git reset الثلاثة (--soft و --mixed و --hard)، وما الفرق الجوهري بين Reset و Revert؟"
-  directAnswer="يقوم git reset بتحريك مؤشر الفرع إلى التزام سابق مع اختلافات في مكان حفظ التغييرات: --soft ينقل التعديلات إلى Staging Area، و--mixed (الافتراضي) ينقل التعديلات إلى Working Directory ويلغي تجهيزها، و--hard يمسح التعديلات نهائيًا من كل الأماكن. الفارق الجوهري: Reset يعيد كتابة التاريخ بحذف الالتزامات ويصلح للفروع المحلية فقط، بينما Revert ينشئ التزامًا جديدًا يعكس ويلغي تأثير التزام سابق بشكل آمن تمامًا للفروع العامة المشتركة."
+  question="Compare the three git reset command levels (--soft, --mixed, and --hard), and what is the fundamental difference between Reset and Revert?"
+  directAnswer="git reset moves the branch pointer to a previous commit with differences in where changes are saved: --soft moves modifications to the Staging Area, --mixed (default) moves modifications to the Working Directory and unprocesses them, and --hard permanently clears modifications from all locations. The key difference: Reset rewrites history by deleting commits and is only valid for local branches, while Revert creates a new commit that completely safely mirrors and undoes the impact of a previous commit for shared global branches."
   pitfalls={[
-    "استخدام git reset --hard على فرع تم رفعه إلى remote repository ثم محاولة عمل push بالقوة، مما قد يمسح عمل الفريق.",
-    "الاعتقاد بأن git reset --hard يحذف كل شيء بلا رجعة؛ يمكن استعادة الالتزامات المفقودة غالبًا عبر git reflog إذا لم يتم تنظيف المستودع عبر Garbage Collection."
+    "Using git reset --hard on a branch that has been pushed to a remote repository and then trying to force a push can wipe out the team's work.",
+    "The belief is that git reset --hard deletes everything irreversibly; lost commits can often be recovered via git reflog if the repository is not cleaned via Garbage Collection."
   ]}
   followUps={[
-    "كيف تستخدم أمر git restore الحديث لإلغاء التعديلات على ملف محدد بدلاً من استخدام git checkout القديم؟",
-    "ماذا يحدث إذا قمت بعمل git revert لـ Merge Commit؟"
+    "How do you use the modern git restore command to undo modifications to a specific file instead of using the old git checkout?",
+    "What happens if I git revert a Merge Commit?"
   ]}
 >
-جدول مستويات `git reset`:
+`git reset` levels table:
 
-| الأمر | مؤشر HEAD والفرع | منطقة التجهيز (Index / Stage) | مجلد العمل (Working Tree) |
+| The command | HEAD index and branch | Preparation area (Index / Stage) | Working Tree folder
 |---|---|---|---|
-| `git reset --soft <hash>` | يتحرك للخلف | **تظل التعديلات مجهزة** | تظل التعديلات موجودة |
-| `git reset --mixed <hash>` (الافتراضي) | يتحرك للخلف | **تُلغى التجهيزات (Unstaged)** | تظل التعديلات موجودة |
-| `git reset --hard <hash>` | يتحرك للخلف | **تُمسح التعديلات** | **تُمسح التعديلات بالكامل** |
+| `git reset --soft <hash>` | Moves backwards | **Modifications remain ready** | The modifications remain
+| `git reset --mixed <hash>` (default) | Moves backwards | **Equipments are canceled (Unstaged)** | The modifications remain
+| `git reset --hard <hash>` | Moves backwards | **Modifications are deleted** | **Modifications are completely deleted** |
 
-**متى تستخدم Revert مقابل Reset؟**
-- **الفروع المحلية (Local Feature Branch):** استخدم `git reset` إذا أردت إلغاء التزاماتك الأخيرة وإعادة صياغتها بنظافة.
-- **الفروع المشتركة (Shared `main` or Production):** استخدم `git revert <commit-hash>` حصرًا:
+**When do you use Revert versus Reset?**
+- **Local Feature Branch:** Use `git reset` if you want to undo your recent commits and refactor them cleanly.
+- **Shared `main` or Production):** Use `git revert <commit-hash>` exclusively:
   ```bash
-  # ينشئ commit جديد يلغي بدقة تغييرات الالتزام السابق دون لمس التاريخ القديم
+  # Creates a new commit that accurately undoes changes to the previous commit without touching the old history
   git revert 3a4b5c6
   ```
 </InterviewQuestion>
@@ -46,34 +46,34 @@ language: ar
   number={2}
   difficulty="advanced"
   tags={["git", "recovery", "reflog", "detached-head"]}
-  question="ما هي حالة Detached HEAD، وكيف يمكن لـ git reflog إنقاذ التزامات ضائعة بعد وقوع reset خاطئ؟"
-  directAnswer="حالة Detached HEAD تعني أن مؤشر HEAD يشير مباشرة إلى هاش التزام محدد بدلاً من الإشارة إلى اسم فرع (Branch Reference). إذا كتبت التزامات جديدة في هذه الحالة ثم انتقلت لفرع آخر، تصبح تلك الالتزامات معلقة (Orphaned / Unreachable). سجل git reflog يسجل كل حركة قام بها مؤشر HEAD محليًا، مما يمكنك من العثور على الهاش المفقود وإنشاء فرع جديد يثبته فورًا."
+  question="What is the case of Detached HEAD, and how can git reflog rescue lost commits after a false reset?"
+  directAnswer="Detached HEAD state means that the HEAD pointer points directly to a specific commit hash instead of pointing to a branch name. If you write new commits in this state and then move to another branch, those commits become suspended (Orphaned/Unreachable). The git reflog records every move the HEAD pointer made locally, enabling you to find the missing hash and create a new branch that installs it immediately."
   pitfalls={[
-    "الانتقال إلى فرع آخر (مثل git checkout main) بعد ارتكاب تعديلات في حالة Detached HEAD دون تسمية فرع، مما يجعل التعديلات غير مرئية في git log.",
-    "الاعتقاد بأن git reflog متاح على الخادم البعيد (Remote)؛ الـ reflog هو سجل شخصي محلي بحت ولا يُرفع إلى GitHub."
+    "Moving to another branch (such as git checkout main) after committing modifications is in Detached HEAD state without naming the branch, making modifications invisible in git log.",
+    "Belief that git reflog is available on a remote server; the reflog is a purely local personal log and is not uploaded to GitHub."
   ]}
   followUps={[
-    "ما هي المدة الافتراضية لبقاء السجلات في git reflog قبل أن يحذفها git gc؟",
-    "كيف يمكنك استرجاع فرع محلي تم حذفه بالخطأ عبر أمر git branch -D؟"
+    "How long does the default log remain in git reflog before git gc deletes it?",
+    "How do you recover a local branch that was accidentally deleted via git branch -D command?"
   ]}
 >
-سيناريو الإنقاذ عبر `git reflog`:
+Rescue scenario via `git reflog`:
 
-1. ارتكبت التزامًا مهمًا في حالة `Detached HEAD` أو قمت بعمل `git reset --hard` خاطئ.
-2. الالتزام اختفى من `git log`.
-3. شغل سجل الحركات المرجعية:
+1. You made a critical commit in `Detached HEAD` state or you did a wrong `git reset --hard`.
+2. The commit disappeared from `git log`.
+3. Run the reference transaction log:
    ```bash
    git reflog -n 10
    ```
-   المخرجات ستظهر حركات المؤشر السابقة:
+   The output will show previous cursor movements:
    ```
    a1b2c3d HEAD@{0}: reset: moving to HEAD~3
    f4e5d6c HEAD@{1}: commit: important emergency fix
    9876543 HEAD@{2}: checkout: moving from main to detached HEAD
    ```
-4. أنشئ فرعًا جديدًا يثبت هذا الالتزام فورًا قبل أن تحذفه أداة تنظيف الذاكرة:
+4. Create a new branch that installs this commit immediately before the memory cleaner deletes it:
    ```bash
    git branch recovery-branch f4e5d6c
    ```
-الآن تم استرداد كافة الملفات والالتزامات بنجاح وأمان.
+Now all files and commits have been recovered successfully and safely.
 </InterviewQuestion>

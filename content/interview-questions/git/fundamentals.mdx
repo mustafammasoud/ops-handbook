@@ -2,10 +2,10 @@
 title: Git Fundamentals & Internals Interview Questions
 technology: git
 topic: fundamentals
-description: أسئلة مقابلات حول البنية الداخلية لـ Git، كائنات التخزين الأساسية (Blobs وTrees وCommits)، الحالات الثلاث، وتشريح مجلد .git.
+description: Interview questions about the internal structure of Git, the basic storage objects (Blobs, Trees, and Commits), the three states, and the anatomy of a .git directory.
 order: 1
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,32 +13,32 @@ language: ar
   number={1}
   difficulty="advanced"
   tags={["git", "internals", "blobs", "trees", "commits"]}
-  question="اشرح نموذج الكائنات الأربعة الأساسية في بنية Git الداخلية (Object Model)، وكيف تمثل مستودعك كـ Directed Acyclic Graph (DAG)؟"
-  directAnswer="يقوم Git بتخزين كافة بيانات وتاريخ المشروع في أربعة أنواع من الكائنات غير القابلة للتغيير: 1. Blobs لتخزين محتوى الملفات الخام فقط دون الأسماء أو الصلاحيات، 2. Trees لتمثيل بنية المجلدات وربط أسماء الملفات وصلاحياتها بالـ Blobs أو مجلدات فرعية، 3. Commits لتوثيق لقطة شجرة المشروع العليا (Root Tree) مع اسم الكاتب والتاريخ ورسالة الالتزام والمؤشر للالتزام الأب، 4. Annotated Tags لتسمية التزام محدد وتوقيعه. تشكل هذه الالتزامات شبكة موجهة لا حلقية (DAG)."
+  question="Explain the four basic object models in Git's internal structure (Object Model), and how you represent your repository as a Directed Acyclic Graph (DAG)?"
+  directAnswer="Git stores all project data and history in four immutable object types: blobs store raw file content without names or permissions; trees represent directory structure and associate names and permissions with blobs or subtrees; commits record a project-tree snapshot with author, date, message, and parent; and annotated tags name and sign a particular commit. Together, commit relationships form a directed acyclic graph (DAG)."
   pitfalls={[
-    "الاعتقاد بأن Git يخزن فروقات التعديل فقط (Diffs / Deltas) بين الالتزامات مثل أنظمة VCS القديمة؛ Git يخزن لقطات كاملة (Full Snapshots)، ويعيد استخدام نفس مؤشرات الـ Blobs للملفات التي لم تتغير.",
-    "الاعتقاد بأن اسم الملف مخزن داخل كائن الـ Blob؛ كائن الـ Blob يحتوي فقط على المحتوى الخام، واسم الملف مخزن حصراً في كائن الـ Tree الحاوي له."
+    "The belief that Git stores only modification differences (Diffs/Deltas) between commits like legacy VCS systems; Git stores Full Snapshots, reusing the same Blob pointers for unchanged files.",
+    "The belief that the file name is stored inside a Blob; the Blob contains only the raw content, and the file name is stored exclusively in its containing Tree object."
   ]}
   followUps={[
-    "كيف يمكنك استكشاف نوع ومحتوى أي كائن داخل مجلد .git/objects باستخدام أمر git cat-file؟",
-    "كيف يتأكد Git من سلامة التاريخ المرجعي وعدم العبث به عبر دوال التجزئة (SHA-1 و SHA-256)؟"
-  ]}
+    "How can you explore the type and content of any object inside a .git/objects folder using the git cat-file command?",
+    "How does Git ensure that the reference history is safe and has not been tampered with via hash functions (SHA-1 and SHA-256)?"
+]}
 >
-الكائنات الأربعة الأساسية في مجلد `.git/objects`:
+The four basic objects in the `.git/objects` folder:
 
 1. **Blob (Binary Large Object):**
-   - يخزن المحتوى الثنائي أو النصي فقط. إذا كان لديك ملفان بنفس المحتوى واسمان مختلفان، ينشئ Git كائن `blob` وحيدًا لهما.
+   - Stores binary or textual content only. If you have two files with the same content and different names, Git creates a single `blob` object for them.
 2. **Tree:**
-   - يمثل الدليل (Directory). يحتوي على قائمة صفوف تشمل: نوع الكائن (`blob` أو `tree`)، واسم الملف، ورقم الصلاحية (مثل `100644` أو `100755`)، والـ SHA الخاص به.
+   - Represents the directory. It contains a list of rows that includes: the type of object (`blob` or `tree`), the file name, its authority number (such as `100644` or `100755`), and its SHA.
 3. **Commit:**
-   - لقطة زمنية تشير إلى الـ Root Tree للمشروع، ومؤشر إلى الالتزام الأب (`parent hash`)، وهوية المؤلف وتاريخ التعديل.
+   - A snapshot of time indicating the project's root tree, an indication of the parent hash, the identity of the author and the modification date.
 4. **Annotated Tag:**
-   - كائن دائم يشير إلى التزام، ويحتوي على رسالة الوسم واسم الموسِّم والتوقيع الإلكتروني.
+   - A permanent object denoting a commitment, containing the tag message, signer's name, and electronic signature.
 
 ```
        [ Commit Object ]
          ├── Parent: a1b2c3d...
-         ├── Author: Mustafa ...
+         ├── Author: Mustafa...
          └── Tree: 8f9e2b1...
                │
        [ Tree Object (Root) ]
@@ -46,15 +46,15 @@ language: ar
          └── 040000 tree d4c5... (src/)
                      │
              [ Tree Object (src/) ]
-               └── 100644 blob 7a8b... (main.go)
+└── 100644 blob 7a8b... (main.go)
 ```
 
-فحص الكائنات مباشرة من سطر الأوامر:
+Inspect objects directly from the command line:
 ```bash
-# معرفة نوع الكائن
+# Find out the type of object
 git cat-file -t <hash>
 
-# قراءة محتوى الكائن
+# Read the content of the object
 git cat-file -p <hash>
 ```
 </InterviewQuestion>
@@ -64,32 +64,32 @@ git cat-file -p <hash>
   number={2}
   difficulty="beginner"
   tags={["git", "architecture", "staging-area", "index"]}
-  question="ما هي الحالات الثلاث (Three States) التي يمكن أن يتواجد فيها الملف في Git، وما دور الـ Staging Area (Index)؟"
-  directAnswer="الحالات الثلاث هي: 1. دليل العمل (Working Directory) حيث تعدل وتنشئ الملفات محليًا، 2. منطقة التجهيز (Staging Area / Index) وهي ملف ثنائي يسجل التغييرات التي ستدخل في الالتزام القادم بالضبط، 3. المستودع (Git Repository / HEAD) حيث تُحفظ التغييرات بشكل دائم في قاعدة بيانات الـ commits. تتيح منطقة التجهيز للمطور تنظيم وصياغة التزامات صغيرة ودقيقة دون الحاجة لتسجيل كل تعديلات مجلد العمل دفعة واحدة."
+  question="What are the Three States in which a file can exist in Git, and what is the role of the Staging Area (Index)?"
+  directAnswer="The three states are: 1. The Working Directory, where you edit and create files locally; 2. The Staging Area / Index, which is a binary file that records exactly what changes will be made in the next commit; 3. The Git Repository / HEAD, where changes are saved permanently in the commits database. The Staging Area allows the developer to organize and draft small, precise commits without having to record all the modifications to the working directory at once."
   pitfalls={[
-    "الاعتقاد بأن Staging Area هي مجرد مفهوم وهمي؛ هي ملف فيزيائي حقيقي موجود في .git/index يتم تحديثه وتخزين بياناته مع كل أمر git add.",
-    "استخدام git commit -a دائمًا لتجاوز Staging Area، مما يؤدي إلى ارتكاب تعديلات تجريبية غير مرغوبة في تاريخ المشروع."
+    "The belief that Staging Area is just an imaginary concept; it is a real physical file located in .git/index whose data is updated and stored with every git add command.",
+    "Always using git commit -a to override the Staging Area, committing unwanted test edits to the project history."
   ]}
-  followUps={[
-    "ما الفرق بين أمر git diff وأمر git diff --cached (أو --staged)؟",
-    "كيف يمكنك تجهيز أجزاء محددة (Hunks) فقط من نفس الملف للالتزام دون بقية الملف؟"
+followUps={[
+    "What is the difference between the git diff command and the git diff --cached (or --staged) command?",
+    "How do you prepare only specific parts (Hunks) of the same file for commit but not the rest of the file?"
   ]}
 >
-تدفق الحالات الثلاث:
+The flow of the three cases:
 
 ```
 [ Working Directory ] ──(git add)──> [ Staging Area (Index) ] ──(git commit)──> [ Git Repository ]
-       │                                     │                                         │
-       └─── (git diff) ──────────────────────┘                                         │
-       │                                                                               │
-       └───────────────────────────── (git diff HEAD) ─────────────────────────────────┘
+       │ │ │
+       └─── (git diff) ──────────────────────┘ │
+       │ │
+       (git diff HEAD) ─────────────────────────────────┘
 ```
 
-- **`git diff`:** يقارن التعديلات الحالية في **Working Directory** مع ما تم تجهيزه في **Staging Area**.
-- **`git diff --cached`:** يقارن التعديلات في **Staging Area** مع آخر التزام في **HEAD**.
-- **تجهيز أجزاء محددة (Interactive Staging):**
+- **`git diff`:** Compares the current modifications in **Working Directory** with what has been prepared in **Staging Area**.
+- **`git diff --cached`:** Compares modifications in **Staging Area** with the last commit in **HEAD**.
+- **Preparing specific parts (Interactive Staging):**
   ```bash
   git add -p file.txt
   ```
-  هذا يتيح مراجعة كل فقرة كود (Hunk) على حدة وقبولها أو تأجيلها لتنظيم رسائل الالتزام بصورة احترافية.
+  This allows each code paragraph to be reviewed individually and accepted or postponed to organize commit messages in a professional manner.
 </InterviewQuestion>

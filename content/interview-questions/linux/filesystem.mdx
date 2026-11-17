@@ -2,10 +2,10 @@
 title: Linux Filesystem & Inodes Interview Questions
 technology: linux
 topic: filesystem
-description: أسئلة مقابلات حول بنية أنظمة ملفات لينكس، مفهوم الـ Inodes، الروابط الصلبة والرمزية، وأعطال نفاد المساحة الوهمية الناتجة عن الملفات المحذوفة المحتجزة.
+description: Interview questions about the architecture of Linux file systems, the concept of inodes, hard and symbolic links, and out-of-space failures caused by retained deleted files.
 order: 3
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,35 +13,35 @@ language: ar
   number={1}
   difficulty="advanced"
   tags={["linux", "filesystem", "troubleshooting", "lsof", "disk-space"]}
-  question="يظهر أمر df -h أن القرص ممتلئ بنسبة 100%، بينما يظهر أمر du -sh أن المساحة المستخدمة لا تتعدى 20%. ما هو السبب الجذري وكيف تحله دون إعادة تشغيل الخادم؟"
-  directAnswer="السبب هو وجود ملفات تم حذفها باستخدام أمر rm، ولكنها لا تزال مفتوحة ومحتجزة بواسطة عمليات قيد التشغيل (مثل خادم تطبيقات يكتب في ملف سجل محذوف). يقوم نظام الملفات بفك الرابط الاسمي فقط للملف، لكنه لا يحرر كتل البيانات (Blocks) على القرص طالما واصف الملف (File Descriptor) مفتوح. يتم حل المشكلة باستخدام lsof +L1 للعثور على المعرفات PIDs المحتجزة، ثم تفريغ الملف بكتابة > /proc/<PID>/fd/<FD> أو إعادة تشغيل الخدمة المسؤولة."
+  question="The df -h command shows that the disk is 100% full, while the du -sh command shows that the space used is only 20%. What is the root cause and how do you solve it without restarting the server?"
+  directAnswer="The reason is that there are files that were deleted with the rm command, but they are still open and being held by running processes (such as an application server writing to a deleted log file). The file system unlinks only the name of the file, but does not free the blocks on disk as long as the File Descriptor is open. The problem is solved by using lsof +L1 to find the retained PIDs, then dumping the file by typing > /proc/<PID>/fd/<FD> or restart the responsible service."
   pitfalls={[
-    "إعادة تشغيل أمر rm مرارًا وتكرارًا على أمل تحرير المساحة؛ الملف غير مرئي في شجرة المجلدات أصلاً لأن مدخله الاسمي أُزيل.",
-    "إعادة تشغيل الخادم بالكامل كحل سريع بدلاً من تشخيص وحل تسريب واصفات الملفات في العملية المعنية."
+    "Rerunning the rm command over and over in hopes of freeing up space; the file isn't even visible in the folder tree because its named entry was removed.",
+    "Reboot the entire server as a quick solution rather than diagnosing and resolving file descriptor leaks in the process in question."
   ]}
   followUps={[
-    "كيف يمكنك قراءة محتويات ملف محذوف لا يزال مفتوحًا بواسطة عملية عبر مسار /proc؟",
-    "كيف تقوم بتفريغ ملف سجل ضخم في الإنتاج دون كسره عبر أمر truncate أو > access.log؟"
+    "How do you read the contents of a deleted file that is still opened by a process via the /proc path?",
+    "How do you dump a huge log file in production without breaking it via truncate or > access.log command?"
   ]}
 >
-خطوات التشخيص والحل في بيئات الإنتاج:
+Diagnostic and resolution steps in production environments:
 
-1. **اكتشاف العمليات التي تحتجز ملفات محذوفة:**
+1. **Detect processes that are holding deleted files:**
    ```bash
    lsof +L1
-   # أو فحص العمليات التي تحتفظ بملفات محذوفة (deleted)
+   # Or scan processes that hold deleted files
    lsof | grep '(deleted)'
    ```
-   ستظهر لك العملية (مثل `nginx` أو `java`) مع الـ `PID` وحجم الملف وواصف الملف `FD`.
+   You will be shown the process (eg `nginx` or `java`) with the `PID`, file size, and `FD` file descriptor.
 
-2. **تحرير المساحة فوريًا دون إيقاف الخدمة:**
-   يمكنك تفريغ محتوى الملف المحتجز مباشرة من خلال الرابط الوهمي في `/proc`:
+2. **Instantly free up space without stopping the service:**
+   You can dump the content of the retained file directly through the virtual link in `/proc`:
    ```bash
    > /proc/<PID>/fd/<FD_NUMBER>
    ```
-   هذا يفرغ كتل البيانات في القرص فورًا ويجعل المساحة حرة في `df -h` دون الحاجة لإعادة تشغيل أو قطع الاتصال بالخدمة.
+   This immediately dumps data blocks into disk and makes space free in `df -h` without having to restart or disconnect from the service.
 
-3. **إعادة تشغيل أو إعادة تحميل الخدمة بنظافة:**
+3. **Restart or cleanly reload the service:**
    ```bash
    systemctl reload <service-name>
    ```
@@ -52,24 +52,24 @@ language: ar
   number={2}
   difficulty="beginner"
   tags={["linux", "filesystem", "inodes", "symlinks"]}
-  question="قارن بين الروابط الصلبة (Hard Links) والروابط الرمزية (Soft / Symbolic Links) في لينكس من حيث الـ Inode والحدود التشغيلية."
-  directAnswer="الرابط الصلب (Hard Link) هو اسم إضافي يشير إلى نفس رقم الـ Inode ونفس كتل البيانات على القرص؛ إذا حذفت الملف الأصلي يبقى الرابط الصلب يعمل بكامل محتواه، ولا يمكن إنشاء روابط صلبة للمجلدات أو عبر أنظمة ملفات مختلفة. بينما الرابط الرمزي (Soft Link) هو ملف منفصل تمامًا يملك Inode خاص به ويحتوي فقط على المسار النصي للملف المستهدف؛ إذا حُذف الملف الأصلي يُكسر الرابط (Broken Link)، ويدعم الإشارة للمجلدات وعبر أقسام وأنظمة ملفات مختلفة."
+  question="Compare hard links and soft/symbolic links in Linux in terms of inodes and operational limits."
+  directAnswer="A hard link is an additional name for the same inode and disk blocks. Deleting the original name does not affect the hard link, but hard links cannot target directories or cross file systems. A symbolic link is a separate file containing the target path. It can target directories and cross file systems, but it becomes broken when its target is deleted."
   pitfalls={[
-    "محاولة إنشاء Hard Link بين قسمين مختلفين (مثل بين / و /var على قرص منفصل)، وهو أمر مستحيل لأن أرقام الـ Inodes فريدة ومستقلة لكل نظام ملفات.",
-    "الاعتقاد بأن تعديل محتوى Soft Link لا يغير الملف الأصلي؛ التعديل على أي رابط يغير محتوى الملف الفعلي، ولكن حذف الـ Soft Link يحذف الرابط فقط."
+    "Trying to create a Hard Link between two different partitions (such as between / and /var on a separate disk), which is impossible because the inode numbers are unique and independent for each file system.",
+    "The belief that modifying the content of a Soft Link does not change the original file; modifying any link changes the content of the actual file, but deleting the Soft Link only deletes the link."
   ]}
   followUps={[
-    "ماذا يمثل العمود الثاني في مخرجات أمر ls -l؟",
-    "متى تقوم النواة بحذف كتل بيانات الملف الفعلي (Blocks) نهائيًا من القرص؟"
+    "What does the second column represent in the output of the ls -l command?",
+    "When does the kernel permanently delete physical file data blocks from disk?"
   ]}
 >
-جدول المقارنة الجوهري:
+Basic comparison table:
 
-| وجه المقارنة | Hard Link (الرابط الصلب) | Soft / Symbolic Link (الرابط الرمزي) |
+| Comparison Hard Link | Soft / Symbolic Link |
 |---|---|---|
-| **رقم الـ Inode** | نفس رقم Inode الملف الأصلي | يمتلك رقم Inode جديد ومستقل |
-| **عبور أنظمة الملفات** | لا يمكن (نفس الـ Filesystem حصراً) | نعم (يمكن الربط عبر أي مسار وقسم) |
-| **الربط بالمجلدات** | غير مسموح به (لمنع الحلقات اللانهائية) | مسموح به بالكامل |
-| **تأثير حذف الملف الأصلي** | يبقى الملف متاحاً عبر الرابط دون أي فقد للبيانات | يُكسر الرابط ويصبح مؤشراً لمسار مفقود (Dangling Link) |
-| **أمر الإنشاء** | `ln file link` | `ln -s file link` |
+| **Inode number** | Same Inode number as the original file | It has a new, independent inode number |
+| **Crossing file systems** | It is not possible (exclusively the same Filesystem) | Yes (can be linked via any path and section) |
+| **Linking to folders** | Not allowed (to prevent infinite loops) | Fully allowed |
+| **Effect of deleting the original file** | The file remains available via the link without any data loss The link is broken and becomes a pointer to a lost path (Dangling Link).
+| **Create command** | `ln file link` | `ln -s file link` |
 </InterviewQuestion>

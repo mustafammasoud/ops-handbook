@@ -2,10 +2,10 @@
 title: Kubernetes Fundamentals Interview Questions
 technology: kubernetes
 topic: fundamentals
-description: أسئلة مقابلات حول المبادئ الأساسية لـ Kubernetes، دورة المزامنة التصريحية (Reconciliation Loop)، وحلقة المقارنة بين الحالة الفعلية والحالة المنشودة.
+description: Interview questions about the basic principles of Kubernetes, the Reconciliation Loop, and the Actual vs. Desired Loop.
 order: 1
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,33 +13,33 @@ language: ar
   number={1}
   difficulty="beginner"
   tags={["kubernetes", "core-concepts", "declarative"]}
-  question="ما الفرق بين النمط التصريحي (Declarative) والنمط الإجرائي (Imperative) في Kubernetes، ولماذا يُفضل النمط التصريحي في بيئات الإنتاج؟"
-  directAnswer="النمط الإجرائي (Imperative) يحدد الأوامر والخطوات الدقيقة لكيفية الوصول إلى الهدف (مثل: أنشئ، عدّل، احذف)، بينما النمط التصريحي (Declarative) يحدد الحالة النهائية المنشودة (Desired State) في ملفات تكوين (YAML) ويترك لـ Kubernetes مهمة مطابقة الحالة الفعلية معها باستمرار."
+  question="What is the difference between Declarative and Imperative in Kubernetes, and why is Declarative in production environments?"
+  directAnswer="The Imperative mode defines the exact commands and steps for how to reach the goal (e.g. create, modify, delete), while the Declarative mode defines the desired state in YAML configuration files and leaves it up to Kubernetes to continually match the actual state to it."
   pitfalls={[
-    "الاعتماد على أوامر kubectl run أو kubectl expose مباشرة في الإنتاج بدلاً من تتبع ملفات الـ YAML في مستودع Git (GitOps).",
-    "الخلط بين kubectl apply (تصريحي) و kubectl create (إجرائي)."
+    "Rely on kubectl run or kubectl expose commands directly in production instead of tracking YAML files in a Git repository (GitOps).",
+    "Confusion between kubectl apply (declarative) and kubectl create (procedural)."
   ]}
   followUps={[
-    "كيف يتعامل kubectl apply مع الدمج الثلاثي (Three-Way Merge) عند تعديل كائن موجود بالفعل؟",
-    "أين يتم تخزين الحالة الأخيرة المطبقة (last-applied-configuration) في الكائن؟"
+    "How does kubectl apply handle Three-Way Merge when modifying an already existing object?",
+    "Where is the last-applied-configuration stored in the object?"
   ]}
 >
-في النمط **الإجرائي (Imperative)**، تخبر النظام **بما يجب فعله خطوة بخطوة**:
+In **Imperative** mode, you tell the system **what to do step by step**:
 ```bash
 # Imperative approach
-kubectl create deployment web --image=nginx:1.25
+kubectl create web deployment --image=nginx:1.25
 kubectl scale deployment web --replicas=3
 ```
-إذا انهار أحد الخوادم أو أعدت تشغيل الأمر، قد يفشل بسبب وجود المورد مسبقًا أو لا يعود إلى حالته تلقائيًا عند حدوث انحراف (Configuration Drift).
+If a server crashes or you rerun the command, it may fail because the resource already exists or not automatically recover when a Configuration Drift occurs.
 
-بينما في النمط **التصريحي (Declarative)**، تُعرف **الحالة المنشودة (Desired State)** داخل ملف manifest:
+While in **declarative** mode, the **desired state** is defined inside the manifest file:
 ```yaml
 apiVersion: apps/v1
-kind: Deployment
+kind:Deployment
 metadata:
   name: web
 spec:
-  replicas: 3
+  copies: 3
   selector:
     matchLabels:
       app: web
@@ -49,51 +49,50 @@ spec:
         app: web
     spec:
       containers:
-      - name: nginx
+      -name: nginx
         image: nginx:1.25
 ```
-ثم تطبقه باستخدام:
+Then you apply it using:
 ```bash
 kubectl apply -f web-deployment.yaml
 ```
-يقوم الـ Control Plane بحفظ التكوين في `etcd`، وتعمل **حلقات التحكم (Reconciliation Loops)** باستمرار على قياس الفرق بين الحالة الفعلية (Actual State) والحالة المنشودة (Desired State) واتخاذ الإجراءات التصحيحية آليًا.
+The Control Plane saves the configuration in `etcd`, and **Reconciliation Loops** constantly measure the difference between the Actual State and the Desired State and take corrective actions automatically.
 </InterviewQuestion>
-
 <InterviewQuestion
   id="k8s-reconciliation-loop"
   number={2}
   difficulty="intermediate"
   tags={["kubernetes", "control-plane", "controllers"]}
-  question="اشرح آلية عمل حلقة المطابقة والتسوية (Reconciliation Loop) في Kubernetes Controller Manager."
-  directAnswer="حلقة التسوية هي حلقة تكرارية غير منتهية تعمل بنموذج Observe -> Analyze/Diff -> Act؛ حيث تراقب وحدات التحكم (Controllers) الحالة الفعلية للكتلة عبر الـ API Server، وتقارنها بالحالة المنشودة المخزنة في etcd، وتنفذ العمليات المطلوبة لإلغاء أي انحراف."
+  question="Explain how the Reconciliation Loop works in Kubernetes Controller Manager."
+  directAnswer="The normalization loop is an endless iterative loop that operates in the form Observe -> Analyze/Diff -> Act, where controllers monitor the actual state of the block via the API Server, compare it with the desired state stored in etcd, and perform the required operations to eliminate any deviation."
   pitfalls={[
-    "الاعتقاد بأن الـ Controllers تتصل مباشرة بقاعدة بيانات etcd، بينما كل الاتصالات تمر حصرًا عبر kube-apiserver.",
-    "تجاهل مفهوم Event-Driven Control، حيث يعتمد Kubernetes على Informers و Watch mechanisms لتجنب فحص الموارد عبر polling مكلف."
+    "Belief that Controllers connect directly to the etcd database, while all communications pass exclusively through kube-apiserver.",
+    "Ignoring the concept of Event-Driven Control, Kubernetes relies on Informers and Watch mechanisms to avoid examining resources via costly polling."
   ]}
   followUps={[
-    "ما دور SharedInformer ومخزن العمليات المؤقت (Lister Cache) في تحسين أداء وحدات التحكم؟",
-    "ماذا يحدث إذا تعطل الـ Controller Manager مؤقتًا؟ هل تتوقف الحاويات الشغالة؟"
+    "What is the role of SharedInformer and List Cache in improving controller performance?",
+    "What happens if Controller Manager temporarily crashes? Do running containers stop?"
   ]}
 >
-تعتمد بنية Kubernetes على فلسفة **Level-Triggered** وليست فقط **Edge-Triggered**. هذا يعني أن النظام لا يكتفي بالتفاعل مع أحداث التغيير لحظة وقوعها، بل يتحقق بانتظام من مطابقة المستوى الحالي مع المستوى المطلوب:
+The Kubernetes architecture is based on the philosophy of **Level-Triggered** and not just **Edge-Triggered**. This means that the system not only reacts to change events as they occur, but also regularly checks whether the current level matches the desired level:
 
-1. **Observe (المراقبة):** يستمع الـ Controller لتغييرات الكائنات المسجلة لديه عبر `Watch API` المتاحة من `kube-apiserver`.
-2. **Analyze / Diff (التحليل واكتشاف الفروقات):** يقارن `spec` (الحالة المنشودة) مع `status` (الحالة الفعلية المبلغ عنها).
-3. **Act (التنفيذ):** إذا وُجد فرق (على سبيل المثال: Deployment يطلب 5 كبسولات والمتاح 3 فقط)، يرسل الـ Controller طلبات إلى `kube-apiserver` لإنشاء الكبسولات المتبقية.
+1. **Observe:** The Controller listens to changes to its registered objects via the `Watch API` available from `kube-apiserver`.
+2. **Analyze / Diff:** Compares `spec` (desired state) with `status` (actual reported state).
+3. **Act:** If there is a difference (eg: Deployment requests 5 capsules and only 3 are available), the Controller sends requests to `kube-apiserver` to create the remaining capsules.
 
 ```
        ┌──────────────────────────────┐
-       │   kube-apiserver (etcd)      │
+       │ kube-apiserver (etcd) │
        └───────┬──────────────▲───────┘
-               │ Watch        │ Create/Update
-               ▼              │
+               │ Watch │ Create/Update
+               ▼ │
        ┌──────────────────────────────┐
-       │     Controller Manager       │
-       │  Observe ──> Diff ──> Act    │
+       │ Controller Manager │
+       │ Observe ──> Diff ──> Act │
        └──────────────────────────────┘
 ```
 
-إذا تعطل `kube-controller-manager`، تظل الحاويات الحالية قيد التشغيل على الـ Worker Nodes دون انقطاع، ولكن الكتلة تفقد قدرتها على الشفاء الذاتي (Self-Healing) وإعادة جدولة الكبسولات المنهارة حتى يعود الـ Controller Manager للعمل.
+If `kube-controller-manager` crashes, existing containers remain running on Worker Nodes without interruption, but the cluster loses its ability to self-heal and reschedule collapsed pods until Controller Manager comes back online.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -101,22 +100,22 @@ kubectl apply -f web-deployment.yaml
   number={3}
   difficulty="intermediate"
   tags={["kubernetes", "pods", "containers"]}
-  question="لماذا اختارت Kubernetes استخدام كبسولة العمل (Pod) كوحدة تشغيل ذرية أصغر بدلاً من تشغيل الحاوية (Container) مباشرة؟"
-  directAnswer="لأن الـ Pod يسمح بتجميع حاويات متكاملة تشترك في نفس مساحة أسماء الشبكة (Network Namespace / IP) ونفس وحدات التخزين المشتركة وتعمل متزامنة على نفس العقدة المادية، مما يمكن أنماطًا معمارية متقدمة مثل Sidecar و Init Containers و Ambassador."
+  question="Why did Kubernetes choose to use a Pod as a smaller atomic operating unit instead of running a container directly?"
+  directAnswer="Because Pod allows integrated containers that share the same Network Namespace/IP and shared storage volumes and run concurrently on the same physical node, enabling advanced architectural patterns such as Sidecar, Init Containers, and Ambassador."
   pitfalls={[
-    "وضع تطبيقات مستقلة وغير مرتبطة وظيفيًا داخل نفس الـ Pod بدلاً من فصلها في Deployments مستقلة.",
-    "الاعتقاد بأن الحاويات داخل نفس الـ Pod تتخاطب عبر عنوان شبكة خارجي، بينما تتواصل عبر localhost بسرعة فائقة."
+    "Place independent, functionally unrelated applications within the same Pod instead of separating them into separate Deployments.",
+    "The belief that containers within the same Pod are communicating via an external network address, while they are communicating via localhost at extremely high speed."
   ]}
   followUps={[
-    "ما دور حاوية التوقف (pause container أو infra container) في تهيئة مساحات أسماء الـ Pod؟",
-    "كيف تتشارك الحاويات داخل الـ Pod الذاكرة المشتركة (IPC Shared Memory) ومساحة التخزين؟"
+    "What is the role of the pause container (or infra container) in initializing Pod namespaces?",
+    "How do containers within a Pod share shared memory (IPC Shared Memory) and storage space?"
   ]}
 >
-الـ **Pod** هو غلاف تجريدي يجمع حاوية واحدة أو أكثر:
+A **Pod** is an abstract shell that collects one or more containers:
 
-- **مساحة شبكية واحدة (Shared Network Namespace):** تشترك جميع حاويات الـ Pod في عنوان IP وحيد ومنفذ محلي واحد. الحاوية الأساسية وتطبيق المراقبة (Sidecar) يتواصلان مباشرة عبر `localhost:PORT`.
-- **مساحات تخزين مشتركة (Shared Storage Volumes):** يمكن لحاوية أن تكتب سجلات أو ملفات تكوين في `emptyDir` وتقوم حاوية أخرى بقراءتها أو شحنها مباشرة إلى خادم السجلات.
-- **التنسيق المشترك لدورة الحياة:** يتم جدولة كافة حاويات الـ Pod معًا على العقدة ذاتها (Atomic Co-scheduling)، ولا يمكن أن تنفصل حاويتان من نفس الـ Pod على عقدتين مختلفتين.
+- **Shared Network Namespace):** All Pod containers share a single IP address and a single local port. The underlying container and the monitoring application (Sidecar) communicate directly via `localhost:PORT`.
+- **Shared Storage Volumes:** One container can write logs or configuration files to `emptyDir` and another container reads them or ships them directly to the log server.
+- **Lifecycle co-ordination:** All Pod containers are scheduled together on the same node (Atomic Co-scheduling), and two containers of the same Pod cannot be separated on two different nodes.
 
-تقوم تقنية CRI بإنشاء **حاوية بنية تحتية (Pause Container)** أولاً لحجز الـ Network Namespace وعنوان الـ IP، ثم تنضم حاويات التطبيق إلى هذه المساحة المشتركة عبر ميزة Linux Namespaces.
+CRI first creates a Pause Container to reserve the Network Namespace and IP address, and then application containers join this shared space via Linux Namespaces.
 </InterviewQuestion>

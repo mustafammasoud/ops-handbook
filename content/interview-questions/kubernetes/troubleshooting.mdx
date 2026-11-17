@@ -2,10 +2,10 @@
 title: Kubernetes Troubleshooting Interview Questions
 technology: kubernetes
 topic: troubleshooting
-description: "أسئلة مقابلات حول تشخيص أعطال Kubernetes الشائعة في الإنتاج: CrashLoopBackOff، كبسولات Pending، انهيارات OOMKilled، وحالات Node NotReady."
+description: "Interview questions about diagnosing common Kubernetes failures in production: CrashLoopBackOff, Pending Pods, OOMKilled crashes, and Node NotReady instances."
 order: 7
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,57 +13,80 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["kubernetes", "troubleshooting", "crashloopbackoff", "production"]}
-  question="دخلت كبسولة في حالة CrashLoopBackOff فور نشرها. ما هي خطواتك المنظمة لتحديد السبب الجذري للمشكلة وحلها؟"
-  directAnswer="أبدأ بتنفيذ kubectl describe pod لفحص قسم Events ورؤية كود الخروج (Exit Code) ورسالة الخطأ الأخيرة. ثم أقرأ سجلات الحاوية السابقة التي انهارت عبر kubectl logs <pod> --previous. إذا كان سبب الانهيار نقص إعدادات أو أسرار، أراجع الـ ConfigMaps/Secrets، وأخيرًا أتحقق من قيود الذاكرة OOMKilled أو فشل فحص livenessProbe."
+  question="Your pod entered a CrashLoopBackOff state immediately after it was deployed. What are your structured steps to identify the root cause of the problem and resolve it?"
+  directAnswer="I start executing kubectl describe pod to check the Events section and see the exit code and final error message. Then I read the logs of the previous container that crashed via kubectl logs <pod> --previous. If the crash was caused by a lack of settings or secrets, I review the ConfigMaps/Secrets, and finally I check for OOMKilled memory constraints or a failed livenessProbe check."
   pitfalls={[
-    "استخدام kubectl logs دون العلم -p / --previous، مما يعرض سجلات الحاوية الجديدة التي قد تكون فارغة أو لم تبدأ بعد، بينما الخطأ الحقيقي مسجل في الحاوية السابقة التي انهارت.",
-    "الافتراض الدائم بأن CrashLoopBackOff مشكلة في الكود، بينما تكون غالبًا بسبب غياب متغير بيئة إلزامي (Missing Env Var) أو فشل الاتصال بقاعدة بيانات غير متاحة."
+    "Using kubectl logs without the -p/--previous flag, displays logs for the new container that may be empty or not started yet, while the real error is logged in the previous container that crashed.",
+    "The constant assumption is that CrashLoopBackOff is a code issue, when it is often due to the absence of a mandatory environment variable (Missing Env Var) or a failed connection to an unavailable database."
   ]}
   followUps={[
-    "ما الفرق بين Exit Code 0 و Exit Code 1 و Exit Code 137 و Exit Code 143 في فحص الحاويات المنهارة؟",
-    "كيف يمكن استخدام أمر kubectl debug لفتح حاوية تشخيص مؤقتة (Ephemeral Container) داخل نفس الـ Pod؟"
+    "What is the difference between Exit Code 0, Exit Code 1, Exit Code 137, and Exit Code 143 in inspecting collapsed containers?",
+    "How can I use the kubectl debug command to open an Ephemeral Container within the same Pod?"
   ]}
 >
-منهجية التشخيص السريعة والمحترفة:
+Fast and professional diagnostic methodology:
 
-1. **فحص الـ Events وحالة الحاوية:**
+1. **Checking the events and status of the container:**
    ```bash
    kubectl describe pod <pod-name> -n <ns>
    ```
-   ابحث في مخرجات قسم `State: Waiting` وقسم `Last State: Terminated`:
-   - `Exit Code 137`: مقتل الحاوية بسبب نفاد الذاكرة (`OOMKilled: true`).
-   - `Exit Code 1` أو `2`: خطأ برمجي في كود التطبيق أو عدم العثور على ملف التكوين.
-   - `Exit Code 0`: انتهى كود الحاوية بنجاح لأنه لا يحتوي على عملية خلفية دائمة (مثل سكربت انتهى تنفيذه وأغلق).
-2. **قراءة سجل الحاوية السابقة المنتهية:**
+   Search the output of the `State: Waiting` section and the `Last State: Terminated` section:
+   - `Exit Code 137`: Container killed due to out of memory (`OOMKilled: true`).
+   - `Exit Code 1` or `2`: A programming error in the application code or the configuration file was not found.
+   - `Exit Code 0`: The container code terminated successfully because it does not have a permanent background process (ie a script that has finished executing and is closed).
+2. **Reading the history of the previous finished container:**
    ```bash
    kubectl logs <pod-name> -c <container-name> -p -n <ns>
    ```
-3. **فحص إعدادات مجسات الصحة (Probes):**
-   إذا كان التطبيق يستغرق وقتاً طويلاً للإقلاع (مثل Java Spring Boot)، قد يقوم `livenessProbe` بقتله قبل اكتمال التهيئة. الحل إضافة `startupProbe` مع `failureThreshold` كافٍ.
+3. **Check the settings of the health sensors (Probes):**
+   If an application takes a long time to boot (such as Java Spring Boot), `livenessProbe` may kill it before initialization is complete. Solution Adding `startupProbe` with `failureThreshold` is sufficient.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="k8s-debug-pending-pod-workflow"
+  number={2}
+  difficulty="advanced"
+  tags={["kubernetes", "troubleshooting", "scheduling", "pending"]}
+  question="A Pod has remained Pending for ten minutes. What is your step-by-step diagnostic workflow?"
+  directAnswer="Start with the Pod events, then verify scheduler constraints and cluster capacity. Run kubectl describe pod to identify the scheduling reason; check requests, node selectors, affinity, taints, quotas, PVC binding, and available node resources before changing the workload."
+  pitfalls={["Deleting and recreating the Pod before reading its Events; this can hide the useful scheduling message.", "Increasing cluster size before checking a mismatched node selector, an unbound PVC, a quota, or an untolerated taint."]}
+  followUps={["Which scheduler event indicates that a PersistentVolumeClaim is blocking scheduling?", "How do requests differ from limits when the scheduler decides placement?"]}
+>
+Use a repeatable order so you do not guess:
+
+```bash
+kubectl describe pod <pod> -n <namespace>
+kubectl get events -n <namespace> --sort-by='.lastTimestamp'
+kubectl get nodes
+kubectl top nodes
+kubectl get pvc -n <namespace>
+```
+
+Look for `FailedScheduling` events first. Common causes are insufficient requested CPU or memory, a node selector that matches no node, a taint without a matching toleration, an unsatisfied affinity rule, a namespace quota, or a PVC that is still `Pending`.
 </InterviewQuestion>
 
 <InterviewQuestion
   id="k8s-debug-pending-pods"
-  number={2}
+  number={3}
   difficulty="intermediate"
   tags={["kubernetes", "troubleshooting", "pending-pods", "scheduler"]}
-  question="كبسولة عمل جديدة عالقة في حالة Pending ولا تبدأ بالعمل. ما هي الأسباب المحتملة وكيف تؤكد السبب؟"
-  directAnswer="حالة Pending تعني أن Kube-Scheduler عجز عن إيجاد عقدة مؤهلة تستوفي متطلبات الكبسولة. يتم تأكيد السبب فورًا عبر تشغيل kubectl describe pod والنظر في قسم Events، ومن أشهر الأسباب: عدم كفاية موارد المعالج أو الذاكرة (0/N nodes available: Insufficient cpu/memory)، أو وجود قيود تآلف (NodeAffinity)، أو وسوم حظر (Taints) بدون سماحيات (Tolerations)، أو انتظار ربط قرص تخزين (VolumeBinding)."
+  question="A new working capsule is stuck in Pending state and won't start working. What are the possible causes and how do you confirm the cause?"
+  directAnswer="Pending condition means that Kube-Scheduler was unable to find a qualified node that meets the pod's requirements. The reason is immediately confirmed by running kubectl describe pod and looking in the Events section. The most common reasons are: insufficient processor or memory resources (0/N nodes available: Insufficient cpu/memory), NodeAffinity restrictions, Taints without Tolerations, or Waiting to mount a storage disk (VolumeBinding)."
   pitfalls={[
-    "محاولة إعادة تشغيل الكبسولة أو حذفها على أمل حل المشكلة؛ الكبسولة ستعود للحالة Pending فورًا لأن قيود الموارد أو العقد لم تتغير.",
-    "الخلط بين طلب الموارد requests واستهلاك الموارد الفعلي limits؛ الجدولة تعتمد حصرًا على requests."
+    "Attempt to restart or delete the pod in hopes of resolving the issue; the pod will return to the Pending state immediately because the resource or node restrictions have not changed.",
+    "Confusion between requests and actual resource consumption limits; scheduling is based solely on requests."
   ]}
   followUps={[
-    "كيف تعالج مشكلة 0/5 nodes available: Insufficient memory في بيئة سحابية تدعم Cluster Autoscaler؟",
-    "كيف يؤثر وجود قرص RWO مرتبط بـ Zone محددة على حصر جدولة الـ Pod في تلك الـ Zone فقط؟"
+    "How to address the issue of 0/5 nodes available: Insufficient memory in a cloud environment that supports Cluster Autoscaler?",
+    "How does having an RWO disk associated with a specific Zone affect limiting Pod scheduling to that Zone only?"
   ]}
 >
-جدول أسباب حالة **Pending** وإجراءات الحل:
+Table of **Pending** status causes and resolution procedures:
 
-| رسالة الـ Event في `kubectl describe pod` | المعنى التقني | الحل العملي |
+| The event message in `kubectl describe pod` | Technical meaning | Practical solution |
 |---|---|---|
-| `0/6 nodes available: Insufficient cpu` | مجموع `requests.cpu` للكبسولات يتجاوز سعة العقد الحالية | تقليص الـ requests، أو تفعيل Cluster Autoscaler لإضافة خوادم جديدة |
-| `0/6 nodes available: 3 node(s) had untolerated taint` | العقد تحتوي على وسوم Taint والكبسولة لا تمتلك toleration | إضافة `tolerations` مطابقة أو إزالة الـ taint غير المقصود من العقدة |
-| `pod has unbound immediate PersistentVolumeClaims` | الـ PVC غير قادر على إيجاد أو حجز قرص PV مطابق | فحص الـ StorageClass ومطابقة سعة القرص و AccessMode المطلوب |
-| `0/6 nodes available: 6 node(s) didn't match PodTopologySpread` | قيود التوزيع الجغرافي تمنع وضع كبسولات إضافية في هذه المنطقة | مراجعة `topologySpreadConstraints` وتعديل `maxSkew` |
+| `0/6 nodes available: Insufficient cpu` | The sum of `requests.cpu` of pods exceeds the capacity of current nodes | Reduce requests, or activate Cluster Autoscaler to add new servers
+| `0/6 nodes available: 3 node(s) had untolerated taint` | The nodes have Taint tags and the pod does not have toleration | Add `tolerations` to match or remove unintended taint from the | node
+| `pod has unbound immediate PersistentVolumeClaims` | The PVC is unable to find or reserve a matching PV disk | Check the StorageClass and match the disk capacity and the required AccessMode |
+| `0/6 nodes available: 6 node(s) didn't match PodTopologySpread` | Geographic distribution restrictions prevent additional capsules from being placed in this area Review `topologySpreadConstraints` and modify `maxSkew` |
 </InterviewQuestion>

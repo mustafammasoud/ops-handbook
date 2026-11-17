@@ -2,10 +2,10 @@
 title: Kubernetes Networking & DNS Interview Questions
 technology: kubernetes
 topic: networking
-description: أسئلة مقابلات حول شبكات Kubernetes، مقارنة أنواع Services، ملحقات CNI (Calico وCilium)، حل أسماء CoreDNS، وسياسات NetworkPolicies.
+description: Interview questions about Kubernetes networking, comparing Services types, CNI extensions (Calico and Cilium), CoreDNS name resolution, and NetworkPolicies.
 order: 4
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,27 +13,27 @@ language: ar
   number={1}
   difficulty="beginner"
   tags={["kubernetes", "networking", "services"]}
-  question="قارن بين أنواع الخدمات (Service Types): ClusterIP و NodePort و LoadBalancer، ومتى تستخدم كلاً منها؟"
-  directAnswer="ClusterIP هو النوع الافتراضي الذي يعين عنوان IP داخلي للخدمة متاح حصرًا داخل الكتلة. NodePort يفتح منفذًا ثابتًا (في النطاق 30000-32767) على عنوان IP الخارجي لكل عقدة لتوجيه الطلبات إلى ClusterIP الداخلي. LoadBalancer يعتمد على مزود السحابة لإنشاء موازن أحمال مادي خارجي يوجه حركة المرور تلقائيًا إلى NodePort ومنه إلى الكبسولات."
+  question="Compare the Service Types: ClusterIP, NodePort, and LoadBalancer, and when do you use each of them?"
+  directAnswer="ClusterIP is the default type that assigns an internal IP address to a service that is exclusively available within the cluster. NodePort opens a fixed port (in the range 30000-32767) on each node's external IP address to route requests to the internal ClusterIP. LoadBalancer relies on the cloud provider to create an external physical load balancer that automatically routes traffic to the NodePort and from there to the pods."
   pitfalls={[
-    "تعريض قواعد البيانات الحساسة عبر NodePort أو LoadBalancer بدلاً من إبقائها خلف ClusterIP داخلي آمن.",
-    "الاعتقاد بأن الخدمة (Service) هي خادم بروكسي أو حاوية وسيطة؛ الخدمة هي مجرد كائن تجريدي يُترجم إلى قواعد توجيه في iptables أو IPVS على كل عقدة."
+    "Expose sensitive databases via NodePort or LoadBalancer instead of keeping them behind a secure internal ClusterIP.",
+    "The belief that a Service is a proxy server or an intermediary container; a Service is just an abstract object that is translated into routing rules in iptables or IPVS on each node."
   ]}
   followUps={[
-    "ما هي الـ Headless Service (التي تملك clusterIP: None) وما الغرض الأساسي منها؟",
-    "كيف يؤثر تعيين externalTrafficPolicy: Local على الحفاظ على عنوان IP الحقيقي للمستخدم العميل (Client IP)؟"
+    "What is the Headless Service (which has clusterIP: None) and what is its main purpose?",
+    "How does setting ExternalTrafficPolicy: Local affect maintaining the client's real IP address?"
   ]}
 >
-المستويات الهرمية لأنواع الخدمات في Kubernetes مبنية بتراكمية:
+The hierarchical levels of service types in Kubernetes are built cumulatively:
 
 1. **ClusterIP:**
-   - يوفر عنوان IP افتراضي مستقر داخل الشبكة الخاصة للكتلة.
-   - لا يمكن الوصول إليه من خارج الكتلة دون وسيط مثل Ingress Controller أو `kubectl port-forward`.
+   - Provides a stable virtual IP address within the cluster's private network.
+   - It cannot be accessed from outside the cluster without an intermediary such as Ingress Controller or `kubectl port-forward`.
 2. **NodePort:**
-   - مبني فوق ClusterIP؛ يخصص منفذًا عشوائيًا أو محددًا (بين 30000 و 32767) على جميع عقد العمل (Nodes).
-   - إذا طلبت `<Node-IP>:<NodePort>`، يستقبل Kube-Proxy الطلب ويوجهه للكبسولات حتى لو كانت الكبسولة على عقدة أخرى.
+   - Built on top of ClusterIP; Allocates a random or specific port (between 30000 and 32767) on all nodes.
+   - If you request `<Node-IP>:<NodePort>`, Kube-Proxy receives the request and forwards it to the pods even if the pod is on another node.
 3. **LoadBalancer:**
-   - مبني فوق NodePort و ClusterIP؛ يرسل استدعاءً لـ Cloud Controller Manager (مثل AWS NLB أو GCP Cloud Load Balancing) لحجز عنوان IP عام خارجي مخصص.
+   - Built on top of NodePort and ClusterIP; Sends a call to the Cloud Controller Manager (such as AWS NLB or GCP Cloud Load Balancing) to reserve a dedicated external public IP address.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -41,31 +41,31 @@ language: ar
   number={2}
   difficulty="advanced"
   tags={["kubernetes", "networking", "kube-proxy", "ipvs"]}
-  question="ما الفرق في الأداء والمعمارية بين وضع iptables ووضع IPVS في Kube-Proxy داخل الكتل الكبيرة؟"
-  directAnswer="وضع iptables يعتمد على فحص تسلسلي خطي (O(N))؛ مع زيادة عدد الخدمات والكبسولات إلى الآلاف، يتضخم جدول القواعد مما يسبب استهلاكًا عاليًا للذاكرة وزمن تأخير كبير في تحديث الحزم. بينما يستخدم IPVS جداول تجزئة (Hash Tables) ذات تعقيد زمني ثابت (O(1))، ويدعم خوارزميات موازنة أحمال متقدمة مثل Round-Robin و Least Connection مما يجعله الخيار القياسي للبيئات الضخمة."
+  question="What is the difference in performance and architecture between iptables mode and IPVS mode in Kube-Proxy within large clusters?"
+  directAnswer="iptables mode is based on a linear sequential scan (O(N)); as the number of services and pods grows into the thousands, the rule table grows, causing high memory consumption and significant delay in updating packets. While IPVS uses hash tables with constant time complexity (O(1)), and supports advanced load balancing algorithms such as Round-Robin and Least Connection, making it the standard choice for large environments."
   pitfalls={[
-    "الاعتقاد بأن Kube-Proxy يمرر حزم الشبكة بنفسه كبروكسي حقيقي في وضع iptables/IPVS؛ في هذين الوضعين، يقوم Kube-Proxy ببرمجة قواعد توجيه في مساحة النواة (Kernel Space) فقط والحزم لا تمر عبر مساحة المستخدم.",
-    "تفعيل وضع IPVS بدون تحميل وحدات النواة (Kernel Modules) المطلوبة مسبقًا مثل ip_vs و ip_vs_rr على العقد."
+    "The belief is that Kube-Proxy passes network packets by itself as a true proxy in iptables/IPVS mode; in these two modes, Kube-Proxy programs routing rules in kernel space only and packets do not pass through user space.",
+    "Enable IPVS mode without loading pre-required kernel modules such as ip_vs and ip_vs_rr on the nodes."
   ]}
   followUps={[
-    "ما دور eBPF ومشاريع مثل Cilium في الاستغناء كليًا عن Kube-Proxy وجداول iptables؟",
-    "كيف يتعامل IPVS مع فحص صحة الوجهات (Connection Tracking & Health Checks)؟"
+    "What is the role of eBPF and projects like Cilium in completely eliminating Kube-Proxy and iptables?",
+    "How does IPVS handle Connection Tracking & Health Checks?"
   ]}
 >
-مقارنة بين الوضعين:
+Comparison between the two situations:
 
 ```
-+--------------------+------------------------+------------------------+
-| الخاصية            | iptables               | IPVS                   |
-+--------------------+------------------------+------------------------+
-| تعقيد التوجيه      | O(N) خطي               | O(1) ثابت              |
-| الأداء في +5000 svc| تدهور ملحوظ وبطء sync  | استقرار وسرعة فائقة    |
-| خوارزمية التوزيع   | عشوائي (Random Prob)   | rr, lc, wrr, sed, ...  |
-| بنية البيانات      | سلاسل متتالية (Chains) | Hash Tables سريعة جداً |
-+--------------------+------------------------+------------------------+
++--------------------+---------------------------------------+---------------------------------------+
+| Property | iptables | IPVS |
++--------------------+---------------------------------------+---------------------------------------+
+| Routing complexity O(N) Linear | O(1) constant |
+| Performance at +5000 svc| Noticeable degradation and slow sync | Super stability and speed
+| Distribution algorithm | Random Prob | rr, lc, wrr, sed, ... |
+| Data structure | Chains | Hash Tables are very fast
++--------------------+---------------------------------------+---------------------------------------+
 ```
 
-في الكتل الضخمة (التي تضم عشرات آلاف الـ Endpoints)، قد يستغرق تحديث قاعدة واحدة في iptables عدة ثوانٍ وتجميد معالجة الحزم، بينما يقوم IPVS بتحديث عناصر الـ Hash Map فوريًا بأقل من جزء من الميلي ثانية.
+In large clusters (with tens of thousands of Endpoints), updating a single rule in iptables can take several seconds and freeze packet processing, while IPVS updates Hash Map elements instantaneously in less than a millisecond.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -73,37 +73,37 @@ language: ar
   number={3}
   difficulty="intermediate"
   tags={["kubernetes", "networking", "dns", "coredns"]}
-  question="كيف يعمل نظام CoreDNS داخل Kubernetes، وما هو التركيب الكامل لاسم النطاق المؤهل (FQDN) لخدمة ما؟"
-  directAnswer="يقوم CoreDNS بحل أسماء الخدمات إلى عناوين ClusterIP تلقائيًا. الصيغة الكاملة لاسم النطاق المؤهل (FQDN) هي: <service-name>.<namespace>.svc.cluster.local. في الكبسولات داخل نفس الـ Namespace، يكفي كتابة اسم الخدمة فقط؛ وإذا كانت في Namespace آخر يُكتب <service>.<namespace>."
+  question="How does CoreDNS work within Kubernetes, and what is the full structure of a Fully Qualified Domain Name (FQDN) for a service?"
+  directAnswer="CoreDNS automatically resolves service names to ClusterIP addresses. The full form of the FQDN is: <service-name>.<namespace>.svc.cluster.local. In pods within the same Namespace, just the service name is sufficient; if in another Namespace, <service>.<namespace>."
   pitfalls={[
-    "إرسال استعلامات DNS خارجية متكررة دون تفعيل NodeLocal DNSCache، مما يسبب ضغطًا واختناقات في شبكة CoreDNS المركزية.",
-    "مشكلة ndots:5 في ملف /etc/resolv.conf التي تتسبب في إرسال ما يصل إلى 4 استعلامات DNS محلية فاشلة قبل محاولة حل أي نطاق خارجي مثل google.com."
+    "Sending repetitive external DNS queries without activating NodeLocal DNSCache, causing pressure and bottlenecks in the CoreDNS central network.",
+    "ndots:5 issue in /etc/resolv.conf file that causes up to 4 failed local DNS queries to be sent before any external domain such as google.com is attempted to resolve."
   ]}
   followUps={[
-    "ما محتويات ملف /etc/resolv.conf الافتراضي داخل كبسولة في Kubernetes؟",
-    "كيف يتم حل عنوان DNS لكبسولة محددة تابعة لـ StatefulSet عبر Headless Service؟"
+    "What is the contents of the default /etc/resolv.conf file inside a pod in Kubernetes?",
+    "How to resolve the DNS address of a specific StatefulSet pod via Headless Service?"
   ]}
 >
-تركيب النطاق الرسمي للخدمة:
+Installation of the official domain of the service:
 ```
 my-service.production.svc.cluster.local
-│          │          │   └── Cluster Domain
-│          │          └────── Object type (Service)
-│          └───────────────── Namespace
-└──────────────────────────── Service Name
+│ │ │ └── Cluster Domain
+│ │ └────── Object type (Service)
+│ └───────────────── Namespace
+Service Name
 ```
 
-داخل كبسولة التطبيق، يحتوي `/etc/resolv.conf` على:
+Inside the application capsule, `/etc/resolv.conf` contains:
 ```
 nameserver 10.96.0.10
 search production.svc.cluster.local svc.cluster.local cluster.local
-options ndots:5
+options windows:5
 ```
-بسبب `ndots:5`، إذا حاولت حاوية استدعاء `api.stripe.com` (الذي يحتوي نقطتين فقط أي أقل من 5 نقاط)، يقوم النظام بالبحث في لواحق search أولاً:
-1. `api.stripe.com.production.svc.cluster.local` (فشل NXDOMAIN)
-2. `api.stripe.com.svc.cluster.local` (فشل NXDOMAIN)
-3. `api.stripe.com.cluster.local` (فشل NXDOMAIN)
-4. وأخيرًا `api.stripe.com` (نجاح).
+Because of `ndots:5`, if a container tries to call `api.stripe.com` (which has only 2 dots, less than 5 dots), the system searches the search suffixes first:
+1. `api.stripe.com.production.svc.cluster.local` (NXDOMAIN failed)
+2. `api.stripe.com.svc.cluster.local` (NXDOMAIN failed)
+3. `api.stripe.com.cluster.local` (NXDOMAIN failed)
+4. Finally `api.stripe.com` (success).
 
-تطبيق **NodeLocal DNSCache** يقلل هذا العبء بتثبيت مخزن DNS مؤقت محلي على كل خادم.
+**NodeLocal DNSCache** reduces this overhead by installing a local DNS cache on each server.
 </InterviewQuestion>

@@ -2,10 +2,10 @@
 title: Git Branching & Merging Interview Questions
 technology: git
 topic: branching-merging
-description: أسئلة مقابلات حول استراتيجيات الدمج (Merge Strategies)، الفرق بين Fast-Forward وThree-Way Merge، ومقارنة الدمج وإعادة البناء (Git Merge vs Git Rebase).
+description: Interview questions about Merge Strategies, the difference between Fast-Forward and Three-Way Merge, and comparing merging and refactoring (Git Merge vs Git Rebase).
 order: 2
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,41 +13,41 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["git", "branching", "merge", "rebase"]}
-  question="قارن بين Git Merge و Git Rebase من حيث بنية التاريخ، ومتى يُعد استخدام Rebase خطرًا كبيرًا؟"
-  directAnswer="يقوم Git Merge بإنشاء التزام دمج جديد (Merge Commit) يربط بين فرعين محتفظًا بالسياق التاريخي وترتيب الأحداث بدقة كما حدثت. بينما يقوم Git Rebase بنسخ التزامات فرعك وإعادة تطبيقها واحدة تلو الأخرى فوق قمة الفرع المستهدف، مما ينتج تاريخًا خطيًا نظيفًا وخاليًا من التزامات الدمج الزائدة. القاعدة الذهبية: لا تقم أبدًا بعمل Rebase على فروع عامة مشتركة (مثل main) تم رفعها إلى السيرفر؛ لأن Rebase يعيد كتابة قيم الـ Hashes ويكسر مسودات زملائك."
+  question="Compare Git Merge and Git Rebase in terms of history structure, and when is it too risky to use Rebase?"
+  directAnswer="Git Merge creates a new merge commit connecting two branches, preserving historical context and the exact order of events as they occurred. Git Rebase copies your branch commits and reapplies them one by one on top of the target branch, producing a clean, linear history free of redundant merge commits. Golden Rule: Never rebase on shared public branches (such as main) that have been uploaded to the server, because Rebase rewrites hashes and breaks Your colleagues' drafts."
   pitfalls={[
-    "تطبيق git rebase على فرع main أو فروع الإصدارات العامة المشتركة، مما يجبر الفريق بأكمله على حل تعارضات معقدة وتاريخ مشوه.",
-    "فقدان سياق وقت كتابة الالتزامات الحقيقي أثناء Rebase، مما يجعل معرفة تاريخ الدمج الفعلي أكثر صعوبة مقارنة بـ Merge Commit."
+    "Applying git rebase to main branch or shared public release branches, forcing the entire team to resolve complex conflicts and a distorted history.",
+    "Loss of context of when commits were actually written during Rebase, making knowing the actual merge date more difficult compared to Merge Commit."
   ]}
   followUps={[
-    "ما هي استراتيجية Squash and Merge وكيف توازن بين نظافة تاريخ main وتفاصيل الفروع المحلية؟",
-    "كيف تتصرف إذا واجهت تعارضات متكررة في كل التزام أثناء Rebase تفاعلي (Interactive Rebase)؟"
+    "What is the Squash and Merge strategy and how do you balance the cleanliness of the main history with the details of the local branches?",
+    "What do you do if you encounter recurring conflicts on each commit during an interactive Rebase?"
   ]}
 >
-المقارنة البصرية:
+Visual comparison:
 
-- **بعد `git merge main`:**
+- **After `git merge main`:**
   ```
-  *   commit 9a8b (Merge branch 'main' into feature)
+  * commit 9a8b (Merge branch 'main' into feature)
   |\
   | * commit 3e4f (main)
   * | commit 1a2b (feature)
   |/
-  *   commit c0d1
-  ```
-  - يحتفظ بالتاريخ الحقيقي لوقت التفرع والدمج.
-  - ينتج التزام دمج إضافي.
-
-- **بعد `git rebase main`:**
-  ```
-  * commit 5g6h' (feature - هاش جديد تماماً)
-  * commit 3e4f  (main)
   * commit c0d1
   ```
-  - تاريخ خطي منظم وسهل القراءة بـ `git log`.
-  - كل التزام في `feature` حصل على SHA-1 جديد تمامًا.
+  - Keeps the real history of fork and merge time.
+  - Generates an additional merge commit.
 
-**القاعدة الذهبية (The Golden Rule of Rebase):**
+- **After `git rebase main`:**
+  ```
+  * commit 5g6h' (feature - completely new hash)
+  * commit 3e4f (main)
+  * commit c0d1
+  ```
+  - Organized, easy-to-read linear history with `git log`.
+  - Every commit in `feature` got a brand new SHA-1.
+
+**The Golden Rule of Rebase:**
 > "Never rebase commits that exist outside your local repository and that other developers have based work on."
 </InterviewQuestion>
 
@@ -56,42 +56,42 @@ language: ar
   number={2}
   difficulty="beginner"
   tags={["git", "branching", "fast-forward", "three-way-merge"]}
-  question="ما الفرق بين Fast-Forward Merge والدمج الثلاثي (Three-Way Merge)، ومتى يفرض Git إنشاء Merge Commit؟"
-  directAnswer="يحدث Fast-Forward عندما لا توجد أي التزامات جديدة على الفرع المستهدف (مثل main) منذ لحظة تفرع فرعك؛ في هذه الحالة يكتفي Git بتقديم مؤشر main للأمام ليشير إلى آخر التزام في فرعك دون إنشاء أي commit جديد. أما الدمج الثلاثي (Three-Way Merge) فيحدث عندما يكون الفرع المستهدف قد استقبل التزامات جديدة متزامنة؛ فيقوم Git بمقارنة ثلاثة التزامات: السلف المشترك (Common Ancestor)، وقمتي الفرعين، لإنشاء Merge Commit يدمج المسارين."
+  question="What's the difference between Fast-Forward Merge and Three-Way Merge, and when does Git force a Merge Commit?"
+  directAnswer="Fast-Forward occurs when there have been no new commits on the target branch (such as main) since the moment your branch forked; in this case, Git just moves the main pointer to the last commit in your branch without creating a new commit. A Three-Way Merge occurs when the target branch has received new concurrent commits; Git compares the common ancestor and the tips of both branches to create a merge commit that joins the two paths."
   pitfalls={[
-    "الاعتقاد بأن الدمج دائماً ينشئ commit جديد؛ في حالة Fast-Forward لا يُنشأ أي commit، مما قد يخفي تاريخ وجود فرع ميزة منفصل إلا إذا استخدمت العلم --no-ff.",
-    "فشل الدمج بسبب تعارضات في نفس السطور بين التزامات الفرعين، مما يتطلب حلاً يدويًا للتعارض."
+    "The belief is that a merge always creates a new commit; in the case of Fast-Forward no commit is created, which would hide the history of a separate feature branch unless you use the --no-ff flag.",
+    "The merge failed due to conflicts on the same lines between commits of the two branches, requiring manual resolution of the conflict."
   ]}
   followUps={[
-    "لماذا تفرض بعض المؤسسات استخدام العلم --no-ff عند دمج فروع الميزات؟",
-    "ما الفرق بين خوارزمية الدمج القديمة Recursive والخوارزمية الافتراضية الحديثة ORT في Git؟"
+    "Why do some organizations force the use of the --no-ff flag when merging feature branches?",
+    "What is the difference between the old merge algorithm Recursive and the modern default algorithm ORT in Git?"
   ]}
 >
-توضيح بالرسم:
+Illustration with drawing:
 
 1. **Fast-Forward Merge:**
    ```
-   قبل الدمج:
-   main:    A ─── B
+   Before merging:
+   main: A ─── B
                    \
-   feature:         C ─── D
+   feature: C ─── D
 
-   بعد git merge feature:
-   main:    A ─── B ─── C ─── D (feature)
+   After git merge feature:
+   main: A ─── B ─── C ─── D (feature)
    ```
-   مؤشر `main` تحرك للأمام فقط.
+   `main` cursor moves forward only.
 
-2. **Three-Way Merge (يحدث تباعد Divergence):**
+2. **Three-Way Merge (Divergence):**
    ```
-   قبل الدمج:
-   main:    A ─── B ─── E (التزامات جديدة على main)
+   Before merging:
+   main: A ─── B ─── E (new commits to main)
                    \
-   feature:         C ─── D
+   feature: C ─── D
 
-   بعد git merge feature:
-   main:    A ─── B ─── E ─────── M (Merge Commit الجديد)
-                   \             /
-   feature:         C ─── D ────┘
+   After git merge feature:
+   main: A ─── B ─── E ─────── M (New Merge Commit)
+                   \ /
+   feature: C ─── D ────┘
    ```
-   يستخدم Git التزام السلف المشترك `B` مع `E` و `D` لحساب الدمج تلقائيًا.
+   Git uses the common ancestor commit `B` with `E` and `D` to automatically calculate the merge.
 </InterviewQuestion>

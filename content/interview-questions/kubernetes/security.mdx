@@ -2,10 +2,10 @@
 title: Kubernetes Security & RBAC Interview Questions
 technology: kubernetes
 topic: security
-description: أسئلة مقابلات حول أمان كتل Kubernetes، نظام التحكم بالوصول المستند للأدوار (RBAC)، إعدادات SecurityContext، ومعايير Pod Security Standards.
+description: Interview questions about Kubernetes cluster security, role-based access control (RBAC), SecurityContext settings, and Pod Security Standards.
 order: 6
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,38 +13,38 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["kubernetes", "security", "rbac"]}
-  question="ما الفرق بين Role و ClusterRole، ومتى نستخدم RoleBinding مقابل ClusterRoleBinding؟"
-  directAnswer="الـ Role يحدد صلاحيات محصورة داخل Namespace واحد فقط (مثل قراءة الكبسولات في مساحة dev). الـ ClusterRole يحدد صلاحيات على مستوى كامل الكتلة (Cluster-scoped مثل العقد PVs والـ Namespaces) أو صلاحيات لجميع مساحات الأسماء معًا. عند استخدام RoleBinding مع ClusterRole، يتم تقييد تلك الصلاحيات لتنطبق فقط داخل مساحة الأسماء التي أُنشئ فيها الـ RoleBinding."
+  question="What's the difference between Role and ClusterRole, and when do we use RoleBinding vs. ClusterRoleBinding?"
+  directAnswer="The Role defines permissions limited to just one Namespace (such as reading pods in dev space). The ClusterRole defines permissions at the entire cluster level (such as PVs and Namespaces) or permissions for all namespaces together. When using RoleBinding with a ClusterRole, those permissions are restricted to apply only within the namespace in which the RoleBinding was created."
   pitfalls={[
-    "منح حساب خدمة (ServiceAccount) صلاحية ClusterRoleBinding مع امتياز cluster-admin كحل سريع لتفادي أخطاء الصلاحيات، وهو خرق أمني جسيم في بيئات الإنتاج.",
-    "الاعتقاد بأن ClusterRole يتطلب دائمًا ClusterRoleBinding؛ استخدام RoleBinding لربط ClusterRole قياسي (مثل edit أو view) هو أفضل ممارسة لتقييد الصلاحية في Namespace محدد دون تكرار إنشاء Roles."
+    "Granting the ServiceAccount the ClusterRoleBinding privilege with the cluster-admin privilege as a quick solution to avoid permission errors, which is a serious security breach in production environments.",
+    "The belief is that a ClusterRole always requires a ClusterRoleBinding; using RoleBinding to bind a standard ClusterRole (such as edit or view) is a best practice for restricting validity to a specific Namespace without duplicating the creation of Roles."
   ]}
   followUps={[
-    "ما هي الحقول الأساسية في قاعدة RBAC (apiGroups, resources, verbs)؟",
-    "كيف يمكنك التحقق مما إذا كان المستخدم أو الحساب يملك صلاحية معينة باستخدام أمر kubectl auth can-i؟"
+    "What are the basic fields in the RBAC base (apiGroups, resources, verbs)?",
+    "How do you check if a user or account has a certain privilege using the kubectl auth can-i command?"
   ]}
 >
-المصفوفة الكاملة لعلاقات الـ RBAC:
+The complete matrix of RBAC relationships:
 
-- **Role:** صلاحيات داخل مساحة أسماء محددة.
-- **ClusterRole:** صلاحيات عامة لكامل الكتلة أو كائنات غير مقيدة بـ Namespace (كالعقد Nodes و PersistentVolumes).
-- **RoleBinding:** يمنح الصلاحيات داخل مساحة الأسماء الخاصة به فقط.
-- **ClusterRoleBinding:** يمنح الصلاحيات على مستوى كامل الكتلة لكل مساحات الأسماء والموارد العامة.
+- **Role:** Permissions within a specific namespace.
+- **ClusterRole:** Global rights for the entire cluster or objects not restricted to Namespace (such as Nodes and PersistentVolumes).
+- **RoleBinding:** Grants rights within its own namespace only.
+- **ClusterRoleBinding:** Grants cluster-wide permissions to all namespaces and global resources.
 
-**مثال تطبيقي احترافي:**
-إذا أردت منح مطور صلاحية `view` في مساحة `staging` فقط دون منحه صلاحية على الكتلة بالكامل:
+**Professional application example:**
+If you want to grant a developer `view` access to only the `staging` space but not the entire cluster:
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: developer-view
+  name:developer-view
   namespace: staging
 subjects:
 - kind: User
-  name: ali@example.com
+  Name: ali@example.com
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: ClusterRole   # استخدام ClusterRole العام الجاهز
+  kind: ClusterRole # Use generic out-of-the-box ClusterRole
   name: view
   apiGroup: rbac.authorization.k8s.io
 ```
@@ -55,18 +55,18 @@ roleRef:
   number={2}
   difficulty="advanced"
   tags={["kubernetes", "security", "security-context", "hardening"]}
-  question="ما هي الإعدادات الإلزامية في SecurityContext لتحصين الحاوية (Hardening) ضد ثغرات الهروب من الحاويات (Container Escape)؟"
-  directAnswer="تشمل الإعدادات الأساسية: runAsNonRoot: true لمنع التشغيل بصلاحية المستخدم الجذر root، readOnlyRootFilesystem: true لمنع المهاجم من تعديل ملفات النظام التنفيذية أو تنزيل برمجيات خبيثة، allowPrivilegeEscalation: false لمنع اكتساب صلاحيات إضافية عبر suid binaries، وإسقاط جميع إمكانيات لينكس عبر capabilities.drop: ['ALL']."
+  question="What are the mandatory settings in SecurityContext for container hardening against Container Escape vulnerabilities?"
+  directAnswer="Basic settings include: runAsNonRoot: true to prevent booting as root, readOnlyRootFilesystem: true to prevent an attacker from modifying system executable files or downloading malware, allowPrivilegeEscalation: false to prevent gaining additional privileges via suid binaries, and dropping all Linux capabilities via capabilities.drop: ['ALL']."
   pitfalls={[
-    "تفعيل privileged: true داخل بيئات الإنتاج، مما يمنح الحاوية إمكانية الوصول المباشر لكافة أجهزة وعمليات الخادم المضيف ويجعل الهروب من الحاوية أمرًا شبه مؤكد عند اختراق التطبيق.",
-    "تفعيل readOnlyRootFilesystem دون توفير emptyDir volumes للمجلدات المؤقتة التي يتطلبها التطبيق للكتابة (مثل /tmp أو /var/run/app)."
+    "Enable privileged: true within production environments, giving the container direct access to all host server hardware and processes and making container escape almost certain when the application is compromised.",
+    "Enable readOnlyRootFilesystem without providing emptyDir volumes for temporary folders that the application requires for writing (such as /tmp or /var/run/app)."
   ]}
   followUps={[
-    "ما الفرق بين SecurityContext على مستوى الـ Pod (pod.spec.securityContext) وعلى مستوى الحاوية (pod.spec.containers[].securityContext)؟",
-    "ما هي معايير Pod Security Standards الثلاثة (Privileged, Baseline, Restricted)؟"
+    "What is the difference between Pod-level SecurityContext (pod.spec.securityContext) and Container-level SecurityContext (pod.spec.containers[].securityContext)?",
+    "What are the three Pod Security Standards (Privileged, Baseline, Restricted)?"
   ]}
 >
-نموذج SecurityContext محصن للإنتاج وفق معيار **Restricted Pod Security Standard**:
+SecurityContext model hardened for production according to the **Restricted Pod Security Standard**:
 
 ```yaml
 spec:
@@ -78,23 +78,23 @@ spec:
     seccompProfile:
       type: RuntimeDefault
   containers:
-  - name: secure-app
-    image: my-app:v1.0.0
+  -name: secure-app
+    image:my-app:v1.0.0
     securityContext:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: true
       capabilities:
         drop:
-        - ALL
+        -ALL
     volumeMounts:
-    - name: tmp-dir
+    -name: tmp-dir
       mountPath: /tmp
   volumes:
-  - name: tmp-dir
+  -name: tmp-dir
     emptyDir: {}
 ```
-هذا التكوين يمنع:
-- تعديل أي ملف في نظام الملفات.
-- استغلال برامج SUID للحصول على صلاحيات إضافية.
-- استخدام أي إمكانيات خاصة بنواة لينكس مثل `CAP_NET_RAW` أو `CAP_SYS_ADMIN`.
+This configuration prevents:
+- Modify any file in the file system.
+- Exploiting SUID programs to obtain additional powers.
+- Use any Linux kernel capabilities such as `CAP_NET_RAW` or `CAP_SYS_ADMIN`.
 </InterviewQuestion>

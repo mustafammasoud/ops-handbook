@@ -2,10 +2,10 @@
 title: Kubernetes Storage & CSI Interview Questions
 technology: kubernetes
 topic: storage
-description: أسئلة مقابلات حول التخزين الدائم في Kubernetes، المفاهيم بين PV وPVC وStorageClass، أنماط الوصول (Access Modes)، ومحركات CSI.
+description: Interview questions about persistent storage in Kubernetes, concepts between PV, PVC, and StorageClass, Access Modes, and CSI drivers.
 order: 5
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,21 +13,21 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["kubernetes", "storage", "pv", "pvc", "storageclass"]}
-  question="اشرح العلاقة بين PersistentVolume (PV) و PersistentVolumeClaim (PVC) و StorageClass وكيف تعمل آلية التخصيص الديناميكي (Dynamic Provisioning)؟"
-  directAnswer="يمثل الـ PV قرص التخزين الفعلي الموجود في البنية التحتية. يمثل الـ PVC طلبًا يقدمه المطور لحجز مساحة تخزينية بمواصفات معينة (الحجم ونمط الوصول). الـ StorageClass هو القالب الذي يربط بينهما؛ فبدلاً من إنشاء أقراص PV يدويًا، تراقب وحدة التخزين إنشاء PVC وتستدعي الـ CSI Driver تلقائيًا لاقتطاع قرص فعلي جديد في السحابة وإنشاء PV مطابق وربطهما معًا (Bound)."
+  question="Explain the relationship between PersistentVolume (PV), PersistentVolumeClaim (PVC) and StorageClass and how the Dynamic Provisioning mechanism works?"
+  directAnswer="The PV represents the physical storage disk present in the infrastructure. The PVC represents a request made by the developer to reserve storage space with certain specifications (size and access pattern). The StorageClass is the template that connects them; instead of manually creating PV disks, the volume monitors the creation of the PVC and automatically calls the CSI Driver to truncate a new physical disk in the cloud, create a matching PV, and bind them together (Bound)."
   pitfalls={[
-    "الاعتقاد بأن حذف كبسولة التطبيق يؤدي بالضرورة لحذف بيانات الـ PV؛ سياسة الاسترداد (Reclaim Policy مثل Retain) تحمي القرص والبيانات حتى بعد حذف الـ PVC والـ Pod.",
-    "استخدام قرص RWO (ReadWriteOnce) ومحاولة ربطه بعدة كبسولات تعمل على عقد مختلفة."
+    "It is believed that deleting the application pod necessarily deletes the PV data; a Reclaim Policy such as Retain protects the disk and data even after the PVC and Pod are deleted.",
+    "Using the RWO (ReadWriteOnce) disk and trying to connect it to multiple pods running on different nodes."
   ]}
   followUps={[
-    "ما الفرق بين سياسات الاسترداد: Delete و Retain و Recycle؟",
-    "ما أهمية ضبط volumeBindingMode: WaitForFirstConsumer في الـ StorageClass؟"
+    "What is the difference between recovery policies: Delete, Retain, and Recycle?",
+    "What is the importance of setting volumeBindingMode: WaitForFirstConsumer in the StorageClass?"
   ]}
 >
-تخيل العلاقة على النحو التالي:
-- **Node** يقابله في الحوسبة قرص **PersistentVolume (PV)**.
-- **Pod** يقابله في طلب التخزين طلب **PersistentVolumeClaim (PVC)**.
-- **StorageClass** هو الوسيط الآلي الذي يحقق **التخصيص الديناميكي (Dynamic Provisioning)**:
+Imagine the relationship as follows:
+- **Node** is equivalent in computing to **PersistentVolume (PV)** disk.
+- **Pod** is matched in the storage request to a **PersistentVolumeClaim (PVC)** request.
+**StorageClass** is an automated broker that achieves **Dynamic Provisioning**:
 
 ```
 [Developer creates PVC]
@@ -48,7 +48,7 @@ language: ar
 [Kubelet attaches and mounts volume to Pod path]
 ```
 
-ضبط `volumeBindingMode: WaitForFirstConsumer` هو أمر حاسم؛ فهو يؤجل إنشاء القرص الفعلي وحجزه حتى يتم تحديد العقدة التي ستستضيف الـ Pod بواسطة Kube-Scheduler، مما يضمن إنشاء القرص في نفس الـ Availability Zone (المنطقة الجغرافية) التي تتواجد فيها العقدة.
+Setting `volumeBindingMode:WaitForFirstConsumer` is crucial; It postpones the creation and reservation of the physical disk until the node that will host the pod is determined by the Kube-Scheduler, ensuring that the disk is created in the same Availability Zone as the node.
 </InterviewQuestion>
 
 <InterviewQuestion
@@ -56,23 +56,23 @@ language: ar
   number={2}
   difficulty="beginner"
   tags={["kubernetes", "storage", "access-modes"]}
-  question="ما هي أنماط الوصول (Access Modes) المتاحة لأقراص التخزين في Kubernetes، وما الفارق الجوهري بينها؟"
-  directAnswer="أنماط الوصول هي: ReadWriteOnce (RWO - يمكن تثبيت القرص للقراءة والكتابة من قِبل عقدة واحدة فقط)، ReadOnlyMany (ROX - يمكن تثبيته للقراءة فقط بواسطة عدة عقد في نفس الوقت)، ReadWriteMany (RWX - يمكن تثبيته للقراءة والكتابة بواسطة عدة عقد متزامنة)، و ReadWriteOncePod (RWOP - حصر التثبيت لكبسولة واحدة فقط في الكتلة بأكملها)."
+  question="What are the access modes available for storage disks in Kubernetes, and what is the fundamental difference between them?"
+  directAnswer="The access patterns are: ReadWriteOnce (RWO - disk can be mounted read-write by only one node), ReadOnlyMany (ROX - can be mounted read-only by multiple nodes at the same time), ReadWriteMany (RWX - can be mounted read-write by multiple nodes simultaneously), and ReadWriteOncePod (RWOP - limit installation to only one pod in the entire cluster)."
   pitfalls={[
-    "الخلط بين مفهوم ReadWriteOnce (عقدة واحدة فقط) والاعتقاد بأنه يعني كبسولة واحدة؛ يمكن لعدة كبسولات داخل نفس العقدة القراءة والكتابة لنفس قرص RWO، لكن كبسولة على عقدة ثانية ستفشل في تثبيت القرص (Multi-Attach error).",
-    "محاولة استخدام قرص سحابي كتلي (مثل AWS EBS أو Azure Managed Disk) بنمط RWX؛ أقراص Block Storage لا تدعم بطبيعتها RWX، بل تتطلب أنظمة ملفات شبكية مثل NFS أو CephFS أو AWS EFS."
+    "Confusing the concept of ReadWriteOnce (one node only) into thinking it means one pod; multiple pods within the same node can read and write to the same RWO disk, but a pod on a second node will fail to mount the disk (Multi-Attach error).",
+    "Try using a cloud-based block disk (such as AWS EBS or Azure Managed Disk) with RWX mode; Block Storage disks do not inherently support RWX, but require networked file systems such as NFS, CephFS, or AWS EFS."
   ]}
   followUps={[
-    "ما رسالة الخطأ الشهيرة التي تظهر عند محاولة تشغيل Pod على خادم ثانٍ مرتبط بقرص RWO مثبت على خادم أول؟",
-    "كيف يعالج نمط الوصول الحديث ReadWriteOncePod ثغرة الأمان في قفل التخزين الحصري؟"
+    "What is the famous error message that appears when you try to run a Pod on a second server linked to an RWO disk installed on a first server?",
+    "How does the modern ReadWriteOncePod access pattern address the security vulnerability in the exclusive storage lock?"
   ]}
 >
-جدول أنماط الوصول في Kubernetes:
+Access patterns table in Kubernetes:
 
-| نمط الوصول | الاختصار | الوصف | أمثلة وسائط التخزين المتوافقة |
+| Access pattern | Abbreviation | Description | Examples of compatible storage media |
 |---|---|---|---|
-| **ReadWriteOnce** | `RWO` | قراءة وكتابة بواسطة **عقدة واحدة (Single Node)** | AWS EBS, GCP Persistent Disk, Azure Disk, iSCSI |
-| **ReadOnlyMany** | `ROX` | قراءة فقط بواسطة **عدة عقد (Multiple Nodes)** | NFS, Ceph, Cloud Storage Buckets |
-| **ReadWriteMany** | `RWX` | قراءة وكتابة متزامنة بواسطة **عدة عقد** | NFS, AWS EFS, GlusterFS, Azure Files |
-| **ReadWriteOncePod** | `RWOP` | قراءة وكتابة بواسطة **كبسولة واحدة حصرياً (Single Pod)** | CSI Plugins الحديثة (Kubernetes v1.22+) |
+| **ReadWriteOnce** | `RWO` | Read and write by **Single Node** | AWS EBS, GCP Persistent Disk, Azure Disk, iSCSI |
+| **ReadOnlyMany** | `ROX` | Read only by **Multiple Nodes** | NFS, Ceph, Cloud Storage Buckets |
+| **ReadWriteMany** | `RWX` | Simultaneous read and write by **multiple nodes** | NFS, AWS EFS, GlusterFS, Azure Files |
+| **ReadWriteOncePod** | `RWOP` | Read and write using **Exclusively One Capsule (Single Pod)** | Modern CSI Plugins (Kubernetes v1.22+) |
 </InterviewQuestion>

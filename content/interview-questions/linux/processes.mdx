@@ -2,10 +2,10 @@
 title: Linux Processes & Signals Interview Questions
 technology: linux
 topic: processes
-description: أسئلة مقابلات حول إدارة العمليات في لينكس، حالات العمليات (Zombie وD-State)، إشارات النواة (SIGTERM وSIGKILL)، ودور PID 1.
+description: Interview questions about process management in Linux, process states (Zombie and D-State), kernel signals (SIGTERM and SIGKILL), and the role of PID 1.
 order: 2
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,36 +13,36 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["linux", "processes", "zombie", "signals"]}
-  question="ما الفرق بين العملية اليتيمة (Orphan Process) والعملية الشبحية (Zombie Process) في لينكس، وكيف تتخلص من كل منهما؟"
-  directAnswer="العملية اليتيمة (Orphan) هي عملية ماتت عمليتها الأم (Parent Process) بينما لا تزال هي قيد التشغيل، ويقوم معالج النظام الأول PID 1 بتبنيها فورًا وتنظيفها عند انتهائها دون أي ضرر. أما العملية الشبحية (Zombie - حالة Z) فهي عملية انتهت بالفعل وأخلت ذاكرتها، لكن عمليتها الأم لم تقرأ كود خروجها عبر استدعاء wait()؛ ولا يمكن قتل الـ Zombie بأمر kill -9 لأنها ميتة مسبقًا، وتُحل إما بإرسال SIGCHLD للأب أو إنهاء العملية الأم ليتولى PID 1 تنظيف مدخلات جدول العمليات."
+  question="What is the difference between an orphan process and a zombie process in Linux, and how do you get rid of both of them?"
+  directAnswer="An orphan process is a process whose parent process (Parent Process) has died while it is still running, and the system's first processor PID 1 immediately adopts it and cleans it up when it finishes without any damage. As for the ghost process (Zombie - Z state), it is a process that has already ended and cleared its memory, but its parent process did not read its exit code by calling wait(); and the zombie cannot be killed with the kill -9 command because it is already dead, and it is resolved by sending either SIGCHLD to the parent or terminate the parent process so that PID 1 cleans up the process table entries."
   pitfalls={[
-    "محاولة تنفيذ kill -9 على عملية في حالة Zombie؛ العملية الشبحية ميتة بالفعل ولا تستهلك معالجًا أو ذاكرة، بل تشغل فقط مدخلاً في جدول العمليات (Process Table Entry).",
-    "تراكم آلاف العمليات الشبحية بسبب خلل برمجي في التطبيق الأم، مما يؤدي إلى نفاد المعرفات المتاحة (PID Exhaustion) ومنع الخادم من تشغيل أي عملية جديدة."
+    "Attempting to execute kill -9 on a process in Zombie state; the ghost process is already dead and does not consume processor or memory, but only occupies an entry in the Process Table Entry.",
+    "Thousands of ghost processes accumulate due to a software bug in the parent application, leading to the running out of available PIDs and preventing the server from running any new process."
   ]}
   followUps={[
-    "كيف يمكنك العثور على المعرف الأم (PPID) لعملية شبحية محددة في الطرفية؟",
-    "ما القيمة القصوى لعدد معرفات العمليات في النظام وأين يتم ضبطها في النواة؟"
+    "How do you find the parent identifier (PPID) of a specific ghost process in the terminal?",
+    "What is the maximum number of process IDs in the system and where are they set in the kernel?"
   ]}
 >
-المقارنة التقنية بين الحالتين:
+Technical comparison between the two cases:
 
-- **العملية اليتيمة (Orphan Process):**
-  - الحالة: الأم ماتت، والابن لا يزال يعمل.
-  - المعالجة: تقوم النواة بنقل تبعية العملية إلى `PID 1` (Systemd) في عملية تسمى **Re-parenting**.
-  - الخطورة: صفر؛ النظام يديرها بشكل طبيعي.
+- **Orphan Process:**
+  - Status: The mother died, and the son is still working.
+  - Processing: The kernel moves the process dependency to `PID 1` (Systemd) in a process called **Re-parenting**.
+  - Risk: Zero; The system runs normally.
 
-- **العملية الشبح (Zombie / Defunct Process):**
-  - الحالة: الابن انتهى (استدعى `exit()`)، لكن الأم لم تستدعِ `wait()` أو `waitpid()`.
-  - الموارد المستهلكة: لا تستهلك CPU أو RAM، ولكنها تحتجز **PID** في جدول عمليات النواة.
-  - كيفية التخلص منها:
+- **Zombie / Defunct Process):**
+  - Status: The child finished (called `exit()`), but the mother did not call `wait()` or `waitpid()`.
+  - Resource Consumed: It does not consume CPU or RAM, but holds **PID** in the kernel process table.
+  - How to get rid of it:
     ```bash
-    # 1. معرفة العملية الشبح والأب الخاص بها
+    #1. Know the stealth process and its parent
     ps -eo pid,ppid,stat,cmd | grep '[Zz]'
 
-    # 2. إرسال إشارة تنبيه للأب لقراءة خروج الأبناء
+    #2. Sending an alert signal to the father to read about the children's departure
     kill -s SIGCHLD <PPID>
 
-    # 3. إذا لم يستجب الأب، يجب إنهاء الأب نفسه ليتبنى PID 1 الأشباح وينظفها
+    #3. If the father does not respond, the father must terminate himself so that PID 1 adopts the ghosts and cleans them
     kill -15 <PPID>
     ```
 </InterviewQuestion>
@@ -52,32 +52,32 @@ language: ar
   number={2}
   difficulty="intermediate"
   tags={["linux", "signals", "kernel", "sigterm", "sigkill"]}
-  question="قارن بين إشارة SIGTERM (15) وإشارة SIGKILL (9) في لينكس، ولماذا لا يُنصح باستخدام kill -9 كإجراء أول؟"
-  directAnswer="إشارة SIGTERM (Signal 15) هي إشارة الإغلاق الافتراضية؛ تُرسل إلى التطبيق ويمكن للبرنامج التقاطها (Catch) أو حجبها (Block) لإكمال المعاملات الجارية، وحفظ الحالة، وإغلاق واصفات الملفات والاتصالات بنظافة. بينما إشارة SIGKILL (Signal 9) لا يمكن للتطبيق التقاطها أو حجبها؛ بل تعترضها النواة مباشرة وتوقف العملية فورًا دون منحها أي فرصة لحفظ البيانات، مما قد يسبب تلفًا في قواعد البيانات والملفات المفتوحة."
+  question="Compare the SIGTERM(15) flag and the SIGKILL(9) flag in Linux, and why is it not recommended to use kill -9 as the first action?"
+  directAnswer="SIGTERM (signal 15) is the default shutdown request. An application can catch or block it to finish work, save state, and close file descriptors and connections cleanly. SIGKILL (signal 9) cannot be caught or blocked: the kernel stops the process immediately, without an opportunity to save data, which can corrupt databases or open files."
   pitfalls={[
-    "استخدام kill -9 مباشرة في سكربتات الأتمتة وإعادة التشغيل، مما يؤدي إلى ترك ملفات قفل ميتة (stale lock files مثل .pid) تمنع الخدمة من الإقلاع مرة أخرى.",
-    "الاعتقاد بأن SIGKILL يمكنها إنهاء عملية في حالة D-State (Uninterruptible Sleep)؛ النواة تؤجل تسليم أي إشارة للعملية حتى يكتمل طلب قراءة/كتابة القرص المتعثر."
+    "Using kill -9 directly in automation and reboot scripts leaves dead lock files such as .pid that prevent the service from starting again.",
+    "Belief that SIGKILL can terminate a process in D-State (Uninterruptible Sleep); the kernel delays handing over any signal to the process until the failed disk read/write request is complete."
   ]}
   followUps={[
-    "ما هي إشارة SIGHUP (Signal 1) وكيف تستخدمها خوادم الويب مثل NGINX لإعادة تحميل التكوين دون إيقاف الخدمة؟",
-    "لماذا لا يمكن للمستخدم العادي قتل عملية يملكها مستخدم آخر دون صلاحيات sudo؟"
+    "What is the SIGHUP signal (Signal 1) and how do web servers like NGINX use it to reload the configuration without stopping the service?",
+    "Why can't a normal user kill a process owned by another user without sudo privileges?"
   ]}
 >
-جدول الإشارات الأكثر استخدامًا في بيئات DevOps:
+The most commonly used flags table in DevOps environments:
 
-| رقم الإشارة | الاسم | المعنى والسلوك | هل يمكن للتطبيق التقاطها؟ |
+| Signal number | Name | Meaning and behavior | Can the app pick it up? |
 |---|---|---|---|
-| `1` | `SIGHUP` | قطع الاتصال بالطرفية / إعادة قراءة ملفات التكوين (Reload) | نعم (Catchable) |
-| `2` | `SIGINT` | المقاطعة اليدوية من لوحة المفاتيح عبر `Ctrl+C` | نعم (Catchable) |
-| `9` | `SIGKILL` | إنهاء فوري إجباري تنفذه النواة مباشرة | **لا (Uncatchable)** |
-| `15` | `SIGTERM` | طلب الإغلاق السلس المؤدب (Graceful Termination) | نعم (Catchable) |
-| `17 / 18` | `SIGCHLD` | إشعار من الابن المنتهي إلى الأب | نعم (Catchable) |
+| `1` | `SIGHUP` | Disconnecting from the terminal / re-reading the configuration files (Reload) | Yes (Catchable) |
+| `2` | `SIGINT` | Manual interruption from the keyboard via `Ctrl+C` | Yes (Catchable) |
+| `9` | `SIGKILL` | Forced immediate termination executed directly by the kernel **No (Uncatchable)** |
+| `15` | `SIGTERM` | Request a graceful termination Yes (Catchable) |
+| `17 / 18` | `SIGCHLD` | Notice from the departed son to the father Yes (Catchable) |
 
-**الممارسة الاحترافية الموصى بها:**
-أرسل `SIGTERM` أولاً، وانتظر مهلة زمنية (مثل 15 أو 30 ثانية)، وإذا استمرت العملية في التعليق، استخدم `SIGKILL` كملاذ أخير:
+**Recommended professional practice:**
+Send `SIGTERM` first, wait for a time limit (such as 15 or 30 seconds), and if the process continues to hang, use `SIGKILL` as a last resort:
 ```bash
 kill -15 <PID>
-# انتظار للإغلاق النظيف
+# Wait for clean shutdown
 sleep 10
 kill -0 <PID> 2>/dev/null && kill -9 <PID>
 ```

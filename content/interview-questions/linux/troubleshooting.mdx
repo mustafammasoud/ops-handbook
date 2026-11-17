@@ -2,10 +2,10 @@
 title: Linux Troubleshooting & Performance Interview Questions
 technology: linux
 topic: troubleshooting
-description: "أسئلة مقابلات حول استكشاف وتشخيص مشاكل أداء لينكس: تحليل متوسط الحمل (Load Average)، ضغط الذاكرة وSwap، واختناقات الإدخال والإخراج I/O."
+description: "Interview questions about troubleshooting and diagnosing Linux performance problems: analyzing load average, memory pressure and swap, and I/O bottlenecks."
 order: 6
 draft: false
-language: ar
+language: en
 ---
 
 <InterviewQuestion
@@ -13,59 +13,83 @@ language: ar
   number={1}
   difficulty="intermediate"
   tags={["linux", "troubleshooting", "performance", "load-average", "cpu"]}
-  question="ماذا تعني أرقام متوسط الحمل (Load Average) الثلاثة في مخرجات أمر uptime أو top، وكيف تميز بين ضغط المعالج واختناق القرص؟"
-  directAnswer="تمثل الأرقام الثلاثة متوسط عدد العمليات التي تنتظر وقت المعالجة في قائمة الانتظار (Run Queue) خلال الفترات: دقيقة واحدة، 5 دقائق، و15 دقيقة الماضية. في لينكس (على عكس يونكس التقليدي)، لا يشمل الحمل فقط العمليات في حالة R (قيد التشغيل على المعالج)، بل يشمل أيضًا العمليات العالقة في حالة D (Uninterruptible Sleep في انتظار قراءة أو كتابة على القرص). إذا كانت نسبة استهلاك المعالج %CPU منخفضة بينما Load Average مرتفع جدًا، فإن السبب الجذري هو اختناق في عمليات الإدخال والإخراج على القرص (Disk I/O Bottleneck / iowait)."
+  question="What do the three Load Average numbers mean in the output of the uptime or top command, and how do you distinguish between processor pressure and disk throttling?"
+  directAnswer="The three numbers represent the average number of processes waiting for CPU time during the last 1, 5, and 15 minutes. In Linux, load includes processes in R state (running or runnable) and in D state (uninterruptible sleep, usually waiting for I/O). If CPU use is low while load average is high, the likely cause is a disk I/O bottleneck or high iowait."
   pitfalls={[
-    "الاعتقاد بأن قيمة Load Average تزيد عن 1 تعني اختناقاً؛ يجب أولاً قسمة قيمة الحمل على إجمالي عدد أنوية المعالج (CPU Cores). في خادم يمتلك 16 نواة، قيمة حمل 12 تعني أن المعالج لم يستنفد طاقته بعد.",
-    "التركيز على المعالج فقط عند ارتفاع Load Average وتجاهل فحص نسبة %wa (IO Wait) ومخرجات أداة iostat."
+    "Belief that the Load Average value is more than 1 means a bottleneck; you must first divide the load value by the total number of processor cores (CPU Cores). On a server with 16 cores, a load value of 12 means that the processor has not exhausted its power yet.",
+    "Focus on the processor only when Load Average is high and ignore checking %wa (IO Wait) and iostat outputs."
   ]}
   followUps={[
-    "كيف يمكنك معرفة عدد أنوية المعالج المتاحة في الخادم باستخدام أمر nproc أو فحص ملف /proc/cpuinfo؟",
-    "ما هي الأداة الموصى بها لفحص العمليات التي تقضي وقتاً طويلاً في حالة Uninterruptible Sleep (D-state)؟"
+    "How can you find out how many processor cores are available in a server using the nproc command or examining the /proc/cpuinfo file?",
+    "What is the recommended tool for checking processes that spend a long time in Uninterruptible Sleep (D-state)?"
   ]}
 >
-كيفية قراءة الحمل بصرياً:
+How to read pregnancy visually:
 
 ```bash
 uptime
-# مخرجات: 20:30:15 up 45 days, 4 users, load average: 14.50, 8.20, 3.10
+# Output: 20:30:15 up 45 days, 4 users, load average: 14.50, 8.20, 3.10
 ```
-- إذا كان عدد الأنوية هو `4`، وقيمة الدقيقة الواحدة هي `14.50`، فالخادم يواجه ضغطًا زائدًا بنسبة 350% تقريبًا، والاتجاه تصاعدي (14.50 > 8.20 > 3.10).
+- If the number of cores is `4`, and the value of 1 minute is `14.50`, then the server is experiencing approximately 350% overload, and the trend is upward (14.50 > 8.20 > 3.10).
 
-**التفريق بين اختناق المعالج واختناق القرص I/O عبر `vmstat`:**
+**Differentiating between processor throttling and disk I/O throttling via `vmstat`:**
 ```bash
 vmstat 1 5
 ```
-- انظر إلى عمود `r` (العمليات المنتظرة للمعالج) وعمود `b` (العمليات المحظورة المنتظرة لعمليات الإدخال والإخراج - Blocked/I/O):
-  - إذا كان `r` مرتفعًا ونسبة `us` (User CPU) أو `sy` (System CPU) تقارب 100%: المشكلة هي **ضغط معالجة خالص (CPU Bound)**.
-  - إذا كان `b` مرتفعًا ونسبة `wa` (IO Wait) مرتفعة: المشكلة هي **بطء أو تعليق في القرص أو الشبكة (Disk I/O Bound)**، مثل قرص تالف أو مصفوفة تخزين بطيئة.
+- Look at the `r` column (processes waiting for the processor) and the `b` column (blocked processes waiting for I/O operations - Blocked/I/O):
+  - If `r` is high and `us` (User CPU) or `sy` (System CPU) ratio is close to 100%: The problem is **pure processing pressure (CPU Bound)**.
+  - If `b` is high and `wa` (IO Wait) is high: The problem is **disk or network slowness or hang (Disk I/O Bound)**, such as a bad disk or a slow storage array.
+</InterviewQuestion>
+
+<InterviewQuestion
+  id="linux-incident-first-five-minutes"
+  number={2}
+  difficulty="advanced"
+  tags={["linux", "incident-response", "performance", "troubleshooting"]}
+  question="A production Linux host is slow but still reachable. What do you check in the first five minutes, and why?"
+  directAnswer="Establish a low-risk baseline before making changes: confirm load and uptime, CPU and memory pressure, disk I/O wait, filesystem capacity and inode usage, recent kernel or service errors, and the processes consuming resources. This separates CPU, memory, I/O, disk-space, and application failures."
+  pitfalls={["Restarting the affected service or clearing caches before capturing evidence.", "Treating high load as a CPU problem without checking D-state tasks and I/O wait."]}
+  followUps={["Which commands can reveal a filesystem that is full of inodes rather than bytes?", "How would you collect this evidence if the host becomes unreachable?"]}
+>
+Start with read-only commands:
+
+```bash
+uptime; free -h; df -h; df -i
+vmstat 1 5
+iostat -xz 1 3
+ps -eo pid,ppid,stat,%cpu,%mem,cmd --sort=-%cpu | head
+ps -eo pid,ppid,stat,%cpu,%mem,cmd --sort=-%mem | head
+journalctl -p warning --since '15 minutes ago'
+```
+
+Record the output in the incident ticket. Only after identifying the bottleneck should you mitigate it—for example, by freeing disk space, scaling the workload, or isolating an unhealthy process.
 </InterviewQuestion>
 
 <InterviewQuestion
   id="linux-free-vs-available-memory"
-  number={2}
+  number={3}
   difficulty="beginner"
   tags={["linux", "troubleshooting", "memory", "cache"]}
-  question="ما الفرق بين حقل free وحقل available في مخرجات أمر free -m، ولماذا لا يجب القلق إذا كان حقل free منخفضًا جدًا؟"
-  directAnswer="حقل free يمثل الذاكرة الفيزيائية غير المستخدمة على الإطلاق والتي تبقى فارغة تمامًا. أما حقل available فيمثل التقدير الواقعي لمقدار الذاكرة المتاحة لتشغيل تطبيقات جديدة دون اللجوء إلى التبديل (Swap)، ويشمل حقل free مضافًا إليه الذاكرة المستخدمة في التخزين المؤقت (Buffers and Page Cache) والتي يمكن للنواة استردادها فورًا عند حاجة أي تطبيق للذاكرة. يقوم لينكس عمدًا باستهلاك كل الذاكرة الحرة كمخزن مؤقت للقرص لتسريع الأداء."
+  question="What is the difference between the free field and the available field in the output of the free -m command, and why should we not worry if the free field is too low?"
+  directAnswer="The free field represents physical memory that is never used and remains completely empty. The available field represents a realistic estimate of the amount of memory available to run new applications without resorting to swapping. The free field includes in addition the memory used in buffers and page cache, which the kernel can immediately reclaim when any application needs memory. Linux intentionally uses up all free memory as a disk cache to speed up performance."
   pitfalls={[
-    "الافتراض بأن استهلاك الذاكرة يقترب من 100% لأن free يساوي بضعة ميجابايت، والمطالبة الخاطئة بترقية الذاكرة بينما حقل available يغطي أكثر من نصف سعة الخادم.",
-    "تشغيل أمر echo 3 > /proc/sys/vm/drop_caches في بيئات الإنتاج كحل وهمي؛ هذا يبطئ قراءة الملفات من القرص ويزيد الضغط على وحدات التخزين."
+    "The assumption that memory consumption is close to 100% because free is a few MB, and the incorrect claim for a memory upgrade while the available field covers more than half of the server's capacity.",
+    "Run echo 3 > /proc/sys/vm/drop_caches in production environments as a workaround; this slows reading files from disk and increases pressure on volumes."
   ]}
   followUps={[
-    "ما هي ظاهرة تشنج التبديل (Swap Thrashing) وما علاماتها في أداء النظام؟",
-    "كيف يعمل مكون OOM Killer (Out Of Memory) في النواة وما الملف الذي يوثق الكبسولة أو العملية التي تم قتلها؟"
+    "What is the phenomenon of switching spasm (Swap Thrashing) and what are its signs in system performance?",
+    "How does the OOM Killer (Out Of Memory) component work in the kernel and what file documents which pod or process was killed?"
   ]}
 >
-مثال عملي على مخرجات `free -m`:
+Practical example of `free -m` output:
 ```
-               total        used        free      shared  buff/cache   available
-Mem:           16000        5200         450         320       10350       10130
-Swap:           4096         120        3976
+               Totally used free shared buff/cache available
+Mem: 16000 5200 450 320 10350 10130
+Swap: 4096 120 3976
 ```
-- `free`: فقط `450 MB` (قد يبدو الخادم في خطر للوهلة الأولى).
-- `buff/cache`: يشغل `10350 MB` (مستغلة لتسريع قراءة أقراص التخزين).
-- `available`: متاح حقيقي `10130 MB` (الخادم سليم تمامًا ويمكنه منح التطبيقات أكثر من 10 جيجابايت فوريًا بمجرد طلبها).
+- `free`: only `450 MB` (server may appear to be in danger at first glance).
+- `buff/cache`: Occupies `10350 MB` (used to speed up storage disk reading).
+- `available`: real available `10130 MB` (server is fully healthy and can give apps more than 10 GB instantaneously as soon as they request it).
 
-إذا اقتربت قيمة `available` من الصفر، تبدأ النواة في نقل صفحات الذاكرة إلى قرص التبديل (Swap). وإذا امتلأ الـ Swap أيضًا، يتدخل **OOM Killer** ويقتل العملية ذات أعلى درجة استهلاك للذاكرة (`oom_score`) لحماية النواة من الانهيار.
+If the value of `available` approaches zero, the kernel starts moving memory pages to the swap disk. If the Swap is also full, **OOM Killer** intervenes and kills the process with the highest memory consumption score (`oom_score`) to protect the kernel from crashing.
 </InterviewQuestion>
