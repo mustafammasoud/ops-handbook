@@ -14,8 +14,8 @@ interface Props {
 }
 
 const { entry, technology, topics } = Astro.props;
-const { title, description, language = 'ar' } = entry.data;
-const dir = language === 'ar' ? 'rtl' : 'ltr';
+const { title, description, language = 'en' } = entry.data;
+const dir = 'ltr';
 
 // Sorted topics
 const sortedTopics = [...topics].sort((a, b) => a.data.order - b.data.order);
@@ -172,7 +172,7 @@ const pageTitle = `${title} — ${technology.name} Cheat Sheet | Ops Handbook`;
       </header>
 
       <!-- MDX Article Body -->
-      <article class="prose max-w-4xl" dir={dir} lang={language}>
+      <article class="prose max-w-none" dir={dir} lang={language}>
         <slot />
       </article>
 
