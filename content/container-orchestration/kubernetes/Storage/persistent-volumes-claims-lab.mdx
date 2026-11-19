@@ -15,8 +15,6 @@ tags:
 language: "ar"
 ---
 
-# Persistent Volumes & Claims — Practical Lab
-
 ## 1. Lab Objectives
 
 في هذا الـ Lab هننفّذ سيناريو عملي متكامل لإدارة Persistent Storage داخل Kubernetes.
@@ -42,7 +40,7 @@ language: "ar"
 
 </Callout>
 
-### Lab Workflow
+### I. Lab Workflow
 
 <Steps>
   <li>Understand the initial problem — data stored in Container filesystem is not persistent.</li>
@@ -64,7 +62,7 @@ language: "ar"
 
 في البداية، لا يوجد Volume مخصص لهذا المسار؛ لذلك البيانات موجودة داخل الـ Container filesystem.
 
-### Inspect the Pod
+### I. Inspect the Pod
 
 ```bash
 kubectl get pods
@@ -84,7 +82,7 @@ kubectl exec webapp -- cat /log/app.log
 kubectl exec webapp -c <container-name> -- cat /log/app.log
 ```
 
-### Why Is This a Problem?
+### II. Why Is This a Problem?
 
 الـ Container filesystem ليس مكانًا مناسبًا للاحتفاظ بالبيانات التي يجب أن تستمر بعد إعادة إنشاء الـ Pod.
 
@@ -115,7 +113,7 @@ Pod recreated → Container data is lost.
 | Node | `/var/log/webapp` |
 | Container | `/log` |
 
-### Configure the Volume
+### I. Configure the Volume
 
 نحتاج إلى تعريف جزأين داخل Pod specification:
 
@@ -148,7 +146,7 @@ Container filesystem: /log
 
 أي كتابة داخل `/log` في الـ Container ستصل إلى المسار المرتبط به على الـ Node.
 
-### Verify the Result
+### II. Verify the Result
 
 ```bash
 kubectl exec webapp -- cat /log/app.log
@@ -185,7 +183,7 @@ sudo cat /var/log/webapp/app.log
 | Storage Backend | `hostPath` |
 | Host Path | `/pv/log` |
 
-### pv.yaml
+### I. pv.yaml
 
 ```yaml
 apiVersion: v1
@@ -224,7 +222,7 @@ kubectl get pv
 kubectl describe pv pv-log
 ```
 
-### Understand the PV State
+### II. Understand the PV State
 
 عند إنشاء PV بدون PVC مرتبط به، تكون حالته:
 
@@ -256,7 +254,7 @@ kubectl get pv
 | Access Mode | `ReadWriteOnce` |
 | Requested Storage | `50Mi` |
 
-### pvc.yaml
+### I. pvc.yaml
 
 ```yaml
 apiVersion: v1
@@ -308,7 +306,7 @@ kubectl get pvc
 
 المشكلة هنا هي اختلاف الـ Access Modes.
 
-### Compare the Access Modes
+### I. Compare the Access Modes
 
 ```bash
 kubectl describe pv pv-log
@@ -332,7 +330,7 @@ accessModes:
 
 يجب أن تتوافق شروط الـ PVC مع الـ PV حتى يتم الـ Binding.
 
-### Fix the PVC
+### II. Fix the PVC
 
 حدّث الـ PVC ليطلب نفس Access Mode الموجود في الـ PV:
 
@@ -375,7 +373,7 @@ kubectl get pv,pvc
 - PV: `Bound`
 - PVC: `Bound`
 
-### What Happened to the Capacity?
+### III. What Happened to the Capacity?
 
 لاحظ أن الـ PV سعته `100Mi` بينما الـ PVC طلب `50Mi`.
 
@@ -398,17 +396,25 @@ kubectl get pv,pvc
 
 أصبح لدينا الآن:
 
-```text
-PersistentVolume: pv-log
-          |
-          | Bound
-          v
-PersistentVolumeClaim: claim-log-1
+```mermaid
+flowchart TD
+    A(["PersistentVolume: pv-log"])
+    B(["PersistentVolumeClaim: claim-log-1"])
+
+    A -->|"Bound"| B
+
+    classDef pv fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef pvc fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
+
+    class A pv
+    class B pvc
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 الخطوة التالية هي استخدام الـ PVC داخل الـ Pod.
 
-### Configure the Pod
+### I. Configure the Pod
 
 نحتفظ بنفس `mountPath`:
 
@@ -427,7 +433,7 @@ volumes:
       claimName: claim-log-1
 ```
 
-### Complete Storage Configuration
+### II. Complete Storage Configuration
 
 ```yaml
 apiVersion: v1
@@ -456,24 +462,26 @@ spec:
 
 </Callout>
 
-### Understand the Complete Storage Flow
+### III. Understand the Complete Storage Flow
 
 ```mermaid
 flowchart TD
-    A["Application writes logs"] --> B["Container: /log"]
-    B --> C["volumeMount: log-volume"]
-    C --> D["Pod Volume"]
-    D --> E["PVC: claim-log-1"]
-    E --> F["PV: pv-log"]
-    F --> G["hostPath: /pv/log"]
+    A(["Application Writes Logs"]) --> B(["Container: /log"])
+    B --> C(["volumeMount: log-volume"])
+    C --> D(["Pod Volume"])
+    D --> E(["PVC: claim-log-1"])
+    E --> F(["PV: pv-log"])
+    F --> G(["hostPath: /pv/log"])
 
-    classDef app fill:#efe4d1,stroke:#96734b,color:#382d20
-    classDef storage fill:#e5d8bd,stroke:#806442,color:#382d20
-    classDef backend fill:#d7c5a7,stroke:#806442,color:#382d20
+    classDef app fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef storage fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef backend fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
 
     class A,B app
     class C,D,E,F storage
     class G backend
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 لاحظ الفرق بين المسؤوليات:
@@ -483,7 +491,7 @@ flowchart TD
 - **Pod:** يستخدم الـ PVC من خلال Volume.
 - **VolumeMount:** يحدد مكان ظهور التخزين داخل الـ Container.
 
-### Verify the Configuration
+### IV. Verify the Configuration
 
 ```bash
 kubectl get pv,pvc,pods
@@ -527,7 +535,7 @@ persistentVolumeReclaimPolicy: Retain
 
 الـ Reclaim Policy تحدد ما الذي يحدث للـ PV والـ Storage Backend بعد حذف الـ PVC المرتبط به.
 
-### Retain
+### I. Retain
 
 عند حذف الـ PVC:
 
@@ -542,7 +550,7 @@ PV Lifecycle with Retain
   PVC deleted → PV retains its data and binding history
 ```
 
-### Reclaim Policy Comparison
+### II. Reclaim Policy Comparison
 
 | Policy | Behavior |
 |---|---|
@@ -572,7 +580,7 @@ kubectl delete pvc claim-log-1
 
 `Terminating`
 
-### Why Does This Happen?
+### I. Why Does This Happen?
 
 Kubernetes يستخدم Finalizer اسمه:
 
@@ -600,7 +608,7 @@ metadata:
     - kubernetes.io/pvc-protection
 ```
 
-### Resolve the Issue
+### II. Resolve the Issue
 
 أولًا، احذف الـ Pod الذي يستخدم الـ PVC:
 
@@ -650,7 +658,7 @@ kubectl get pv
 | `kubectl describe pod <name>` | فحص Events ومشاكل Mounting |
 | `kubectl get events --sort-by=.metadata.creationTimestamp` | مراجعة الأحداث الأخيرة |
 
-### Common Problems
+### I. Common Problems
 
 **PVC Pending**
 
@@ -706,23 +714,26 @@ kubectl get pv
 
 <Callout type="note" title="The Storage Architecture">
 
-```text
-Application
-    |
-    v
-Container Mount
-    |
-    v
-Pod Volume
-    |
-    v
-PersistentVolumeClaim
-    |
-    v
-PersistentVolume
-    |
-    v
-Storage Backend
+```mermaid
+flowchart TD
+    A(["Application"])
+    B(["Container Mount"])
+    C(["Pod Volume"])
+    D(["PersistentVolumeClaim"])
+    E(["PersistentVolume"])
+    F(["Storage Backend"])
+
+    A --> B --> C --> D --> E --> F
+
+    classDef app fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef storage fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef backend fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
+
+    class A,B app
+    class C,D,E storage
+    class F backend
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 افهم العلاقة بين هذه الطبقات جيدًا؛ فهي أساس التعامل مع Persistent Storage في Kubernetes.

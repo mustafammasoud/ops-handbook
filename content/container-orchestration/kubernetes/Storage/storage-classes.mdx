@@ -64,24 +64,26 @@ language: "ar"
 
 </InfoCard>
 
-### StorageClass in the Storage Architecture
+### I. StorageClass in the Storage Architecture
 
 ```mermaid
 flowchart TD
-    A["Application / Pod"] --> B["PersistentVolumeClaim"]
-    B --> C["StorageClass"]
-    C --> D["Provisioner"]
-    D --> E["Storage Backend"]
-    D --> F["PersistentVolume"]
+    A(["Application / Pod"]) --> B(["PersistentVolumeClaim"])
+    B --> C(["StorageClass"])
+    C --> D(["Provisioner"])
+    D --> E(["Storage Backend"])
+    D --> F(["PersistentVolume"])
     F --> B
 
-    classDef app fill:#efe4d1,stroke:#96734b,color:#382d20
-    classDef control fill:#e5d8bd,stroke:#806442,color:#382d20
-    classDef backend fill:#d7c5a7,stroke:#806442,color:#382d20
+    classDef app fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef control fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef backend fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
 
     class A app
     class B,C,D,F control
     class E backend
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 لاحظ إن الـ StorageClass لا تستبدل PV أو PVC.
@@ -92,7 +94,7 @@ flowchart TD
 
 لفهم أهمية StorageClasses، لازم نفرّق بين طريقتين لتوفير التخزين.
 
-### 3.1 Static Provisioning
+### I. Static Provisioning
 
 في Static Provisioning، الـ Administrator بيجهز التخزين بنفسه قبل ما المستخدم يطلبه.
 
@@ -105,14 +107,17 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Administrator"] --> B["Create Storage Volume"]
-    B --> C["Create PersistentVolume"]
-    C --> D["User creates PVC"]
-    D --> E["PV / PVC Binding"]
-    E --> F["Pod uses PVC"]
+    A(["Administrator"]) --> B(["Create Storage Volume"])
+    B --> C(["Create PersistentVolume"])
+    C --> D(["User creates PVC"])
+    D --> E(["PV / PVC Binding"])
+    E --> F(["Pod uses PVC"])
 
-    classDef step fill:#efe4d1,stroke:#96734b,color:#382d20
+    classDef step fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+
     class A,B,C,D,E,F step
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 **Example:**
@@ -123,7 +128,7 @@ flowchart TD
 
 **The limitation:** كل Volume جديد يحتاج تجهيزًا مسبقًا، وقد يتطلب تدخلًا يدويًا من الـ Administrator.
 
-### 3.2 Dynamic Provisioning
+### II. Dynamic Provisioning
 
 في Dynamic Provisioning، Kubernetes يستطيع توفير Storage تلقائيًا عندما يتم إنشاء PVC يطلب StorageClass مناسبة.
 
@@ -138,20 +143,22 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Administrator creates StorageClass"] --> B["User creates PVC"]
-    B --> C["StorageClass selects Provisioner"]
-    C --> D["Provisioner creates Storage"]
-    D --> E["PersistentVolume created"]
-    E --> F["PVC becomes Bound"]
-    F --> G["Pod uses PVC"]
+    A(["Administrator creates StorageClass"]) --> B(["User creates PVC"])
+    B --> C(["StorageClass selects Provisioner"])
+    C --> D(["Provisioner creates Storage"])
+    D --> E(["PersistentVolume created"])
+    E --> F(["PVC becomes Bound"])
+    F --> G(["Pod uses PVC"])
 
-    classDef admin fill:#efe4d1,stroke:#96734b,color:#382d20
-    classDef provision fill:#e5d8bd,stroke:#806442,color:#382d20
-    classDef result fill:#d7c5a7,stroke:#806442,color:#382d20
+    classDef admin fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef provision fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef result fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
 
     class A,B admin
     class C,D provision
     class E,F,G result
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 <InfoCard title="Important: Dynamic Provisioning Still Creates a PV" variant="insight">
@@ -162,7 +169,7 @@ flowchart TD
 
 </InfoCard>
 
-### Comparison
+### III. Comparison
 
 | Feature | Static Provisioning | Dynamic Provisioning |
 |---|---|---|
@@ -181,7 +188,7 @@ flowchart TD
 - `reclaimPolicy`
 - `volumeBindingMode`
 
-### 4.1 Provisioner
+### I. Provisioner
 
 الـ Provisioner هو المسؤول عن توفير Storage Volume بالطريقة التي يحددها الـ StorageClass.
 
@@ -205,7 +212,7 @@ provisioner: ebs.csi.aws.com
 
 لما PVC يطلب الـ StorageClass دي، Kubernetes يقدر يستخدم الـ Driver لتوفير EBS Volume، بشرط إن الـ CSI Driver يكون مثبتًا ومهيأ بشكل صحيح.
 
-### Common Provisioner Examples
+### II. Common Provisioner Examples
 
 | Provisioner | Storage Platform |
 |---|---|
@@ -231,7 +238,7 @@ provisioner: ebs.csi.aws.com
 
 </InfoCard>
 
-### 4.2 Parameters
+### III. Parameters
 
 الـ `parameters` بتحدد تفاصيل إضافية عن الـ Storage Volume الذي سيتم إنشاؤه.
 
@@ -273,7 +280,7 @@ Kubernetes لا يضمن إن أي Parameter تكتبها ستكون مدعوم�
 
 </Callout>
 
-### 4.3 Reclaim Policy
+### IV. Reclaim Policy
 
 الـ `reclaimPolicy` بتحدد ما الذي يحدث للـ PersistentVolume بعد حذف الـ PVC المرتبط به.
 
@@ -296,7 +303,7 @@ reclaimPolicy: Retain
 
 **Important:** الـ Reclaim Policy الموجودة في StorageClass تُطبّق على الـ PVs التي يتم إنشاؤها ديناميكيًا من خلالها. أما الـ PVs التي أنشأها الـ Administrator يدويًا، فلها Reclaim Policy الخاصة بها.
 
-### 4.4 Allow Volume Expansion
+### V. Allow Volume Expansion
 
 تقدر تحدد إذا كان مسموحًا بزيادة حجم الـ Volume بعد إنشائه.
 
@@ -332,7 +339,7 @@ resources:
 
 لا يمكن استخدام هذه الخاصية لتقليل حجم الـ Volume.
 
-### 4.5 Mount Options
+### VI. Mount Options
 
 يمكن تحديد Mount Options للـ Volumes التي يتم إنشاؤها من خلال StorageClass.
 
@@ -356,7 +363,7 @@ mountOptions:
 - `Immediate`
 - `WaitForFirstConsumer`
 
-### 5.1 Immediate
+### I. Immediate
 
 ده الوضع الافتراضي.
 
@@ -385,7 +392,7 @@ Pod Scheduled
 
 مثلًا، لو الـ Storage Backend موجود في Availability Zone معينة، والـ Pod محتاج يشتغل في Zone مختلفة، ممكن تحصل مشكلة Scheduling.
 
-### 5.2 WaitForFirstConsumer
+### II. WaitForFirstConsumer
 
 في الوضع ده، Kubernetes بيأجل عملية Binding أو Provisioning لحد ما يتم إنشاء Pod يستخدم الـ PVC.
 
@@ -405,25 +412,27 @@ volumeBindingMode: WaitForFirstConsumer
 - Taints and Tolerations.
 - Storage Topology.
 
-### How It Works
+### III. How It Works
 
 ```mermaid
 flowchart TD
-    A["Create PVC"] --> B["PVC: Pending"]
-    B --> C["Create Pod using PVC"]
-    C --> D["Scheduler evaluates Pod constraints"]
-    D --> E["Select suitable Node"]
-    E --> F["Bind existing PV or provision new Volume"]
-    F --> G["PVC: Bound"]
-    G --> H["Pod can be scheduled"]
+    A(["Create PVC"]) --> B(["PVC: Pending"])
+    B --> C(["Create Pod using PVC"])
+    C --> D(["Scheduler evaluates Pod constraints"])
+    D --> E(["Select suitable Node"])
+    E --> F(["Bind existing PV or provision new Volume"])
+    F --> G(["PVC: Bound"])
+    G --> H(["Pod can be scheduled"])
 
-    classDef pending fill:#efe4d1,stroke:#96734b,color:#382d20
-    classDef scheduling fill:#e5d8bd,stroke:#806442,color:#382d20
-    classDef ready fill:#d7c5a7,stroke:#806442,color:#382d20
+    classDef pending fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef scheduling fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef ready fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
 
     class A,B pending
     class C,D,E,F scheduling
     class G,H ready
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 <InfoCard title="Why Does the PVC Stay Pending?" variant="insight">
@@ -436,7 +445,7 @@ flowchart TD
 
 </InfoCard>
 
-### Immediate vs WaitForFirstConsumer
+### IV. Immediate vs WaitForFirstConsumer
 
 | Behavior | Immediate | WaitForFirstConsumer |
 |---|---|---|
@@ -453,7 +462,7 @@ flowchart TD
 
 بعد إنشاء StorageClass، المستخدم يقدر يطلب التخزين من خلالها باستخدام `storageClassName` داخل PVC.
 
-### Example StorageClass
+### I. Example StorageClass
 
 ```yaml
 apiVersion: storage.k8s.io/v1
@@ -468,7 +477,7 @@ volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 ```
 
-### Example PVC
+### II. Example PVC
 
 ```yaml
 apiVersion: v1
@@ -492,30 +501,27 @@ spec:
 
 Kubernetes يستخدم الـ Provisioner والـ Parameters المحددين في الـ StorageClass لتوفير التخزين.
 
-### Complete Flow
+### III. Complete Flow
 
-```text
-StorageClass
-    |
-    | Defines Provisioner and Parameters
-    v
-PersistentVolumeClaim
-    |
-    | Requests StorageClass
-    v
-Provisioner
-    |
-    | Creates Backend Volume
-    v
-PersistentVolume
-    |
-    | Bound to PVC
-    v
-Pod
-    |
-    | Uses PVC as a Volume
-    v
-Container Mount
+```mermaid
+flowchart TD
+    A(["StorageClass"]) -->|"Defines Provisioner and Parameters"| B(["PersistentVolumeClaim"])
+    B -->|"Requests StorageClass"| C(["Provisioner"])
+    C -->|"Creates Backend Volume"| D(["PersistentVolume"])
+    D -->|"Bound to PVC"| E(["Pod"])
+    E -->|"Uses PVC as a Volume"| F(["Container Mount"])
+
+    classDef config fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef provision fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef storage fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef workload fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class A config
+    class B,D storage
+    class C provision
+    class E,F workload
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 ## 7. Multiple Storage Classes
@@ -576,7 +582,7 @@ spec:
 
 يمكن أن يستخدم الـ Default StorageClass تلقائيًا.
 
-### Important Difference: Empty vs Unspecified
+### I. Important Difference: Empty vs Unspecified
 
 في PVC، فيه فرق بين عدم تحديد `storageClassName` وبين تحديده بقيمة فارغة:
 
@@ -615,9 +621,6 @@ storageClassName: ""
 </InfoCard>
 
 ---
-
-# Practical Lab — Storage Classes
-
 ## 10. Lab Objectives
 
 في الجزء العملي هنشتغل على Cluster يحتوي على مجموعة من StorageClasses وPersistentVolumes.
@@ -633,7 +636,7 @@ storageClassName: ""
 - استخدام PVC داخل Pod.
 - إنشاء StorageClass جديدة باستخدام `no-provisioner`.
 
-### Lab Workflow
+### I. Lab Workflow
 
 <Steps>
   <li>Inspect existing StorageClasses and identify their provisioners and binding modes.</li>
@@ -711,7 +714,7 @@ provisioner: kubernetes.io/no-provisioner
 local-storage
 ```
 
-### Inspect Its Volume Binding Mode
+### I. Inspect Its Volume Binding Mode
 
 ```bash
 kubectl get sc local-storage -o yaml
@@ -842,7 +845,7 @@ kubectl describe pv local-pv
 | Access Mode | `ReadWriteOnce` |
 | StorageClass | `local-storage` |
 
-### local-pvc.yaml
+### I. local-pvc.yaml
 
 ```yaml
 apiVersion: v1
@@ -933,7 +936,7 @@ volumeBindingMode: WaitForFirstConsumer
 
 `/var/www/html`
 
-### nginx.yaml
+### I. nginx.yaml
 
 ```yaml
 apiVersion: v1
@@ -993,7 +996,7 @@ NAME       STATUS
 local-pv   Bound
 ```
 
-### Why Did It Become Bound?
+### II. Why Did It Become Bound?
 
 لأننا أنشأنا Pod يستخدم الـ PVC.
 
@@ -1009,7 +1012,7 @@ local-pv   Bound
 
 </InfoCard>
 
-### Verify the Mount
+### III. Verify the Mount
 
 اعرض تفاصيل الـ Pod:
 
@@ -1045,7 +1048,7 @@ kubectl exec nginx -- ls -la /var/www/html
 | Provisioner | `kubernetes.io/no-provisioner` |
 | Volume Binding Mode | `WaitForFirstConsumer` |
 
-### delayed-volume-sc.yaml
+### I. delayed-volume-sc.yaml
 
 ```yaml
 apiVersion: storage.k8s.io/v1
@@ -1083,7 +1086,7 @@ Provisioner:          kubernetes.io/no-provisioner
 VolumeBindingMode:    WaitForFirstConsumer
 ```
 
-### Understand What We Created
+### II. Understand What We Created
 
 الـ StorageClass دي:
 
@@ -1148,7 +1151,7 @@ VolumeBindingMode:    WaitForFirstConsumer
   </li>
 </Steps>
 
-### Common Causes
+### I. Common Causes
 
 | Symptom | Possible Cause |
 |---|---|
@@ -1195,27 +1198,25 @@ VolumeBindingMode:    WaitForFirstConsumer
 
 <Callout type="note" title="The Big Picture">
 
-```text
-StorageClass
-    |
-    | Defines how storage is provisioned
-    v
-Provisioner
-    |
-    | Creates storage when requested
-    v
-PersistentVolume
-    |
-    | Bound to
-    v
-PersistentVolumeClaim
-    |
-    | Consumed by
-    v
-Pod
-    |
-    v
-Container
+```mermaid
+flowchart TD
+    A(["StorageClass"]) -->|"Defines how storage is provisioned"| B(["Provisioner"])
+    B -->|"Creates storage when requested"| C(["PersistentVolume"])
+    C -->|"Bound to"| D(["PersistentVolumeClaim"])
+    D -->|"Consumed by"| E(["Pod"])
+    E --> F(["Container"])
+
+    classDef config fill:#efe4d1,stroke:#96734b,color:#382d20,stroke-width:2px
+    classDef provision fill:#e5d8bd,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef storage fill:#d7c5a7,stroke:#806442,color:#382d20,stroke-width:2px
+    classDef workload fill:#e5eadf,stroke:#849578,color:#263323,stroke-width:2px
+
+    class A config
+    class B provision
+    class C,D storage
+    class E,F workload
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 StorageClass is the provisioning policy, PV is the storage resource, and PVC is the application's request for that resource.
