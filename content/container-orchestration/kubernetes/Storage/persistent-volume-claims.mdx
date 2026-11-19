@@ -14,8 +14,6 @@ tags:
 language: ar
 ---
 
-# Persistent Volume Claims (PVC)
-
 ## 1. What is a Persistent Volume Claim?
 
 في الدرس السابق، عرفنا إن الـ Administrator بيجهز Persistent Volumes.
@@ -45,22 +43,24 @@ Kubernetes بيحاول يعمل Binding بين الـ PVC وواحد من ال�
 
 ```mermaid
 flowchart TD
-    A["Administrator creates PV"] --> B["Available PV"]
-    C["User creates PVC"] --> D["PVC requests storage"]
-    B --> E{"Matching PV found?"}
+    A(["Administrator Creates PV"]) --> B(["Available PV"])
+    C(["User Creates PVC"]) --> D(["PVC Requests Storage"])
+    B --> E{"Matching PV Found?"}
     D --> E
-    E -->|"Yes"| F["PVC Bound to PV"]
-    E -->|"No"| G["PVC Pending"]
-    G --> H["New matching PV becomes available"]
+    E -->|"Yes"| F(["PVC Bound to PV"])
+    E -->|"No"| G(["PVC Pending"])
+    G --> H(["New Matching PV Becomes Available"])
     H --> F
 
-    classDef admin fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef storage fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef status fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef admin fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef storage fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef status fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A,C admin
     class B,D,E,H storage
     class F,G status
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 ## 3. PVC Binding Rules
@@ -143,21 +143,23 @@ Kubernetes بيعمل Matching بناءً على الـ Requirements والخص�
 
 ```mermaid
 flowchart TD
-    A["PV: 1Gi"] -->|"Bound"| B["PVC: 500Mi"]
-    C["PVC: Another Claim"] --> D["Cannot share the same PV"]
+    A(["PV: 1Gi"]) -->|"Bound"| B(["PVC: 500Mi"])
+    C(["PVC: Another Claim"]) --> D(["Cannot Share the Same PV"])
 
-    classDef pv fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef pvc fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef pv fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef pvc fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A pv
     class B,C,D pvc
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 ## 5. Creating a PVC
 
 هنعمل PVC اسمها `myclaim` تطلب `500Mi` وتستخدم `ReadWriteOnce`.
 
-### persistent-volume-claim.yaml
+### I. persistent-volume-claim.yaml
 
 ```yaml
 apiVersion: v1
@@ -173,13 +175,13 @@ spec:
       storage: 500Mi
 ```
 
-### Create the PVC
+### II. Create the PVC
 
 ```bash
 kubectl apply -f persistent-volume-claim.yaml
 ```
 
-### Inspect the PVC
+### III. Inspect the PVC
 
 ```bash
 kubectl get pvc
@@ -217,7 +219,7 @@ myclaim   Pending
 
 ## 7. Inspecting the Binding
 
-في مثال المحاضرة:
+ مثال:
 
 ```text
 PV:
@@ -250,7 +252,7 @@ kubectl get pvc myclaim
 
 بعد ما الـ PVC ترتبط بـ PV، تقدر تستخدمها داخل Pod عن طريق `persistentVolumeClaim`.
 
-### pod.yaml
+### I. pod.yaml
 
 ```yaml
 apiVersion: v1
@@ -279,18 +281,20 @@ spec:
 
 ```mermaid
 flowchart TD
-    A["Pod"] --> B["Volume"]
-    B --> C["PVC: myclaim"]
-    C --> D["PV: pv-vol1"]
-    D --> E[("Storage Backend")]
+    A(["Pod"]) --> B(["Volume"])
+    B --> C(["PVC: myclaim"])
+    C --> D(["PV: pv-vol1"])
+    D --> E(["Storage Backend"])
 
-    classDef pod fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef claim fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef backend fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef pod fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef claim fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef backend fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A,B pod
     class C,D claim
     class E backend
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 ## 9. What Happens When a PVC Is Deleted?

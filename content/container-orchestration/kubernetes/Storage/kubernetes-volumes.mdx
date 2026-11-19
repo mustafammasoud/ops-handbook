@@ -39,21 +39,23 @@ Volume هو Storage Resource بيتم إتاحته للـ Container داخل ا�
 
 ```mermaid
 flowchart TD
-    A["Pod Created"] --> B["Application Generates Data"]
-    B --> C["Writes to /opt/number.out"]
-    C --> D{"Where is /opt mounted?"}
-    D -->|"Without Volume"| E["Container Filesystem"]
-    D -->|"With Volume"| F["Mounted Volume"]
-    E --> G["Data may be lost"]
-    F --> H["Data survives Pod deletion if backend persists"]
+    A(["Pod Created"]) --> B(["Application Generates Data"])
+    B --> C(["Writes to /opt/number.out"])
+    C --> D{"Where is /opt Mounted?"}
+    D -->|"Without Volume"| E(["Container Filesystem"])
+    D -->|"With Volume"| F(["Mounted Volume"])
+    E --> G(["Data May Be Lost"])
+    F --> H(["Data Survives Pod Deletion if Backend Persists"])
 
-    classDef pod fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef bad fill:#e8c5bd,stroke:#9c6258,color:#42251f
-    classDef good fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef pod fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef bad fill:#e8c5bd,stroke:#9c6258,color:#42251f,stroke-width:2px
+    classDef good fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A,B,C,D pod
     class E,G bad
     class F,H good
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 <Callout type="note">
@@ -62,13 +64,12 @@ flowchart TD
 
 ## 3. Creating a Volume with hostPath
 
-في المحاضرة، استخدمنا `hostPath` كمثال بسيط.
 
 الـ `hostPath` بيستخدم Directory موجود على الـ Node نفسه.
 
 مثال: هنستخدم `/data` على الـ Host، ونعمل Mount له داخل الـ Container على `/opt`.
 
-### Pod Definition
+### I. Pod Definition
 
 ```yaml
 apiVersion: v1
@@ -94,7 +95,7 @@ spec:
         type: DirectoryOrCreate
 ```
 
-### Understanding the Configuration
+### II. Understanding the Configuration
 
 | Field | Purpose |
 |---|---|
@@ -105,21 +106,23 @@ spec:
 | `volumeMounts` | Defines where the Volume appears inside the Container |
 | `mountPath` | Container path where the Volume is mounted |
 
-### Data Flow
+### III. Data Flow
 
 ```mermaid
 flowchart LR
-    A["Application"] -->|"Writes /opt/number.out"| B["Container"]
-    B -->|"Mount"| C["data-volume"]
-    C -->|"hostPath"| D["Node: /data/number.out"]
+    A(["Application"]) -->|"Writes /opt/number.out"| B(["Container"])
+    B -->|"Mount"| C(["data-volume"])
+    C -->|"hostPath"| D(["Node: /data/number.out"])
 
-    classDef app fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef volume fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef host fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef app fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef volume fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef host fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A,B app
     class C volume
     class D host
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 بالتالي، الملف اللي التطبيق بيكتبه في `/opt/number.out` داخل الـ Container، بيظهر على الـ Node في:
@@ -152,21 +155,23 @@ Node 3: /data
 
 ```mermaid
 flowchart TD
-    A["Kubernetes Cluster"] --> B["Node 1"]
-    A --> C["Node 2"]
-    A --> D["Node 3"]
+    A(["Kubernetes Cluster"]) --> B(["Node 1"])
+    A --> C(["Node 2"])
+    A --> D(["Node 3"])
 
-    B --> E["/data - File A"]
-    C --> F["/data - Empty"]
-    D --> G["/data - Empty"]
+    B --> E(["/data - File A"])
+    C --> F(["/data - Empty"])
+    D --> G(["/data - Empty"])
 
-    classDef cluster fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef node fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef data fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef cluster fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef node fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef data fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A cluster
     class B,C,D node
     class E,F,G data
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 <Callout type="warning">
@@ -177,7 +182,7 @@ flowchart TD
 
 Kubernetes بيدعم أنواع مختلفة من Storage Backends.
 
-أمثلة من المحاضرة:
+أمثلة  :
 
 | Storage Type | Description |
 |---|---|
@@ -191,17 +196,7 @@ Kubernetes بيدعم أنواع مختلفة من Storage Backends.
 
 اختيار الـ Backend بيعتمد على البيئة والـ Requirements والـ CSI Driver المتاح.
 
-## 6. Example: Using AWS EBS
-
-في المحاضرة، المثال بيستخدم `awsElasticBlockStore` داخل تعريف الـ Volume.
-
-المفهوم الأساسي إننا بنحدد الـ Volume ID والـ Filesystem Type بدل الاعتماد على Directory محلي على الـ Node.
-
-**ملاحظة مهمة:** ده مثال من الـ In-tree Volume Plugins القديمة. الـ AWS EBS In-tree integration تم استبداله بـ CSI Driver في الإصدارات الحديثة، لذلك ما تستخدمش المثال ده كـ Configuration حديثة.
-
-في بيئة حديثة، عادةً هتتعامل مع EBS من خلال AWS EBS CSI Driver، ثم PV/PVC أو Dynamic Provisioning.
-
-## 7. Volume vs Container Filesystem
+## 6. Volume vs Container Filesystem
 
 | Container Filesystem | Volume |
 |---|---|

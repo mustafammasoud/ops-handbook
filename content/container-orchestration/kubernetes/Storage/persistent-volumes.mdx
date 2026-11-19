@@ -13,8 +13,6 @@ tags:
 language: ar
 ---
 
-# Persistent Volumes (PV)
-
 ## 1. The Problem with Pod-Level Volume Configuration
 
 في الدرس السابق، عرفنا إننا بنقدر نعرّف Volume مباشرة داخل Pod Definition.
@@ -45,27 +43,29 @@ Persistent Volume هو Kubernetes Object بيمثل Storage Resource متاح ع
 
 ```mermaid
 flowchart TD
-    A["Storage Administrator"] --> B["Creates Persistent Volumes"]
-    B --> C["Cluster Storage Pool"]
-    D["Application User"] --> E["Creates PVC"]
-    E --> F["Requests Storage"]
+    A(["Storage Administrator"]) --> B(["Creates Persistent Volumes"])
+    B --> C(["Cluster Storage Pool"])
+    D(["Application User"]) --> E(["Creates PVC"])
+    E --> F(["Requests Storage"])
     F --> C
-    C --> G["Bound Persistent Volume"]
+    C --> G(["Bound Persistent Volume"])
 
-    classDef admin fill:#e9dfce,stroke:#8b7355,color:#33291f
-    classDef storage fill:#d8c6a5,stroke:#8b7355,color:#33291f
-    classDef user fill:#c5d0c4,stroke:#667766,color:#263326
+    classDef admin fill:#e9dfce,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef storage fill:#d8c6a5,stroke:#8b7355,color:#33291f,stroke-width:2px
+    classDef user fill:#c5d0c4,stroke:#667766,color:#263326,stroke-width:2px
 
     class A,D admin
     class B,C,G storage
     class E,F user
+
+    linkStyle default stroke:#a58a64,stroke-width:2px
 ```
 
 ## 3. Creating a Persistent Volume
 
 هنبدأ بمثال بسيط لـ PV باستخدام `hostPath`.
 
-### persistent-volume.yaml
+### I. persistent-volume.yaml
 
 ```yaml
 apiVersion: v1
@@ -86,7 +86,7 @@ spec:
     type: DirectoryOrCreate
 ```
 
-### Understanding the Configuration
+### II. Understanding the Configuration
 
 | Field | Purpose |
 |---|---|
@@ -152,8 +152,7 @@ Access Modes مش معناها بالضرورة إن Kubernetes بيمنع كل 
 - الـ PVC اللي بيطلب استخدامه هو Namespaced Resource.
 
 ## 7. hostPath in Production
-
-المحاضرة استخدمت `hostPath` لتوضيح فكرة الـ PV، لكنه مش اختيار مناسب عادةً كحل Production Storage.
+ استخدمنا `hostPath` لتوضيح فكرة الـ PV، لكنه مش اختيار مناسب عادةً كحل Production Storage.
 
 السبب إن الـ Data مرتبطة بـ Node معينة.
 
